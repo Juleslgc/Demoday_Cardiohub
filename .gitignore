@@ -3,3 +3,6 @@
 
 # Ignore package-lock.json throughout the entire project
 **/package-lock.json
+
+# Ignore .expo
+**/.expo/
