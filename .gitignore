@@ -1,0 +1,5 @@
+# Ignore the node_modules folder for the entire project
+**/node_modules/
+
+# Ignore package-lock.json throughout the entire project
+**/package-lock.json
