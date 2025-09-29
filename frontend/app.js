@@ -1,8 +1,8 @@
 import { registerRootComponent } from 'expo';
 import React from "react";
-import PlaygroundScreen from "./src/screens/TestScreen";
+import SimulationPsc from './src/screens/SimulationPsc.js';
 
 export default function App() {
-  return <PlaygroundScreen />;
+  return <SimulationPsc />;
 }
 registerRootComponent(App);
