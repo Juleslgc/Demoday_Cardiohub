@@ -36,6 +36,11 @@ export default class ProService {
 		return { pro, token };
 	}
 
+	// Recover all Pro
+	async getAllPros() {
+		return proRepository.findAll();
+	}
+
 	// Recover a Pro by RPPS
 	async getProByRpps(rpps) {
 		if (!rpps) {
@@ -84,6 +89,10 @@ export default class ProService {
 		const pro = await proRepository.findById(id);
 		if (!pro) {
 			throw new Error('Pro not found');
+		}
+
+		if (data.rpps !== pro.rpps) {
+			throw new Error('The RPPS cannot be changed');
 		}
 
 		const updatedPro = await proRepository.update(id, data);

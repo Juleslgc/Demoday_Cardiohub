@@ -14,6 +14,16 @@ export default class ProController {
 		}
 	}
 
+  // Recover all Pro
+  static async getAllPros(req, res) {
+    try {
+      const pros = await proService.getAllPros();
+      res.status(200).json(pros);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
+
 	// Recover a Pro by RPPS
 	static async getProByRpps(req, res) {
 		const { rpps } = req.params;
