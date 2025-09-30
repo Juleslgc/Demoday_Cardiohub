@@ -13,6 +13,7 @@
  * - Returns JSON responses with appropriate HTTP status codes.
  */
 
+import { ValidationError } from "sequelize";
 import patientService from "../services/patientService.js";
 
 class PatientController {
@@ -22,6 +23,9 @@ class PatientController {
 			const result = await patientService.registerPatient(req.body); // Delegates to the service layer
 			res.status(201).json(result);	// Responds with "Created" status
 		} catch (err) {
+			if (err instanceof ValidationError) {
+				return res.status(400).json({ error: err.errors[0].message });
+			}
 			res.status(400).json({ error: err.message }); // Bad Request (invalid input, validation error, etc.)
 		}
 	}
