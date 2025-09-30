@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, View, Text, StyleSheet, Alert, Dimensions } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardAvoidingView, View, Text, StyleSheet, Alert, Dimensions, Platform } from "react-native";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { Picker } from "@react-native-picker/picker";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 import StyledPicker from "../components/Picker.js";
-import { ScrollView } from "react-native-gesture-handler";
 
 export default function SimulationPsc() {
 	const [lastName, setLastName] = useState("");
@@ -22,9 +22,9 @@ export default function SimulationPsc() {
 	}
 
 	return (
-		<SafeAreaView>
-			<KeyboardAvoidingView>
-				<View style={{ width: '90%', height: '100%', alignSelf: 'center', justifyContent: 'center' }}>
+		<SafeAreaView style={{ flex: 1 }}>
+			<KeyboardAvoidingView style={{ flex: 1 }}>
+				<View style={styles.container}>
 					<Text style={styles.h1}>Simulation</Text>
 					<Text style={styles.h2}>Pro Santé Connect</Text>
 					<Input
@@ -56,7 +56,7 @@ export default function SimulationPsc() {
 						required
 					/>
 					<StyledPicker
-								label="Rôle"
+								label="Rôle (sélectionner un rôle)"
 								selectedValue={role}
 						onValueChange={setRole}
 						options={[
@@ -74,7 +74,6 @@ export default function SimulationPsc() {
 						required
 					/>
 					<Button title="Se connecter" onPress={handleSubmit} variant="full" />
-
 					<Text style={styles.h3}>Simulation d'authentification Pro Santé Connect</Text>
 				</View>
 			</KeyboardAvoidingView>
@@ -105,6 +104,12 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		textAlign: "center",
 		marginTop: 30
+	},
+	container: { 
+		width: wp(90),
+		height: hp(90),
+		alignSelf: 'center',
+		justifyContent: 'center'
 	}
 
 });

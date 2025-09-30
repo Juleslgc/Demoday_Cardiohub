@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-export default function StyledPicker({ label, selectedValue, onValueChange, options, error, required }) {
+export default function StyledPicker({ label, selectedValue, onValueChange, options, error, required}) {
   return (
     <View style={styles.container}>
       {label && (
@@ -38,10 +38,13 @@ const styles = StyleSheet.create({
     borderColor: "#042456",
     borderRadius: 5,
     overflow: "hidden", // so that the Picker does not overflow
+    height: 50,
+    justifyContent: "center"
   },
   picker: {
     fontFamily: "Nunito",
     color: "#042456", // Picker text
+    fontSize: 12,
   },
 
   errorInput: { borderColor: "red" },
