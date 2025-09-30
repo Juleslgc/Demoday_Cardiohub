@@ -16,7 +16,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { initDB } from "./config/initDB.js";
-import signUpRoutes from "./routes/signUpRoutes.js";
+import patientRoutes from "./routes/patientRoutes.js";
 
 dotenv.config();
 const app = express(); // Initialize an Express application
@@ -25,7 +25,7 @@ const app = express(); // Initialize an Express application
 app.use(express.json());
 
 // Register routes under /api/auth
-app.use("/api/auth", signUpRoutes);
+app.use("/api/auth", patientRoutes);
 
 // Define server port (from environment or fallback to 3000)
 const PORT = process.env.PORT || 3000;
