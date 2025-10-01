@@ -5,9 +5,9 @@ const proService = new ProService();
 export default class ProController {
 
 	// Creates a new Pro or returns the existing Pro
-  static async createPro(req, res) {
+  static async createOrLoginPro(req, res) {
 		try {
-			const pro = await proService.createPro(req.body);
+			const pro = await proService.createOrLoginPro(req.body);
 			res.status(201).json(pro);
 		} catch (err) {
 			res.status(400).json({ message: err.message });

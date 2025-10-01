@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
 // Load the .env file: the variables become accessible via process.env
-dotenv.config({ path: '../.env' });
+dotenv.config();
 
 // Create a Sequelize instance that represents the connection to PostgreSQL
 export const sequelize = new Sequelize({

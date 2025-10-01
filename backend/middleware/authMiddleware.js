@@ -1,12 +1,15 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const SECRET_KEY = 'ton_secret_key';
+dotenv.config({ path: '../.env' });
+
+const SECRET_KEY = process.env.JWT_SECRET;
 
 export default function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({ message: 'Aucun jeton n\'a été fourni' });
   }
 
   const token = authHeader.split(' ')[1]; // "Bearer <token>"
@@ -16,6 +19,6 @@ export default function authenticate(req, res, next) {
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: 'Jeton invalide' });
   }
 }

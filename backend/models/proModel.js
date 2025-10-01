@@ -12,57 +12,57 @@ Pro.init(
 		lastName: { type: DataTypes.STRING(100), allowNull: false,
 			validate: {
 				notEmpty: {
-					msg: 'LastName cannot be empty'
+					msg: 'Le champ Nom est obligatoire.'
 				},
 				isString(value) {
 					if (typeof value !== 'string') {
-						throw new Error('LastName must be a string');
+						throw new Error('Le champ Nom doit être une chaîne de caractères.');
 					}},},},
 
 		firstName: { type: DataTypes.STRING(100), allowNull: false, 
 			validate: {
 				isString(value) {
 					if (typeof value !== 'string') {
-						throw new Error('FirstName must be a string');
+						throw new Error('Le champ Prénom doit être une chaîne de caractères.');
 					}},
 				notEmpty: {
-					msg: 'FirstName cannot be empty'
+					msg: 'Le champ Prénom est obligatoire.'
     		},},},
 
 		rpps: { type: DataTypes.STRING(11), allowNull: false, unique: true, validate: {
       is: /^\d{11}$/,
 			notEmpty: {
-				msg: 'RPPS cannot be empty'
+				msg: 'Le champ RPPS est obligatoire.'
     	},},},
 
 		institution: { type: DataTypes.STRING, allowNull: false, 
 			validate: {
 				isString(value) {
 					if (typeof value !== 'string') {
-						throw new Error('Institution must be a string');
+						throw new Error('Le champ Établissement doit être une chaîne de caractères.');
 					}},
 				notEmpty: {
-      		msg: 'Institution cannot be empty'
+      		msg: 'Le champ Établissement est obligatoire.'
     		},},},
 
 		role: { type: DataTypes.STRING, allowNull: false, 
 			validate: {
 				isString(value) {
 					if (typeof value !== 'string') {
-						throw new Error('Role must be a string');
+						throw new Error('Le champ Rôle doit être une chaîne de caractères.');
 					}},
 				notEmpty: {
-      		msg: 'Role cannot be empty'
+      		msg: 'Le champ Rôle est obligatoire.'
     		},},},
 
 		speciality: { type: DataTypes.STRING, allowNull: false, 
 			validate: {
 				isString(value) {
 					if (typeof value !== 'string') {
-						throw new Error('Speciality must be a string');
+						throw new Error('Le champ Spécialité doit être une chaîne de caractères.');
 					}},
 				notEmpty: {
-      		msg: 'Speciality cannot be empty'
+      		msg: 'Le champ Spécialité est obligatoire.'
     		},},
 		},
 	},

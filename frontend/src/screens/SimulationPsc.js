@@ -17,9 +17,37 @@ export default function SimulationPsc() {
 	
 	const { width, height } = Dimensions.get("window");
 
-	const handleSubmit = () => {
-		fetch()
-	}
+    const backendURL = 'http://10.5.3.240:3000';
+
+    // 
+	const handleSubmit = async () => {
+        console.log('handleSubmit déclenché');
+        const data = {
+            lastName,
+            firstName,
+            rpps,
+            institution,
+            role,
+            speciality
+        }
+		try {
+            const response = await fetch(`${backendURL}/api/auth/register/pro/`,{
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+            })
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP : ${response.status}`);
+            }
+            const result = await response.json();
+            console.log('Réponse backend :', result);
+            Alert.alert('Succès', 'Pro enregistré !');
+
+        } catch (error) {
+            console.error('Erreur fetch :', error);
+            Alert.alert('Erreur', 'Impossible de contacter le backend');
+        }
+    };
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
