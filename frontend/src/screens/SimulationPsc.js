@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, View, Text, StyleSheet, Alert, Dimensions, Platform } from "react-native";
+import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, Alert, Dimensions, Platform } from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -51,8 +51,8 @@ export default function SimulationPsc() {
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			<KeyboardAvoidingView style={{ flex: 1 }}>
-				<View style={styles.container}>
+			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+				<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 					<Text style={styles.h1}>Simulation</Text>
 					<Text style={styles.h2}>Pro Santé Connect</Text>
 					<Input
@@ -103,7 +103,7 @@ export default function SimulationPsc() {
 					/>
 					<Button title="Se connecter" onPress={handleSubmit} variant="full" />
 					<Text style={styles.h3}>Simulation d'authentification Pro Santé Connect</Text>
-				</View>
+				</ScrollView>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	)
@@ -135,9 +135,10 @@ const styles = StyleSheet.create({
 	},
 	container: { 
 		width: wp(90),
-		height: hp(90),
-		alignSelf: 'center',
-		justifyContent: 'center'
+        alignSelf: 'center',
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingBottom: 20 
 	}
 
 });
