@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, Alert, Dimensions, Platform, Image, ViewStyle, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, Alert, Dimensions, Platform, Image, ViewStyle, View, TouchableOpacity } from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { useNavigation } from '@react-navigation/native';
 import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from "../components/Input.js";
@@ -44,8 +45,14 @@ export default function LoginScreen() {
 						/>
 						<Button title="Se connecter" onPress={handleSubmit} variant="full" />
 						<Text style={styles.h3}>Mot de passe oublié ?</Text>
+						<SeparatorOr/>
+						
+						<Button title="Connexion via Pro Santé Connect" variant="outline" icon="shield-check" />
 						<Separator/>
-
+						<Text style={styles.h3}>Pas encore de compte ?</Text>
+						<TouchableOpacity onPress={() => navigation.navigate('SimulationPsc')}>
+        					<Text style={styles.h3}>Créer un compte</Text>
+      					</TouchableOpacity>
 					</ScrollView>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
@@ -93,10 +100,27 @@ export default function LoginScreen() {
 	});
 
 	const separatorStyle: ViewStyle = {
-		height: '0.1%',
+		height: 1,
 		width: '100%',
 		backgroundColor: '#042456',
 		marginTop: 30
 	};
 
 	const Separator = () => <View style={separatorStyle}/>;
+
+	const separatorOr: ViewStyle = {
+		height: 1,
+		flex: 1,
+		backgroundColor: '#042456'
+	};
+
+	function SeparatorOr() {
+		return(
+		<SafeAreaView>
+			<View style={{flexDirection: 'row', alignItems: 'center'}}>
+				<View style={separatorOr} />
+				<Text style={{color: '#042456', fontFamily: 'Nunito'}}> ou </Text>
+				<View style={separatorOr} />
+			</View>
+		</SafeAreaView>
+	)};

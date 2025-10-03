@@ -13,13 +13,24 @@ export default class ProService {
 
 	// Creates a new Pro or returns the existing Pro
 	async createOrLoginPro(data) {
-        console.log('Requête reçue', req.body);
 		if (!data) {
 			throw new Error('Données manquantes.');
 		}
 		if (!/^\d{11}$/.test(data.rpps)) {
     	throw new Error('Le numéro RPPS doit comporter exactement 11 chiffres.');
-  	}
+  		}
+		if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(data.firstName)) {
+  			throw new Error('Le prénom doit contenir uniquement des lettres.');
+		}
+		if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(data.lastName)) {
+  			throw new Error('Le nom doit contenir uniquement des lettres.');
+		}
+		if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(data.speciality)) {
+  			throw new Error('La spécialité doit contenir uniquement des lettres.');
+		}
+		if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(data.institution)) {
+  			throw new Error('L\'établissement doit contenir uniquement des lettres.');
+		}
 		
 		let pro = await proRepository.findByRpps(data.rpps);
 		// If not found, create a new pro

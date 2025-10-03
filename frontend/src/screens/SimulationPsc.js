@@ -17,7 +17,7 @@ export default function SimulationPsc() {
 	
 	const { width, height } = Dimensions.get("window");
 
-    const backendURL = 'http://10.5.3.240:3000';
+    const backendURL = 'https://defensive-vsnet-arrivals-link.trycloudflare.com';
 
     // 
 	const handleSubmit = async () => {
@@ -30,22 +30,25 @@ export default function SimulationPsc() {
             role,
             speciality
         }
+		console.log(data);
 		try {
             const response = await fetch(`${backendURL}/api/auth/register/pro/`,{
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data),
             })
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP : ${response.status}`);
-            }
             const result = await response.json();
-            console.log('Réponse backend :', result);
+			console.log(result.message);
+
+  			if (!response.ok) {
+    			Alert.alert('Erreur', `${result.message}`);
+				return;
+  			}
             Alert.alert('Succès', 'Pro enregistré !');
 
         } catch (error) {
             console.error('Erreur fetch :', error);
-            Alert.alert('Erreur', 'Impossible de contacter le backend');
+            Alert.alert('Erreur', 'Impossible de contacter le serveur.');
         }
     };
 
