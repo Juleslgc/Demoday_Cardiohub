@@ -1,3 +1,18 @@
+/**
+* Generic class: BaseRepository
+*
+* This repository serves as the **base class for all database interactions**.
+* It provides reusable CRUD (Create, Read, Update, Delete) methods for any Sequelize model.
+*
+* Goal:
+* - Centralize basic data operations (access, update, delete, etc.).
+* - Avoid code duplication between different specific repositories (UserRepository, ProRepository, etc.).
+*
+*
+* Advantage:
+* Each repository inherits ready-to-use generic methods,
+* while being able to add specific methods if needed.
+*/
 export default class BaseRepository {
   constructor(model) {
 		// We inject a "model" (e.g. User, Pro...) from Sequelize

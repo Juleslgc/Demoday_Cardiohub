@@ -1,3 +1,17 @@
+/**
+* Specific repository: ProRepository
+*
+* This repository manages interactions with healthcare professional (Pro) data
+* and their patients.
+*
+* Inherits from BaseRepository to benefit from generic CRUD methods:
+* - create, findById, findAll, findOne, update, delete
+*
+* Specific methods:
+* - findByRpps(rpps) → searches for a pro by their unique RPPS number.
+* - findPatients(proId) → retrieves all patients associated with a pro.
+* - findPatient(proId, patientId) → retrieves a specific patient linked to a pro.
+*/
 import BaseRepository from './baseRepository.js';
 import Pro from '../models/proModel.js';
 import Patient from '../models/patientModel.js';

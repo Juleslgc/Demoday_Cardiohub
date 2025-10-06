@@ -1,7 +1,23 @@
+/**
+* Routes for Healthcare Professionals (Pro)
+*
+* This file defines the Express endpoints for managing professionals and their patients.
+* It uses the `ProController` to execute business logic
+* and the `authenticate` middleware to secure protected routes.
+* Available routes:
+* - POST /register/pro/ -> Create or retrieve a pro
+* - GET /pro/ -> Retrieve all pros
+* - GET /pro/:rpps -> Retrieve a pro by RPPS
+* - PUT /pro/:id -> Update a pro by id
+* - DELETE /pro/:id -> Delete a pro by id
+* - GET /pro/:proId/patients -> Retrieve all patients of a pro
+* - GET /pro/:proId/patients/:patientId -> Retrieve a specific patient of a pro
+*/
 import express from 'express';
 import ProController from '../controllers/proController.js';
 import authenticate from '../middleware/authMiddleware.js';
 
+// Creating an Express router
 const router = express.Router();
 
 // Create or retrieve a pro

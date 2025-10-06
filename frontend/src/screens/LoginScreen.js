@@ -7,17 +7,36 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
 
   const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
 	const { width, height } = Dimensions.get("window");
+	const backendURL = 'https://url-passing-architectural-those.trycloudflare.com';
 
-	const backendURL = 'http://10.5.3.240:3000';
+	const handleSubmitLogin = async () => {
+		const data = { email, password }
+		console.log(data);
+		try {
+			const response = await fetch(`${backendURL}/api/users/login`,{
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(data),
+			})
+			const result = await response.json();
+			console.log(result.message);
+						
+			if (!response.ok) {
+				Alert.alert(result.message);
+				return;
+			}
+			navigation.replace('HomePatient');
 
-	const handleSubmit = async () => {
-
+		} catch (error) {
+			console.error('Erreur fetch :', error.message);
+			Alert.alert('Erreur', 'Impossible de contacter le serveur.');
+		}
 	};
 
 	return (
@@ -43,14 +62,14 @@ export default function LoginScreen() {
 							placeholder="••••••••••••••"
 							required
 						/>
-						<Button title="Se connecter" onPress={handleSubmit} variant="full" />
+						<Button title="Se connecter" onPress={handleSubmitLogin} variant="full" />
 						<Text style={styles.h3}>Mot de passe oublié ?</Text>
 						<SeparatorOr/>
 						
-						<Button title="Connexion via Pro Santé Connect" variant="outline" icon="shield-check" />
+						<Button title="Connexion via Pro Santé Connect" onPress={() => navigation.replace('SimulationPsc')}variant="outline" icon="shield-check" />
 						<Separator/>
 						<Text style={styles.h3}>Pas encore de compte ?</Text>
-						<TouchableOpacity onPress={() => navigation.navigate('SimulationPsc')}>
+						<TouchableOpacity onPress={() => navigation.replace('Register')}>
         					<Text style={styles.h3}>Créer un compte</Text>
       					</TouchableOpacity>
 					</ScrollView>

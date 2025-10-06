@@ -4,14 +4,14 @@ import { View, StyleSheet, Alert } from "react-native";
 import Input from "../components/Input";
 import Button from "../components/Button";
 
-export default function PlaygroundScreen() {
+export default function HomePro() {
   // états pour stocker ce que l'utilisateur tape
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   // fonction déclenchée quand on appuie sur le bouton
   const handleSubmit = () => {
-    Alert.alert("Infos saisies", `Username: ${username}\nPassword: ${password}`);
+    
   };
 
   return (

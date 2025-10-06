@@ -1,3 +1,19 @@
+/**
+* Business Service: ProService
+*
+* This service contains the business logic for managing healthcare professionals (Pros)
+* and their patients. It uses ProRepository to interact with the database.
+*
+* Main roles:
+* - Creating or logging in to a Pro
+* - Retrieving all Pros or a specific Pro
+* - Managing patients associated with a Pro
+* - Updating and deleting Pros
+* - Validating business data
+*
+* The service focuses on business logic, validation, and JWT generation,
+* while the repository only manages CRUD access to the database.
+*/
 import ProRepository from '../repositories/proRepository.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -13,12 +29,15 @@ export default class ProService {
 
 	// Creates a new Pro or returns the existing Pro
 	async createOrLoginPro(data) {
+		// Verification of received data
 		if (!data) {
-			throw new Error('Données manquantes.');
+			throw new Error('Aucune information fournie dans le formulaire.');
 		}
+		// RPPS validation: exactly 11 digits
 		if (!/^\d{11}$/.test(data.rpps)) {
     	throw new Error('Le numéro RPPS doit comporter exactement 11 chiffres.');
   		}
+		// Validation of text fields: only letters and special characters allowed
 		if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(data.firstName)) {
   			throw new Error('Le prénom doit contenir uniquement des lettres.');
 		}
@@ -32,6 +51,7 @@ export default class ProService {
   			throw new Error('L\'établissement doit contenir uniquement des lettres.');
 		}
 		
+		// Search for an existing pro by RPPS
 		let pro = await proRepository.findByRpps(data.rpps);
 		// If not found, create a new pro
 		if (!pro) {
@@ -68,12 +88,12 @@ export default class ProService {
 	// Retrieves all patients associated with a Pro
 	async getAllPatients(proId) {
 		if (!proId) {
-			throw new Error('Numéro d\'identifiant pro manquant.');
+			throw new Error('Numéro d\'identifiant professionnel manquant.');
 		}
 		
 		const pro = await proRepository.findById(proId);
 		if (!pro) {
-			throw new Error('Pro introuvable.');
+			throw new Error('Professionnel introuvable.');
 		}
 		return proRepository.findPatients(proId);
 	}
@@ -100,7 +120,7 @@ export default class ProService {
 		
 		const pro = await proRepository.findById(id);
 		if (!pro) {
-			throw new Error('Pro introuvable.');
+			throw new Error('Professionnel introuvable.');
 		}
 
 		if (data.rpps !== pro.rpps) {
@@ -119,7 +139,7 @@ export default class ProService {
 	async deletePro(id) {
 		const pro = await proRepository.findById(id);
 		if (!pro) {
-			throw new Error('Pro introuvable.');
+			throw new Error('Professionnel introuvable.');
 		}
 
 		const deletedPro = await proRepository.delete(id);

@@ -2,6 +2,23 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
+/**
+* Reusable "StyledPicker" component
+*
+* Props:
+* - label: Text displayed above the picker
+* - selectedValue: Currently selected value
+* - onValueChange: Function called each time the value changes
+* - options: Array of options (label, value) to display in the Picker
+* - error: Error message displayed if the selection is invalid
+* - required: Indicates whether the field is required (displays an *)
+*
+* How it works:
+* - Displays a label with an * if the field is required
+* - Changes the border color if an error occurs
+* - Displays an error message below the Picker
+* - Displays the options passed in the `options` prop
+*/
 export default function StyledPicker({ label, selectedValue, onValueChange, options, error, required}) {
   return (
     <View style={styles.container}>
@@ -13,9 +30,9 @@ export default function StyledPicker({ label, selectedValue, onValueChange, opti
 
       <View style={[styles.pickerContainer, error && styles.errorInput]}>
         <Picker
-          selectedValue={selectedValue}
-          onValueChange={onValueChange}
-          style={styles.picker}
+          selectedValue={selectedValue} // currently selected value
+          onValueChange={onValueChange} // function called on change
+          style={styles.picker} // Picker text style
         >
           {options.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
@@ -28,6 +45,7 @@ export default function StyledPicker({ label, selectedValue, onValueChange, opti
   );
 }
 
+// Styles of the StyledPicker component
 const styles = StyleSheet.create({
   container: { marginBottom: 15 },
   label: { marginBottom: 5, fontWeight: "bold", color: "#042456", fontFamily: "Nunito" },

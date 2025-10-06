@@ -1,12 +1,20 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-// Reusable "Button" component
-// Properties:
-// - title: text of the button
-// - onPress: function called when clicked
-// - variant: 'full' (filled, default) or 'outline' (outline only)
-// - disabled: disables the button
+/**
+* Reusable "Button" component
+*
+* Props:
+* - title: Text displayed in the button
+* - onPress: Function called when clicked
+* - variant: Button type ('full' = filled by default, 'outline' = outline only)
+* - disabled: Disables the button
+* - icon: Name of the MaterialCommunityIcons icon to display before the text
+*
+* How it works:
+* - Dynamic styles based on the button type and state
+* - Optionally displays an icon before the text
+*/
 export default function Button({title, onPress, variant = 'full', disabled, icon}) {
     return (
       <TouchableOpacity
@@ -24,8 +32,10 @@ export default function Button({title, onPress, variant = 'full', disabled, icon
         >
           {icon && (
         <MaterialCommunityIcons
+					// Display the icon if it is defined
           name={icon}
           size={20}
+					// Color according to the button type
           color={variant === 'outline' ? '#042456' : '#fff'}
           style={{ marginRight: 8 }}
         />
@@ -44,6 +54,7 @@ export default function Button({title, onPress, variant = 'full', disabled, icon
         </TouchableOpacity>
     );
 }
+
 // Button and text styles
 const styles = StyleSheet.create({
   button: {

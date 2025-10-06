@@ -7,7 +7,7 @@ import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 import StyledPicker from "../components/Picker.js";
 
-export default function SimulationPsc() {
+export default function SimulationPsc({ navigation }) {
 	const [lastName, setLastName] = useState("");
 	const [firstName, setFirstName] = useState("");
 	const [rpps, setRpps] = useState("");
@@ -16,12 +16,11 @@ export default function SimulationPsc() {
 	const [speciality, setSpeciality] = useState("");
 	
 	const { width, height } = Dimensions.get("window");
-
-    const backendURL = 'https://defensive-vsnet-arrivals-link.trycloudflare.com';
+    const backendURL = 'https://url-passing-architectural-those.trycloudflare.com';
 
     // 
 	const handleSubmit = async () => {
-        console.log('handleSubmit déclenché');
+        
         const data = {
             lastName,
             firstName,
@@ -44,7 +43,7 @@ export default function SimulationPsc() {
     			Alert.alert('Erreur', `${result.message}`);
 				return;
   			}
-            Alert.alert('Succès', 'Pro enregistré !');
+            navigation.replace('HomePro');
 
         } catch (error) {
             console.error('Erreur fetch :', error);

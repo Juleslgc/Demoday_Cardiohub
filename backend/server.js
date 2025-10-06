@@ -1,17 +1,21 @@
 import './config/initDB.js';
 import express from 'express';
 import proRoutes from './routes/proRoute.js';
+import userRoute from './routes/userRoute.js';
 import cors from 'cors';
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
+
 // Middleware to parse JSON
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', proRoutes);
+
+app.use('/api/users', userRoute);
 
 
 // 404 for routes not found
