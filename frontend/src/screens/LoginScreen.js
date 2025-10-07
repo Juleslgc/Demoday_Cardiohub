@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, Alert, Dimensions, Platform, Image, ViewStyle, View, TouchableOpacity } from "react-native";
+import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, Alert, Dimensions, Platform, Image, View, TouchableOpacity } from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from "@react-native-picker/picker";
@@ -118,7 +118,7 @@ export default function LoginScreen({ navigation }) {
 	
 	});
 
-	const separatorStyle: ViewStyle = {
+	const separatorStyle = {
 		height: 1,
 		width: '100%',
 		backgroundColor: '#042456',
@@ -127,7 +127,7 @@ export default function LoginScreen({ navigation }) {
 
 	const Separator = () => <View style={separatorStyle}/>;
 
-	const separatorOr: ViewStyle = {
+	const separatorOr = {
 		height: 1,
 		flex: 1,
 		backgroundColor: '#042456'
