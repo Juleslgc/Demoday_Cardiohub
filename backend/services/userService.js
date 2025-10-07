@@ -50,7 +50,7 @@ export default class UserService {
     }
 		// Search for the user in the database
     const user = await userRepository.findByEmail(email);
-
+    console.log(user);
     if (!user) {
       throw new Error('Utilisateur non trouvé');
     }

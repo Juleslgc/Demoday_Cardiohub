@@ -33,8 +33,8 @@ User.init(
 	},
 	{
 		sequelize, // Connect to the database
-		modelName: 'User', // Internal model name for Sequelize
-		tableName: 'users', // Actual name of the table in the database
+		modelName: 'Patient', // Internal model name for Sequelize
+		tableName: 'patients', // Actual name of the table in the database
 		timestamps: true, // Automatically create createdAt and updatedAt fields
 	}
 );

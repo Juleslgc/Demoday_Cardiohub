@@ -6,21 +6,38 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 import StyledPicker from "../components/Picker.js";
+import { registerPro } from "../services/api.js";
 
+/**
+* Login simulation screen via "Pro Santé Connect"
+* --------------------------------------------------------
+* This screen allows a healthcare professional to:
+* - Enter their information (last name, first name, RPPS, etc.)
+* - Simulate a login (authentication) using a button
+*
+* Main features:
+* - Validation of mandatory fields (visual via Input)
+* - Send data to a backend API (`registerPro`)
+* - Automatic navigation to the Pro homepage after success
+*/
 export default function SimulationPsc({ navigation }) {
+  // Local states to manage form fields
 	const [lastName, setLastName] = useState("");
 	const [firstName, setFirstName] = useState("");
 	const [rpps, setRpps] = useState("");
 	const [institution, setInstitution] = useState("");
 	const [role, setRole] = useState("Médecins");
 	const [speciality, setSpeciality] = useState("");
-	
-	const { width, height } = Dimensions.get("window");
-    const backendURL = 'https://url-passing-architectural-those.trycloudflare.com';
 
-    // 
+  /**
+* Function called when the form is submitted
+* ----------------------------------------------------
+* - Constructs the `data` object from the fields
+* - Sends the request via the `registerPro` function
+* - If successful → redirects to the "HomeProScreen" page
+* - If error → displays an alert
+*/
 	const handleSubmit = async () => {
-        
         const data = {
             lastName,
             firstName,
@@ -29,27 +46,18 @@ export default function SimulationPsc({ navigation }) {
             role,
             speciality
         }
-		console.log(data);
 		try {
-            const response = await fetch(`${backendURL}/api/auth/register/pro/`,{
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data),
-            })
-            const result = await response.json();
-			console.log(result.message);
+      // Call the registration/connection service
+			const response = await registerPro(data);
+			console.log(response.message);
 
-  			if (!response.ok) {
-    			Alert.alert('Erreur', `${result.message}`);
-				return;
-  			}
-            navigation.replace('HomePro');
-
-        } catch (error) {
-            console.error('Erreur fetch :', error);
-            Alert.alert('Erreur', 'Impossible de contacter le serveur.');
-        }
-    };
+      // Redirect to the main pros page
+      navigation.replace('HomeProScreen');
+    } catch (error) {
+      // Displays a user error message
+      Alert.alert('Erreur', error.message);
+    }
+  };
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
@@ -111,6 +119,7 @@ export default function SimulationPsc({ navigation }) {
 	)
 }
 
+// Component styles
 const styles = StyleSheet.create({
 	h1: {
 		fontWeight: 'normal', 
@@ -137,10 +146,10 @@ const styles = StyleSheet.create({
 	},
 	container: { 
 		width: wp(90),
-        alignSelf: 'center',
-        flexGrow: 1,
-        justifyContent: 'center',
-        paddingBottom: 20 
+    alignSelf: 'center',
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: 20 
 	}
 
 });

@@ -13,7 +13,7 @@
  */
 
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import { sequelize } from "../config/db.js";
 import BaseModel, { baseModel } from "./baseModel.js";
 
 class Patient extends BaseModel {

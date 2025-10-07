@@ -16,8 +16,6 @@
 * 2. login() -> Authenticates a user and generates a JWT token.
 */
 import UserService from '../services/userService.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 
 // Create an instance of the user service
 const userService = new UserService;
@@ -47,36 +45,18 @@ export default class UserController {
 			// We retrieve the identifiers from the body of the request
 			const { email, password } = req.body;
 
-			// Checks if a user exists with this email
-			const user = await userService.getByEmail(email);
-			if (!user) {
-				return res.status(404).json({message: 'Utilisateur non trouvé'});
-			}
-
-			// Compare the received password with the hash stored in the database
-			const isMatch = await bcrypt.compare(password, user.password);
-			if (!isMatch) {
-			// If the password is incorrect -> code 401 (Unauthorized)
-				return res.status(401).json({ message: 'Mot de passe invalide'});
-			}
-
-			// Creation of the JWT token for the authenticated user
-			// This token will allow access to protected roads for 3 hours.
-			const token = jwt.sign(
-				{ id: user.id, email: user.email }, // Data embedded in the token
-				SECRET_KEY, // Secret signing key (which is defined in .env)
-				{ expiresIn: '3h' } // Token validity period
-			);
+			// The service handles validation + bcrypt + token generation
+			const { user, token } = await userService.login(email, password);
 
       // Remove the password before returning the user
 			const { password: _, ...userWithoutPassword } = user;
 
-				// Returns a complete response: message, user and token
-        return res.status(200).json({
-        message: 'Connexion réussie',
-        user: userWithoutPassword,
-        token,
-      });
+			// Returns a complete response: message, user and token
+			return res.status(200).json({
+			message: 'Connexion réussie',
+			user: userWithoutPassword,
+			token,
+		});
 		} catch (err) {
 			// In case of error (non-existent email, token problem, etc.)
 			return res.status(400).json({ message: err.message });

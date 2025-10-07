@@ -10,16 +10,21 @@
 */
 import BaseRepository from './baseRepository.js';
 import User from '../models/userModel.js';
+import { fn, col } from "sequelize";
+import { sequelize } from "../config/db.js";
 
 export default class UserRepository extends BaseRepository {
   constructor() {
 		super(User);
 	}
 
-	// We define an asynchronous method "findByEmail"
-	// which allows us to find a user in the database
-	// based on their email address.
-	async findByEmail(email) {
-		return await this.findOne({ where: { email } });
-	}
+	// Search for a user by email, case and space insensitive
+  async findByEmail(email) {
+    return await this.model.findOne({
+      where: sequelize.where(
+        fn('LOWER', col('email')),    // converts the column to lowercase
+        email.toLowerCase().trim()    // converts the input to lowercase and removes spaces
+      )
+    });
+  }
 }

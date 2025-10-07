@@ -14,7 +14,7 @@
 import { Alert } from "react-native";
 
 // Base API endpoint
-const API_URL = "https://cattle-deputy-donate-statutory.trycloudflare.com/api";
+const API_URL = "https://cash-barriers-blacks-originally.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null) {
@@ -32,7 +32,7 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 
     // Handle HTTP errors and custom backend messages
     if (!response.ok) {
-      throw new Error(data.error || "Erreur serveur");
+      throw new Error(data.message || "Erreur serveur");
     }
 
     // Display success message if present
@@ -41,6 +41,7 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 
   } catch (error) {
     console.error("Erreur API:", error.message);
+		Alert.alert(error.message);
     throw error;
   }
 };
@@ -48,4 +49,14 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 // Register a new patient account
 export async function registerPatient(patientData) {
   return apiRequest("/auth/register/patient", "POST", patientData);
+};
+
+// Register or connection a professionnal
+export async function registerPro(proData) {
+	return apiRequest("/auth/register/pro", "POST", proData);
+};
+
+// Patient login
+export async function login(loginData) {
+	return apiRequest("/auth/login", "POST", loginData);
 };

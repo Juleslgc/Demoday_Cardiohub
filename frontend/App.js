@@ -22,6 +22,7 @@ import LoginScreen from "./src/screens/LoginScreen.js";
 import ConditionsScreen from "./src/screens/ConditionsScreen.js";
 import ConfidentialiteScreen from "./src/screens/ConfidentialiteScreen.js";
 import SimulationPsc from './src/screens/SimulationPsc.js';
+import HomeProScreen from './src/screens/HomeProScreen.js';
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -37,6 +38,7 @@ export default function App() {
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="ConditionsScreen" component={ConditionsScreen} />
         <Stack.Screen name="ConfidentialiteScreen" component={ConfidentialiteScreen} />
+        <Stack.Screen name="HomeProScreen" component={HomeProScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

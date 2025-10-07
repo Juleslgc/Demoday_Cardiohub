@@ -187,7 +187,7 @@ export default function PatientRegisterScreen({ navigation }) {
         <Input
           label="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => setEmail(text.toLowerCase())}
           placeholder="exemple@mail.com"
           required
         />
