@@ -16,7 +16,7 @@
  */
 
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native"; // View = div, StyleSheet équivalent à CSS
+import { View, Text, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import Checkbox from "expo-checkbox";
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,7 +26,6 @@ import { registerPatient } from "../services/api.js"; // Backend API call handle
 
 export default function PatientRegisterScreen({ navigation }) {
   // Local states to store form values
-  const [typeAccount, setTypeAccount] = useState("patient"); // Default account type
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -117,8 +116,6 @@ export default function PatientRegisterScreen({ navigation }) {
         address,
         phone,
       });
-
-      console.log("Votre compte a été créé avec succès !", response);
     
       // Redirect to login screen after success
       navigation.navigate("LoginScreen"); 

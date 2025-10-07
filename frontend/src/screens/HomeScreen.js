@@ -48,7 +48,7 @@ export default function HomeScreen({ navigation }) {
 
         <Button
           title="Créer un compte Professionnel"
-          onPress={() => navigation.navigate("ProRegisterScreen")}
+          onPress={() => navigation.navigate("SimulationPsc")}
           variant="full"
         />
 
