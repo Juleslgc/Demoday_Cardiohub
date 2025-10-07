@@ -15,11 +15,19 @@
 
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { initDB } from "./config/initDB.js";
 import patientRoutes from "./routes/patientRoutes.js";
 
 dotenv.config();
 const app = express(); // Initialize an Express application
+
+// Allow calls from the front
+app.use(cors({
+	origin: "*",
+	methods: ["GET", "POST", "PUT", "DELETE"],
+	allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 // Middleware to parse JSON in incoming requests
 app.use(express.json());
@@ -32,7 +40,7 @@ const PORT = process.env.PORT || 3000;
 
 // Initialize database connection before launching the server
 initDB().then(() => {
-	app.listen(PORT, () => {
-		console.log(`Server launched on port ${PORT}`);
+	app.listen(PORT, "0.0.0.0", () => {
+		console.log(`Server launched and accessible at http://0.0.0.0:${PORT}`);
 	});
 });
