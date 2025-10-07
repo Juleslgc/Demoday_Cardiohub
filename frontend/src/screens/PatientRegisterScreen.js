@@ -266,12 +266,12 @@ export default function PatientRegisterScreen({ navigation }) {
 
         {/* Link to login screen */}
         <View style={styles.footerText}>
-          <Text style={{ color: "#042456" }}>Déjà inscrit ?</Text>
+          <Text style={{ color: "#042456" }}>Déjà inscrit ? </Text>
           <Text
             style={styles.link}
             onPress={() => navigation.navigate("LoginScreen")}
             >
-            Se connecter
+             Se connecter
             </Text>
         </View>
         </ScrollView>
