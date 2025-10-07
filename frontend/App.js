@@ -18,7 +18,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // Import all screens
 import HomeScreen from "./src/screens/HomeScreen.js";
 import PatientRegisterScreen from "./src/screens/PatientRegisterScreen.js";
-import ProRegisterScreen from "./src/screens/ProRegisterScreen.js";
 import LoginScreen from "./src/screens/LoginScreen.js";
 import ConditionsScreen from "./src/screens/ConditionsScreen.js";
 import ConfidentialiteScreen from "./src/screens/ConfidentialiteScreen.js";
@@ -34,7 +33,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="PatientRegisterScreen" component={PatientRegisterScreen} />
-        <Stack.Screen name="ProRegisterScreen" component={ProRegisterScreen} />
+        <Stack.Screen name="SimulationPsc" component={SimulationPsc} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="ConditionsScreen" component={ConditionsScreen} />
         <Stack.Screen name="ConfidentialiteScreen" component={ConfidentialiteScreen} />
