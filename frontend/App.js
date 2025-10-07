@@ -22,6 +22,7 @@ import ProRegisterScreen from "./src/screens/ProRegisterScreen.js";
 import LoginScreen from "./src/screens/LoginScreen.js";
 import ConditionsScreen from "./src/screens/ConditionsScreen.js";
 import ConfidentialiteScreen from "./src/screens/ConfidentialiteScreen.js";
+import SimulationPsc from './src/screens/SimulationPsc.js';
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
