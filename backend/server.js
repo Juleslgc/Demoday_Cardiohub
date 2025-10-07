@@ -15,7 +15,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', proRoutes);
 
-app.use('/api/users', userRoute);
+app.use('/api/auth', userRoute);
 
 
 // 404 for routes not found
