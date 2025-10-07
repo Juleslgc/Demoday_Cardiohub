@@ -1,4 +1,5 @@
 /**
+<<<<<<< HEAD
 * This file configures and initializes the connection to the PostgreSQL database
 * using Sequelize, an ORM (Object-Relational Mapping) for Node.js.
 *

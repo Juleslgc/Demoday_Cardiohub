@@ -15,6 +15,7 @@
 import { sequelize } from './db.js';
 import User from '../models/userModel.js';
 import Pro from '../models/proModel.js';
+import Patient from "../models/patientModel.js";
 
 // Asynchronous database initialization function
 async function initDB() {

@@ -3,6 +3,7 @@ import express from 'express';
 import proRoutes from './routes/proRoute.js';
 import userRoute from './routes/userRoute.js';
 import cors from 'cors';
+import patientRoutes from "./routes/patientRoutes.js";
 
 const app = express();
 const PORT = 3000;
@@ -14,7 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', proRoutes);
-
+app.use("/api/auth", patientRoutes);
 app.use('/api/auth', userRoute);
 
 
@@ -31,5 +32,4 @@ app.use((err, req, res, next) => {
 
 // Server start
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
-});
+  console.log(`Server running on http://0.0.0.0:${PORT}`);})
