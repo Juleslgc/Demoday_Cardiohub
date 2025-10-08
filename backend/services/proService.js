@@ -65,7 +65,7 @@ export default class ProService {
 			{ expiresIn: '3h' }
     );
 		
-		return { pro, token };
+		return { pro, token, message: "Connexion réussie" };
 	}
 
 	// Recover all Pro

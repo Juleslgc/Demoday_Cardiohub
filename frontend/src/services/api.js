@@ -14,7 +14,7 @@
 import { Alert } from "react-native";
 
 // Base API endpoint
-const API_URL = "https://cash-barriers-blacks-originally.trycloudflare.com/api";
+const API_URL = "https://coffee-highest-elements-reliability.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null) {
