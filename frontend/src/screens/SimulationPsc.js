@@ -28,6 +28,7 @@ export default function SimulationPsc({ navigation }) {
 	const [institution, setInstitution] = useState("");
 	const [role, setRole] = useState("Médecins");
 	const [speciality, setSpeciality] = useState("");
+  const [error, setError] = useState("");
 
   /**
 * Function called when the form is submitted
@@ -55,7 +56,7 @@ export default function SimulationPsc({ navigation }) {
       navigation.replace('HomeProScreen');
     } catch (error) {
       // Displays a user error message
-      Alert.alert('Erreur', error.message);
+      setError(error.message);
     }
   };
 
@@ -65,6 +66,7 @@ export default function SimulationPsc({ navigation }) {
 				<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 					<Text style={styles.h1}>Simulation</Text>
 					<Text style={styles.h2}>Pro Santé Connect</Text>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 					<Input
 						label="Nom"
 						value={lastName}
@@ -150,6 +152,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingBottom: 20 
-	}
+	},
+  error: {
+    color: "red",
+    marginBottom: 10,
+    textAlign: "center",
+  }
 
 });

@@ -17,6 +17,7 @@
 import ProRepository from '../repositories/proRepository.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { Patient } from '../models/relationModel.js';
 
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET;
@@ -30,9 +31,12 @@ export default class ProService {
 	// Creates a new Pro or returns the existing Pro
 	async createOrLoginPro(data) {
 		// Verification of received data
-		if (!data) {
-			throw new Error('Aucune information fournie dans le formulaire.');
-		}
+		const hasUsefulData = data && Object.entries(data).some(
+    ([key, value]) => key !== 'role' && value != null && value !== '');
+
+  if (!hasUsefulData) {
+    throw new Error('Aucune information fournie dans le formulaire.');
+  }
 		// RPPS validation: exactly 11 digits
 		if (!/^\d{11}$/.test(data.rpps)) {
     	throw new Error('Le numéro RPPS doit comporter exactement 11 chiffres.');
@@ -84,6 +88,28 @@ export default class ProService {
 
 		return proRepository.findByRpps(rpps);
 	}
+
+  // Ajout de patients
+  async addPatient(proId, patientId) {
+    if (!proId || !patientId) {
+      throw new Error("ID manquant");
+    }
+    const patient = await Patient.findByPk(patientId);
+    if (!patient) {
+      throw new Error("Patient introuvable");
+    }
+    const existingPatients = await proRepository.findPatients(proId);
+    const alreadyLinked = existingPatients.find(p => p.id === Number(patientId));
+
+    if (alreadyLinked) {
+      throw new Error("Ce patient est déjà associé à ce pro");
+    }
+    const addedPatient = await proRepository.addPatient(proId, patientId);
+    if (!addedPatient) {
+      throw new Error("Erreur lors de l'ajout du patient");
+    }
+    return addedPatient;
+  }
 
 	// Retrieves all patients associated with a Pro
 	async getAllPatients(proId) {

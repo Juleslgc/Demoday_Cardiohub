@@ -14,7 +14,7 @@
 import { Alert } from "react-native";
 
 // Base API endpoint
-const API_URL = "https://cash-barriers-blacks-originally.trycloudflare.com/api";
+const API_URL = "https://rio-historic-dui-secret.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null) {
@@ -32,7 +32,8 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 
     // Handle HTTP errors and custom backend messages
     if (!response.ok) {
-      throw new Error(data.message || "Erreur serveur");
+      console.log(data);
+      throw new Error(data.message);
     }
 
     // Display success message if present
@@ -41,7 +42,6 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 
   } catch (error) {
     console.error("Erreur API:", error.message);
-		Alert.alert(error.message);
     throw error;
   }
 };

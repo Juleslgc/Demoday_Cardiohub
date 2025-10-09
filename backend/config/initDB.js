@@ -13,7 +13,7 @@
 * 4. Automatic execution: The initialization function is called directly at the end of the script.
 */
 import { sequelize } from './db.js';
-import User from '../models/userModel.js';
+import '../models/relationModel.js';
 import Pro from '../models/proModel.js';
 import Patient from "../models/patientModel.js";
 
