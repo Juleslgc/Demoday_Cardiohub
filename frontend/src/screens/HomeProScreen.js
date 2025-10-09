@@ -1,8 +1,10 @@
 // frontend/src/screens/PlaygroundScreen.js
 import React, { useState } from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert, Text, KeyboardAvoidingView, Image,  } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from "../components/Input";
 import Button from "../components/Button";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function HomePro() {
   // états pour stocker ce que l'utilisateur tape
@@ -15,38 +17,44 @@ export default function HomePro() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Champ utilisateur */}
-      <Input
-        label="Nom d'utilisateur"
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Entrez votre nom"
-      />
-
-      {/* Champ mot de passe */}
-      <Input
-        label="Mot de passe"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholder="••••••••"
-      />
-
-      {/* Bouton plein */}
-      <Button title="Se connecter" onPress={handleSubmit} variant="full" />
-
-      {/* Bouton contour */}
-      <Button title="Annuler" onPress={() => Alert.alert("Annulé")} variant="outline"/>
-    </View>
+    <SafeAreaView style={{backgroundColor: '#042456', flex: 1 }}>
+      <KeyboardAvoidingView>
+        <View style={styles.container}>
+          <View style={styles.square}>
+            <FontAwesome name="video-camera" size={24} color="#042456" />
+            <Text style={{backgroundColor: '#0000' }}>Test</Text>
+          </View >
+          <View style={styles.square}>
+            <Text style={{backgroundColor: '#0000' }}>Test</Text>
+          </View>
+          <View style={styles.square}>
+            <Text style={{backgroundColor: '#0000' }}>Test</Text>
+          </View>
+          <View style={styles.square}>
+            <Text style={{backgroundColor: '#0000' }}>Test</Text>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff",
+    flexDirection: 'row',
+    flexWrap: 'wrap',  
+    justifyContent: 'center',
+    alignContent: 'center',
+    gap: 15,
+  },
+  square: {
+    width: 161,
+    height: 110,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    
   },
 });
