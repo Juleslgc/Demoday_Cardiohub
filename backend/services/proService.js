@@ -112,7 +112,7 @@ export default class ProService {
   }
 
 	// Retrieves all patients associated with a Pro
-	async getAllPatients(proId) {
+	async getAllPatients(proId, limit) {
 		if (!proId) {
 			throw new Error('Numéro d\'identifiant professionnel manquant.');
 		}
@@ -121,7 +121,7 @@ export default class ProService {
 		if (!pro) {
 			throw new Error('Professionnel introuvable.');
 		}
-		return proRepository.findPatients(proId);
+		return proRepository.findPatients(proId, limit);
 	}
 
 	// Retrieves a specific patient for a Pro

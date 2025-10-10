@@ -31,7 +31,11 @@ export default class ProRepository extends BaseRepository {
 	 async findPatients(proId) {
     // On récupère le Pro et on inclut ses Patients via l'alias défini
     const pro = await Pro.findByPk(proId, {
-      include: { model: Patient, as: 'Patients' }
+      include: { 
+        model: Patient,
+        as: 'Patients',
+        through: { attributes: [] },
+      }
     });
 
     // Si le Pro existe, retourner la liste de ses patients, sinon tableau vide

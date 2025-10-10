@@ -32,12 +32,6 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="PatientRegisterScreen" component={PatientRegisterScreen} />
-        <Stack.Screen name="SimulationPsc" component={SimulationPsc} />
-        <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        <Stack.Screen name="ConditionsScreen" component={ConditionsScreen} />
-        <Stack.Screen name="ConfidentialiteScreen" component={ConfidentialiteScreen} />
         <Stack.Screen name="HomeProScreen" component={HomeProScreen} />
       </Stack.Navigator>
     </NavigationContainer>

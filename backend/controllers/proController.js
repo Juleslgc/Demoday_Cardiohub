@@ -70,8 +70,9 @@ export default class ProController {
 	// Retrieves all patients associated with a Pro
 	static async getAllPatients(req, res) {
     const { proId } = req.params; // Extract the professional ID parameter from the URL
+    const { limit } = req.query;
     try {
-      const patients = await proService.getAllPatients(proId); // Retrieves patients linked to the professional's ID
+      const patients = await proService.getAllPatients(proId, limit); // Retrieves patients linked to the professional's ID
       res.json(patients);
     } catch (err) {
       res.status(400).json({ message: err.message });

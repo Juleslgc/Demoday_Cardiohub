@@ -14,10 +14,10 @@
 import { Alert } from "react-native";
 
 // Base API endpoint
-const API_URL = "https://rio-historic-dui-secret.trycloudflare.com/api";
+const API_URL = "https://irrigation-researchers-liz-sponsored.trycloudflare.com/api";
 
 // Generic API request handler
-export async function apiRequest(endpoint, method = "GET", body = null) {
+export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false) {
   const options = {
     method,
     headers: { "Content-Type": "application/json" },
@@ -37,7 +37,9 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
     }
 
     // Display success message if present
-    Alert.alert(data.message);
+    if (showAlert && data.message) {
+      Alert.alert(data.message);
+    }
     return data;
 
   } catch (error) {
@@ -48,15 +50,20 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 
 // Register a new patient account
 export async function registerPatient(patientData) {
-  return apiRequest("/auth/register/patient", "POST", patientData);
+  return apiRequest("/auth/register/patient", "POST", patientData, true);
 };
 
 // Register or connection a professionnal
 export async function registerPro(proData) {
-	return apiRequest("/auth/register/pro", "POST", proData);
+	return apiRequest("/auth/register/pro", "POST", proData, true);
 };
 
 // Patient login
 export async function login(loginData) {
-	return apiRequest("/auth/login", "POST", loginData);
+	return apiRequest("/auth/login", "POST", loginData, true);
+};
+
+export async function getPatients() {
+  const proId = '6f654911-85eb-432e-8749-8b2144575844';
+  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET")
 };
