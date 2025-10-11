@@ -34,4 +34,12 @@ router.put("/patient/:id", authenticate, patientController.updatePatient);
 // Delete a patient (protected route)
 router.delete("/patient/:id", authenticate, patientController.deletePatient);
 
+// Authenticates a user (login) and returns a JWT token
+// This route is not protected because it is the entry point for authentication
+router.post('/login', patientController.login);
+
+// Retrieves a user by email
+// Protected route: requires a valid JWT token
+router.get('/email/:email', authenticate, patientController.getByEmail);
+
 export default router;

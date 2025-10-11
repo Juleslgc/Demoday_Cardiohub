@@ -25,7 +25,7 @@ export default class ProController {
   static async createOrLoginPro(req, res) {
 		try {
 			const pro = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
-			res.status(201).json(pro); // Response with the pro created or found
+			res.status(201).json({pro, message: "Connexion réussi !"}); // Response with the pro created or found
 		} catch (err) {
 			res.status(400).json({ message: err.message }); // Validation error or other
 		}
@@ -55,6 +55,17 @@ export default class ProController {
 			res.status(400).json({ message: err.message });
 		}
 	}
+
+  // Ajout patient
+  static async addPatient(req, res) {
+    try {
+      const { proId, patientId } = req.params;
+      const patient = await proService.addPatient(proId, patientId);
+      res.status(201).json({ message: "Patient ajouté avec succès", patient });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 
 	// Retrieves all patients associated with a Pro
 	static async getAllPatients(req, res) {

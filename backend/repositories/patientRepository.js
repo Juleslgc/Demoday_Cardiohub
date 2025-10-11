@@ -16,6 +16,8 @@
 
 import BaseRepository from "./baseRepository.js";
 import Patient from "../models/patientModel.js";
+import { sequelize } from "../config/db.js";
+import { fn, col } from "sequelize";
 
 class PatientRepository extends BaseRepository {
 	constructor() {
@@ -24,7 +26,12 @@ class PatientRepository extends BaseRepository {
 	
   // Find a patient by email (excludes password by default)
 	async findByEmail(email) {
-		return await Patient.findOne({ where: { email } });
+		return await Patient.findOne({ 
+      where: sequelize.where(
+        fn('LOWER', col('email')),    // converts the column to lowercase
+        email.toLowerCase().trim()    // converts the input to lowercase and removes spaces
+      )
+    });
 	}
 
 	// Find a patient by email including the hashed password (for authentication purposes)
