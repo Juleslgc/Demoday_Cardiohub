@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, Alert, Dimensions, Platform } from "react-native";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import { Picker } from "@react-native-picker/picker";
+import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, View, Platform, TouchableOpacity } from "react-native";
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from "@expo/vector-icons";
 import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 import StyledPicker from "../components/Picker.js";
@@ -28,6 +28,7 @@ export default function SimulationPsc({ navigation }) {
 	const [institution, setInstitution] = useState("");
 	const [role, setRole] = useState("Médecins");
 	const [speciality, setSpeciality] = useState("");
+	const [error, setError] = useState("");
 
   /**
 * Function called when the form is submitted
@@ -55,7 +56,7 @@ export default function SimulationPsc({ navigation }) {
       navigation.replace('HomeProScreen');
     } catch (error) {
       // Displays a user error message
-      Alert.alert('Erreur', error.message);
+      setError(error.message);
     }
   };
 
@@ -63,8 +64,15 @@ export default function SimulationPsc({ navigation }) {
 		<SafeAreaView style={{ flex: 1 }}>
 			<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
 				<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+					<View style={styles.header}>
+						<TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+							<MaterialIcons name="arrow-back" size={26} color="#042456" />
+						</TouchableOpacity>
+					</View>
+
 					<Text style={styles.h1}>Simulation</Text>
 					<Text style={styles.h2}>Pro Santé Connect</Text>
+					{error ? <Text style={styles.error}>{error}</Text> : null}
 					<Input
 						label="Nom"
 						value={lastName}
@@ -94,8 +102,8 @@ export default function SimulationPsc({ navigation }) {
 						required
 					/>
 					<StyledPicker
-								label="Rôle (sélectionner un rôle)"
-								selectedValue={role}
+						label="Rôle (sélectionner un rôle)"
+						selectedValue={role}
 						onValueChange={setRole}
 						options={[
 							{ label: "Médecins", value: "Médecins" },
@@ -150,6 +158,25 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingBottom: 20 
+	},
+	header: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 15,  // space between the arrow and the title
+    marginBottom: 10,
+    position: "relative",
+  },
+  backButton: {
+    position: "absolute",
+    top: 0,
+    left: -10,
+    padding: 5,
+    zIndex: 2, // ensures that the button remains clickable
+  },
+	error: {
+		color: "red",
+		marginBottom: 10,
+		textAlign: "center",
 	}
 
 });

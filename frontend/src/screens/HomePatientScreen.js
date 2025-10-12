@@ -1,5 +1,5 @@
-import HeaderPro from "../components/HeaderPro.js";
-import FooterPro from "../components/FooterPro.js";
+import HeaderPatient from "../components/HeaderPatient.js";
+import FooterPatient from "../components/FooterPatient.js";
 import React from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from "react-native";
@@ -7,8 +7,8 @@ import { StyleSheet } from "react-native";
 export default function HomePatientScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderPro />
-      <FooterPro />
+      <HeaderPatient />
+      <FooterPatient />
     </SafeAreaView>
   );
 }
