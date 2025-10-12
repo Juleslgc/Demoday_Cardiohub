@@ -8,6 +8,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Header from "../components/HearderPro.js";
 import Footer from "../components/FooterPro.js";
 import { getPatients } from "../services/api.js";
+import calculateAge from "../utils/CalculateAge.js";
 /**
 * HomePro.js
 *
@@ -38,23 +39,6 @@ export default function HomePro({navigation}) {
   // Declaration of the "loading" state to know if the data is still loading
   const [loading, setLoading] = useState(true);
 
-  // Function to calculate a patient's age from their date of birth
-  function calculateAge(birthDate) {
-    const today = new Date(); // current date
-    const birth = new Date(birthDate); // patient's date of birth
-
-    // approximate age calculation
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    const dayDiff = today.getDate() - birth.getDate();
-
-    // Adjustment if the month or birthday has not yet passed
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    return age;
-  }
 
   // useEffect allows you to execute an action when the component is displayed
   useEffect(() => {
