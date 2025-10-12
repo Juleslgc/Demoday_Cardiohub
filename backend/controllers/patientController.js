@@ -100,6 +100,19 @@ class PatientController {
 			return res.status(400).json({ message: err.message });
 		}
 	}
+
+	// Retrieves information from the connected patient
+	async getMe(req, res) {
+		try {
+			const patient = await patientService.getPatientById(req.user.id);
+			if (!patient) {
+				return res.status(404).json({ message: "Utilisateur introuvable" });
+			}
+			res.status(200).json(patient);
+		} catch (err) {
+			res.status(400).json({ message: err.message });
+		}
+	}
 }
 
 export default new PatientController();

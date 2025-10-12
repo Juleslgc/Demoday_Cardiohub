@@ -11,17 +11,34 @@
  * - Clean, minimal design consistent with the app’s theme
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getMe } from "../services/api";
 
 // Functional component returning the patient header layout
-export default function Header() {
+export default function HeaderPatient() {
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getMe(); // retrieves { firstName, ... }
+        setFirstName(user.firstName || ""); // save the firstname
+      } catch (error) {
+        console.error("Erreur lors de la récupération du prénom:", error.message);
+      }
+    };
+    fetchUser();
+  }, []);
+
   return (
     // Ensures header content stays below system UI (status bar, notch)
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Bonjour Alice</Text>
+        <Text style={styles.headerText}>
+          Bonjour {firstName ? firstName : "..."}
+        </Text>
         <Image
           source={require("../assets/LogoCardioHub.png")}
           style={styles.logo}
