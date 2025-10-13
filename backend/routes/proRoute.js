@@ -36,7 +36,7 @@ router.put('/pro/:id', authenticate, ProController.updatePro);
 router.delete('/pro/:id', authenticate, ProController.deletePro);
 
 // Ajoute patient
-router.post("/add/pro/:proId/patients/:patientId", ProController.addPatient);
+router.post("/add/pro/:proId/patients/:patientId", authenticate, ProController.addPatient);
 
 // Retrieve all patients from a pro
 router.get('/pro/:proId/patients',  ProController.getAllPatients);

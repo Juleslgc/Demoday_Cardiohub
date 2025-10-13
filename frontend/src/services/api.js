@@ -12,15 +12,20 @@
  */
 
 import { Alert } from "react-native";
+import { storeToken, getToken, removeToken } from '../utils/TokenStorage.js';
+const jwtDecode = require("jwt-decode");
+
 
 // Base API endpoint
-const API_URL = "https://irrigation-researchers-liz-sponsored.trycloudflare.com/api";
+const API_URL = "https://libraries-hotels-parallel-mistress.trycloudflare.com/api";
 
 // Generic API request handler
-export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false) {
+export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const options = {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers,
   };
 
   // Convert request body to JSON string if provided
@@ -64,6 +69,11 @@ export async function login(loginData) {
 };
 
 export async function getPatients() {
-  const proId = '6f654911-85eb-432e-8749-8b2144575844';
-  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET")
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
 };

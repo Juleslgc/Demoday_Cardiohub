@@ -24,8 +24,8 @@ export default class ProController {
 	// Creates a new Pro or returns the existing Pro
   static async createOrLoginPro(req, res) {
 		try {
-			const pro = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
-			res.status(201).json({pro, message: "Connexion réussi !"}); // Response with the pro created or found
+			const { pro, token} = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
+			res.status(201).json({pro, token, message: "Connexion réussi !"}); // Response with the pro created or found with token created
 		} catch (err) {
 			res.status(400).json({ message: err.message }); // Validation error or other
 		}

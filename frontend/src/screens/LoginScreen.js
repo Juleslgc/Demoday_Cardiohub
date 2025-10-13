@@ -9,6 +9,7 @@ import Button from "../components/Button.js";
 import Separator from "../components/Separator.js";
 import SeparatorWithText from "../components/SeparatorWithText.js";
 import { login } from "../services/api.js";
+import { storeToken } from '../utils/TokenStorage.js';
 
 /**
 * User Login Screen
@@ -41,6 +42,13 @@ export default function LoginScreen({ navigation }) {
 		try {
 			const response = await login(data);
 			console.log(response.message);
+      // Retrieve the token to store it
+      const token = response.token;
+      console.log('TOKEN :', token);
+      if (token) {
+        await storeToken(token);
+        console.log('Token enregistrer');
+      }
 			
       // Redirection after login
 			navigation.replace('HomePatientScreen');

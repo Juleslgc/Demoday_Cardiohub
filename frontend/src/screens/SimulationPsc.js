@@ -7,6 +7,7 @@ import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 import StyledPicker from "../components/Picker.js";
 import { registerPro } from "../services/api.js";
+import { storeToken } from '../utils/TokenStorage.js';
 
 /**
 * Login simulation screen via "Pro Santé Connect"
@@ -51,6 +52,13 @@ export default function SimulationPsc({ navigation }) {
       // Call the registration/connection service
 			const response = await registerPro(data);
 			console.log(response.message);
+      // Retrieve the token to store it
+      const token = response.token;
+      console.log('TOKEN :', token);
+      if (token) {
+        await storeToken(token);
+        console.log('Token enregistrer');
+      }
 
       // Redirect to the main pros page
       navigation.replace('HomeProScreen');
