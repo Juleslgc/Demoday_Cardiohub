@@ -13,17 +13,26 @@
  */
 
 import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
+import HeaderPatient from "../components/HeaderPatient";
+import FooterPatient from "../components/FooterPatient";
 
 // Functional component representing the ECG feature screen
 export default function EcgScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Espace ECG</Text>
-      <Text style={styles.text}>
-        Connexion ECG à implémenter.
-      </Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <HeaderPatient />
+
+      <View style={styles.content}>
+        <Text style={styles.title}>Espace ECG</Text>
+        <Text style={styles.text}>
+          Connexion ECG à implémenter.
+        </Text>
+      </View>
+
+      <FooterPatient />
+    </SafeAreaView>
   );
 }
 
@@ -31,9 +40,12 @@ export default function EcgScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F5F7FA", // Light background for readability
+  },
+  content: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   title: {
     fontSize: 22,
