@@ -24,6 +24,11 @@ import ConfidentialiteScreen from "./src/screens/ConfidentialiteScreen.js";
 import SimulationPsc from './src/screens/SimulationPsc.js';
 import HomeProScreen from './src/screens/HomeProScreen.js';
 import HomePatientScreen from './src/screens/HomePatientScreen.js';
+import TeleconsultationScreen from "./src/screens/TeleconsultationScreen.js";
+import MessagingScreen from "./src/screens/MessagingScreen.js";
+import EcgScreen from "./src/screens/EcgScreen.js";
+import ProfilScreen from "./src/screens/ProfilScreen.js";
+import EditProfileScreen from "./src/screens/EditProfileScreen.js";
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -41,6 +46,11 @@ export default function App() {
         <Stack.Screen name="ConfidentialiteScreen" component={ConfidentialiteScreen} />
         <Stack.Screen name="HomeProScreen" component={HomeProScreen} />
         <Stack.Screen name="HomePatientScreen" component={HomePatientScreen} />
+        <Stack.Screen name="TeleconsultationScreen" component={TeleconsultationScreen} />
+        <Stack.Screen name="MessagingScreen" component={MessagingScreen} />
+        <Stack.Screen name="EcgScreen" component={EcgScreen} />
+        <Stack.Screen name="ProfilScreen" component={ProfilScreen} />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -39,7 +39,7 @@ export default function Footer() {
         {/* Video consultation navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("TeleconsultationScreen")}
         >
           <FontAwesome5 name="video" size={22} color="#042456" />
           <Text style={styles.link}>Téléconsulte</Text>
@@ -48,7 +48,7 @@ export default function Footer() {
         {/* ECG feature navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("EcgScreen")}
         >
           <FontAwesome name="heartbeat" size={24} color="#F35330" />
           <Text style={styles.link}>ECG</Text>
@@ -57,7 +57,7 @@ export default function Footer() {
         {/* Messaging navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("MessagingScreen")}
         >
           <FontAwesome name="envelope" size={22} color="#042456" />
           <Text style={styles.link}>Messagerie</Text>
@@ -66,7 +66,7 @@ export default function Footer() {
         {/* Profile navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("ProfilScreen")}
         >
           <FontAwesome name="user" size={22} color="#042456" />
           <Text style={styles.link}>Profil</Text>
