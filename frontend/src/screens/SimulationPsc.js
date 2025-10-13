@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, View, Platform, TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,12 +23,51 @@ import { registerPro } from "../services/api.js";
 export default function SimulationPsc({ navigation }) {
   // Local states to manage form fields
 	const [lastName, setLastName] = useState("");
+	const [lastNameError, setLastNameError] = useState("");
 	const [firstName, setFirstName] = useState("");
+	const [firstNameError, setFirstNameError] = useState("");
 	const [rpps, setRpps] = useState("");
+	const [rppsError, setRppsError] = useState("");
 	const [institution, setInstitution] = useState("");
+	const [institutionError, setInstitutionError] = useState("");
 	const [role, setRole] = useState("Médecins");
 	const [speciality, setSpeciality] = useState("");
+	const [specialityError, setSpecialityError] = useState("");
 	const [error, setError] = useState("");
+	const [loading, setLoading] = useState(false);
+
+	// Capitalize the first letter of each word or part separated by a space or hyphen
+  const capitalizeName = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/(?:^|[\s-])\p{L}/gu, (match) => match.toUpperCase());
+  };
+
+	// Checks that the string contains only letters (including accented and hyphens)
+  const isValidName = (text) => {
+    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\-'\s]+$/;
+    return regex.test(text);
+  };
+
+	// Check that the rpps contains exactly 11 digits
+  const isValidRpps = (text) => {
+    const regex = /^[0-9]{11}$/;
+    return regex.test(text);
+  };
+
+	// Check if the form is valid
+  const isFormValid =
+    lastName.trim() !== "" &&
+    !lastNameError &&
+    firstName.trim() !== "" &&
+    !firstNameError &&
+    rpps.trim() !== "" &&
+    !rppsError &&
+    institution.trim() !== "" &&
+    !institutionError &&
+    speciality.trim() !== "" &&
+    !specialityError;
+
 
   /**
 * Function called when the form is submitted
@@ -39,15 +78,23 @@ export default function SimulationPsc({ navigation }) {
 * - If error → displays an alert
 */
 	const handleSubmit = async () => {
-        const data = {
-            lastName,
-            firstName,
-            rpps,
-            institution,
-            role,
-            speciality
-        }
+		if (!isFormValid) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+		const data = {
+				lastName,
+				firstName,
+				rpps,
+				institution,
+				role,
+				speciality
+		}
 		try {
+			setLoading(true);
+			setError("");
+
       // Call the registration/connection service
 			const response = await registerPro(data);
 			console.log(response.message);
@@ -57,7 +104,9 @@ export default function SimulationPsc({ navigation }) {
     } catch (error) {
       // Displays a user error message
       setError(error.message);
-    }
+    } finally {
+			setLoading(false);
+		}
   };
 
 	return (
@@ -76,28 +125,62 @@ export default function SimulationPsc({ navigation }) {
 					<Input
 						label="Nom"
 						value={lastName}
-						onChangeText={setLastName}
+						onChangeText={(text) => {
+							const formatted = capitalizeName(text);
+							setLastName(formatted);
+							
+							if (text && !isValidName(text)) {
+								setLastNameError("Le nom doit contenir uniquement des lettres");
+							} else {
+								setLastNameError("");
+							}
+						}}
 						placeholder="Dupont"
 						required
+						error={lastNameError}
 					/>
 					<Input
 						label="Prénom"
 						value={firstName}
-						onChangeText={setFirstName}
+						onChangeText={(text) => {
+							const formatted = capitalizeName(text);
+							setFirstName(formatted);
+
+							if (text && !isValidName(text)) {
+								setFirstNameError("Le prénom doit contenir uniquement des lettres");
+							} else {
+								setFirstNameError("");
+							}
+						}}
 						placeholder="Jean"
 						required
+						error={firstNameError}
 					/>
 					<Input
 						label="Identification National (RPPS)"
 						value={rpps}
-						onChangeText={setRpps}
+						onChangeText={(text) => {
+							// Remove spaces and non-numeric characters
+							const numeric = text.replace(/\D/g, "");
+							setRpps(numeric);
+					
+							if (numeric && !isValidRpps(numeric)) {
+								setRppsError("Le numéro RPPS doit contenir 11 chiffres");
+							} else {
+								setRppsError("");
+							}
+						}}
 						placeholder="81000123456"
 						required
+						error={rppsError}
 					/>
 					<Input
 						label="Établissement"
 						value={institution}
-						onChangeText={setInstitution}
+						onChangeText={(text) => {
+							const formatted = capitalizeName(text);
+							setInstitution(formatted);
+						}}
 						placeholder="CHU Bordeaux"
 						required
 					/>
@@ -115,11 +198,26 @@ export default function SimulationPsc({ navigation }) {
 					<Input
 						label="Spécialité"
 						value={speciality}
-						onChangeText={setSpeciality}
+						onChangeText={(text) => {
+							const formatted = capitalizeName(text);
+							setSpeciality(formatted);
+	
+							if (text && !isValidName(text)) {
+								setSpecialityError("La spécialité doit contenir uniquement des lettres");
+							} else {
+								setSpecialityError("");
+							}
+						}}
 						placeholder="Cardiologue"
 						required
+						error={specialityError}
 					/>
-					<Button title="Se connecter" onPress={handleSubmit} variant="full" />
+					<Button
+						title="Se connecter"
+						onPress={handleSubmit}
+						disabled={loading || !isFormValid}
+						variant="full"
+					/>
 					<Text style={styles.h3}>Simulation d'authentification Pro Santé Connect</Text>
 				</ScrollView>
 			</KeyboardAvoidingView>
