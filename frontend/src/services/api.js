@@ -12,12 +12,13 @@
  */
 
 import { Alert } from "react-native";
-import { storeToken, getToken, removeToken } from '../utils/TokenStorage.js';
+import { storeToken, getToken, removeToken, isTokenExpired } from '../utils/TokenStorage.js';
+import LogOut from "../utils/LogOut.js";
 const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://libraries-hotels-parallel-mistress.trycloudflare.com/api";
+const API_URL = "https://streets-citysearch-retrieved-optimization.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -68,9 +69,17 @@ export async function login(loginData) {
 	return apiRequest("/auth/login", "POST", loginData, true);
 };
 
-export async function getPatients() {
+export async function getPatients(navigation) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
+
+  // Checks if the token is expired
+  const expired = await isTokenExpired(token);
+  if (expired) {
+    console.log("Token expiré, déconnexion automatique...");
+    await LogOut(navigation);
+    return null; // stops execution
+  }
 
   const decoded = jwtDecode(token);
   const proId = decoded.id;

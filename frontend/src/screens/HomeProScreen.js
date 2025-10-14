@@ -45,7 +45,7 @@ export default function HomePro({navigation}) {
     // Function to retrieve patients from the API
     const fetchPatients = async () => {
       try {
-        const response = await getPatients(); // API call
+        const response = await getPatients(navigation); // API call
         // If the response is an array, we use it directly, otherwise we take response.patients
         setPatients(Array.isArray(response) ? response : response.patients || []);
       } catch (error) {

@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+const jwtDecode = require("jwt-decode");
 
 /**
 * tokenStorage.js
@@ -41,5 +42,24 @@ export const removeToken = async () => {
     console.log('Token supprimer');
   } catch (error) {
     console.log('Erreur suppression token :', error.message);
+  }
+};
+
+// Checks if the token is expired
+export const isTokenExpired = async (token) => {
+  if (!token) {
+    return true; // If there is no token, it is considered "expired"
+  }
+  try {
+    const decoded = jwtDecode(token);
+    if (!decoded.exp) {
+      return true; // If there is no exp field, it is considered "expired"
+    }
+
+    const now = Date.now() / 1000; // We pass the date from millisecond to second
+    return decoded.exp < now; // Compare if expiration has passed
+  } catch (error) {
+    console.log("Token invalid :", error.message);
+    return true; // If the token is invalid, it is considered "expired"
   }
 };
