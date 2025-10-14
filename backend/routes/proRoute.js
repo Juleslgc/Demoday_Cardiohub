@@ -21,7 +21,7 @@ import authenticate from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Create or retrieve a pro
-router.post('/register/pro/', ProController.createOrLoginPro);
+router.post('/auth/register/pro/', ProController.createOrLoginPro);
 
 // Recover all Pro
 router.get('/pro/', authenticate, ProController.getAllPros);
@@ -35,8 +35,11 @@ router.put('/pro/:id', authenticate, ProController.updatePro);
 // Delete a pro by id
 router.delete('/pro/:id', authenticate, ProController.deletePro);
 
+// Ajoute patient
+router.post("/add/pro/:proId/patients/:patientId", authenticate, ProController.addPatient);
+
 // Retrieve all patients from a pro
-router.get('/pro/:proId/patients', authenticate, ProController.getAllPatients);
+router.get('/pro/:proId/patients',  ProController.getAllPatients);
 
 // Retrieve a specific patient from a pro
 router.get('/pro/:proId/patients/:patientId', authenticate, ProController.getPatient);

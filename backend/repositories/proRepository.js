@@ -11,10 +11,10 @@
 * - findByRpps(rpps) → searches for a pro by their unique RPPS number.
 * - findPatients(proId) → retrieves all patients associated with a pro.
 * - findPatient(proId, patientId) → retrieves a specific patient linked to a pro.
+* - addPatient(proId, patientId) → allows the professional to add a patient
 */
 import BaseRepository from './baseRepository.js';
-import Pro from '../models/proModel.js';
-import Patient from '../models/patientModel.js';
+import { Pro, Patient } from '../models/relationModel.js'
 
 export default class ProRepository extends BaseRepository {
 	constructor() {
@@ -29,14 +29,43 @@ export default class ProRepository extends BaseRepository {
 
 	// Method to retrieve all patients of a pro
 	// `proId` is the pro's primary key
-	async findPatients(proId) {
-		return await Patient.findAll({ where: { proId } });
-	}
+	 async findPatients(proId) {
+    // We retrieve the Pro and include its Patients via the defined alias
+    const pro = await Pro.findByPk(proId, {
+      include: { 
+        model: Patient,
+        as: 'Patients',
+        through: { attributes: [] },
+      }
+    });
+
+    // If the Pro exists, return the list of its patients, otherwise empty array
+    return pro ? pro.Patients : [];
+  }
 
 	// Method to retrieve a specific patient from a pro
 	// `proId` -> pro identifier
 	// `patientId` -> patient identifier (in the patient's `id` column)
 	async findPatient(proId, patientId) {
-		return await Patient.findOne({ where: { id: patientId, proId } });
-	}
+    const pro = await Pro.findByPk(proId, {
+      include: { model: Patient, as: 'Patients' }
+    });
+
+    if (!pro) return null;
+
+    // We are looking for the patient among those linked to this Pro
+    return pro.Patients.find(p => p.id === Number(patientId)) || null;
+  }
+
+  async addPatient(proId, patientId) {
+    const pro = await Pro.findByPk(proId);
+    const patient = await Patient.findByPk(patientId);
+
+    if (!pro || !patient) {
+      return null;
+    } 
+
+    await pro.addPatients(patient);
+    return patient;
+  }
 }

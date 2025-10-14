@@ -7,6 +7,7 @@ import Input from "../components/Input.js";
 import Button from "../components/Button.js";
 import StyledPicker from "../components/Picker.js";
 import { registerPro } from "../services/api.js";
+import { storeToken } from '../utils/TokenStorage.js';
 
 /**
 * Login simulation screen via "Pro Santé Connect"
@@ -28,6 +29,7 @@ export default function SimulationPsc({ navigation }) {
 	const [institution, setInstitution] = useState("");
 	const [role, setRole] = useState("Médecins");
 	const [speciality, setSpeciality] = useState("");
+  const [error, setError] = useState("");
 
   /**
 * Function called when the form is submitted
@@ -50,12 +52,19 @@ export default function SimulationPsc({ navigation }) {
       // Call the registration/connection service
 			const response = await registerPro(data);
 			console.log(response.message);
+      // Retrieve the token to store it
+      const token = response.token;
+      console.log('TOKEN :', token);
+      if (token) {
+        await storeToken(token);
+        console.log('Token enregistrer');
+      }
 
       // Redirect to the main pros page
       navigation.replace('HomeProScreen');
     } catch (error) {
       // Displays a user error message
-      Alert.alert('Erreur', error.message);
+      setError(error.message);
     }
   };
 
@@ -65,6 +74,7 @@ export default function SimulationPsc({ navigation }) {
 				<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 					<Text style={styles.h1}>Simulation</Text>
 					<Text style={styles.h2}>Pro Santé Connect</Text>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 					<Input
 						label="Nom"
 						value={lastName}
@@ -150,6 +160,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingBottom: 20 
-	}
+	},
+  error: {
+    color: "red",
+    marginBottom: 10,
+    textAlign: "center",
+  }
 
 });

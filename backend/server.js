@@ -1,7 +1,7 @@
+import "./models/relationModel.js"; 
 import './config/initDB.js';
 import express from 'express';
 import proRoutes from './routes/proRoute.js';
-import userRoute from './routes/userRoute.js';
 import cors from 'cors';
 import patientRoutes from "./routes/patientRoutes.js";
 
@@ -14,9 +14,8 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', proRoutes);
+app.use('/api', proRoutes);
 app.use("/api/auth", patientRoutes);
-app.use('/api/auth', userRoute);
 
 
 // 404 for routes not found

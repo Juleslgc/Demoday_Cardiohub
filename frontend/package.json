@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^6.9.12",
     "expo": "^54.0.10",
     "expo-checkbox": "~5.0.7",
+    "jwt-decode": "^3.1.2",
     "nativewind": "^2.0.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",

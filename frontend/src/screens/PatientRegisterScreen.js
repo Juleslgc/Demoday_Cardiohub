@@ -119,8 +119,8 @@ export default function PatientRegisterScreen({ navigation }) {
     
       // Redirect to login screen after success
       navigation.navigate("LoginScreen"); 
-    } catch (err) {
-      setError(err.message || "Erreur lors de l'inscription");
+    } catch (error) {
+      setError(error.message);
     } finally {
       setLoading(false);
     }

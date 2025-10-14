@@ -24,8 +24,8 @@ export default class ProController {
 	// Creates a new Pro or returns the existing Pro
   static async createOrLoginPro(req, res) {
 		try {
-			const pro = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
-			res.status(201).json(pro); // Response with the pro created or found
+			const { pro, token} = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
+			res.status(201).json({pro, token, message: "Connexion réussi !"}); // Response with the pro created or found with token created
 		} catch (err) {
 			res.status(400).json({ message: err.message }); // Validation error or other
 		}
@@ -56,11 +56,23 @@ export default class ProController {
 		}
 	}
 
+  // Ajout patient
+  static async addPatient(req, res) {
+    try {
+      const { proId, patientId } = req.params;
+      const patient = await proService.addPatient(proId, patientId);
+      res.status(201).json({ message: "Patient ajouté avec succès", patient });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
 	// Retrieves all patients associated with a Pro
 	static async getAllPatients(req, res) {
     const { proId } = req.params; // Extract the professional ID parameter from the URL
+    const { limit } = req.query;
     try {
-      const patients = await proService.getAllPatients(proId); // Retrieves patients linked to the professional's ID
+      const patients = await proService.getAllPatients(proId, limit); // Retrieves patients linked to the professional's ID
       res.json(patients);
     } catch (err) {
       res.status(400).json({ message: err.message });

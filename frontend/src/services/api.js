@@ -12,15 +12,21 @@
  */
 
 import { Alert } from "react-native";
+import { storeToken, getToken, removeToken, isTokenExpired } from '../utils/TokenStorage.js';
+import LogOut from "../utils/LogOut.js";
+const jwtDecode = require("jwt-decode");
+
 
 // Base API endpoint
 const API_URL = "https://coffee-highest-elements-reliability.trycloudflare.com/api";
 
 // Generic API request handler
-export async function apiRequest(endpoint, method = "GET", body = null) {
+export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const options = {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers,
   };
 
   // Convert request body to JSON string if provided
@@ -32,31 +38,51 @@ export async function apiRequest(endpoint, method = "GET", body = null) {
 
     // Handle HTTP errors and custom backend messages
     if (!response.ok) {
-      throw new Error(data.message || "Erreur serveur");
+      console.log(data);
+      throw new Error(data.message);
     }
 
     // Display success message if present
-    Alert.alert(data.message);
+    if (showAlert && data.message) {
+      Alert.alert(data.message);
+    }
     return data;
 
   } catch (error) {
     console.error("Erreur API:", error.message);
-		Alert.alert(error.message);
     throw error;
   }
 };
 
 // Register a new patient account
 export async function registerPatient(patientData) {
-  return apiRequest("/auth/register/patient", "POST", patientData);
+  return apiRequest("/auth/register/patient", "POST", patientData, true);
 };
 
 // Register or connection a professionnal
 export async function registerPro(proData) {
-	return apiRequest("/auth/register/pro", "POST", proData);
+	return apiRequest("/auth/register/pro", "POST", proData, true);
 };
 
 // Patient login
 export async function login(loginData) {
-	return apiRequest("/auth/login", "POST", loginData);
+	return apiRequest("/auth/login", "POST", loginData, true);
+};
+
+export async function getPatients(navigation) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  // Checks if the token is expired
+  const expired = await isTokenExpired(token);
+  if (expired) {
+    console.log("Token expiré, déconnexion automatique...");
+    await LogOut(navigation);
+    return null; // stops execution
+  }
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
 };
