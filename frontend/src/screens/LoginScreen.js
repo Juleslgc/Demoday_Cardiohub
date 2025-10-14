@@ -9,6 +9,7 @@ import SeparatorWithText from "../components/SeparatorWithText.js";
 import { login } from "../services/api.js";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storeToken } from '../utils/TokenStorage.js';
 
 /**
 * User Login Screen
@@ -44,6 +45,13 @@ export default function LoginScreen({ navigation }) {
 
 			// Save the token to local storage
 			await AsyncStorage.setItem("token", response.token);
+      // Retrieve the token to store it
+      const token = response.token;
+      console.log('TOKEN :', token);
+      if (token) {
+        await storeToken(token);
+        console.log('Token enregistrer');
+      }
 			
       // Redirection after login
 			navigation.replace('HomePatientScreen');

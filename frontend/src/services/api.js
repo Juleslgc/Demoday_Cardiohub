@@ -13,15 +13,21 @@
 
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storeToken, getToken, removeToken, isTokenExpired } from '../utils/TokenStorage.js';
+import LogOut from "../utils/LogOut.js";
+const jwtDecode = require("jwt-decode");
+
 
 // Base API endpoint
 const API_URL = "https://ski-emerald-suitable-faqs.trycloudflare.com/api";
 
 // Generic API request handler
-export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false) {
+export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const options = {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers,
   };
 
   // Convert request body to JSON string if provided
@@ -64,11 +70,6 @@ export async function login(loginData) {
 	return apiRequest("/auth/login", "POST", loginData, true);
 };
 
-export async function getPatients() {
-  const proId = '6f654911-85eb-432e-8749-8b2144575844';
-  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET")
-};
-
 // Retrieves information from the connected patient
 export async function getMe() {
   try {
@@ -94,4 +95,21 @@ export async function getMe() {
     console.error("Erreur getMe():", error.message);
     throw error;
   }
+};
+export async function getPatients(navigation) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  // Checks if the token is expired
+  const expired = await isTokenExpired(token);
+  if (expired) {
+    console.log("Token expiré, déconnexion automatique...");
+    await LogOut(navigation);
+    return null; // stops execution
+  }
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
 };

@@ -11,6 +11,7 @@
 * - findByRpps(rpps) → searches for a pro by their unique RPPS number.
 * - findPatients(proId) → retrieves all patients associated with a pro.
 * - findPatient(proId, patientId) → retrieves a specific patient linked to a pro.
+* - addPatient(proId, patientId) → allows the professional to add a patient
 */
 import BaseRepository from './baseRepository.js';
 import { Pro, Patient } from '../models/relationModel.js'
@@ -29,12 +30,16 @@ export default class ProRepository extends BaseRepository {
 	// Method to retrieve all patients of a pro
 	// `proId` is the pro's primary key
 	 async findPatients(proId) {
-    // On récupère le Pro et on inclut ses Patients via l'alias défini
+    // We retrieve the Pro and include its Patients via the defined alias
     const pro = await Pro.findByPk(proId, {
-      include: { model: Patient, as: 'Patients' }
+      include: { 
+        model: Patient,
+        as: 'Patients',
+        through: { attributes: [] },
+      }
     });
 
-    // Si le Pro existe, retourner la liste de ses patients, sinon tableau vide
+    // If the Pro exists, return the list of its patients, otherwise empty array
     return pro ? pro.Patients : [];
   }
 
@@ -48,7 +53,7 @@ export default class ProRepository extends BaseRepository {
 
     if (!pro) return null;
 
-    // On cherche le patient parmi ceux liés à ce Pro
+    // We are looking for the patient among those linked to this Pro
     return pro.Patients.find(p => p.id === Number(patientId)) || null;
   }
 
