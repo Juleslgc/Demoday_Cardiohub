@@ -15,8 +15,8 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
-import HeaderPatient from "../components/HeaderPatient";
-import FooterPatient from "../components/FooterPatient";
+import HeaderPatient from "../../components/HeaderPatient";
+import FooterPatient from "../../components/FooterPatient";
 
 // Functional component representing the ECG feature screen
 export default function EcgScreen() {

@@ -5,10 +5,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Foundation from '@expo/vector-icons/Foundation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Header from "../components/HearderPro.js";
-import Footer from "../components/FooterPro.js";
-import { getPatients } from "../services/api.js";
-import calculateAge from "../utils/CalculateAge.js";
+import HeaderPro from '../../components/HeaderPro.js';
+import Footer from "../../components/FooterPro.js";
+import { getPatients } from "../../services/api.js";
+import calculateAge from "../../utils/CalculateAge.js";
 /**
 * HomePro.js
 *
@@ -61,84 +61,86 @@ export default function HomePro({navigation}) {
   // Display part of the component
   return (
     // SafeAreaView to properly handle non-visible screen areas
-    <SafeAreaView style={{backgroundColor: '#fff', flex: 1}}>
-      <Header/>
+    <SafeAreaView style={{backgroundColor: '#042456', flex: 1}}>
+      <HeaderPro/>
       {/* ScrollView allows you to scroll the page if everything does not fit on the screen */}
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.h1}>Patients récents</Text>
-        {/* If the data is loading, a spinner is displayed */}
-        {loading ? (
-          <ActivityIndicator size="large" color="#042456" />
-        ) : (
-          // Otherwise, we display the list of patients
-          <View style={styles.patients}>
-            {patients.map((patient, index) => (
-              <View key={patient.id} style={styles.rectangle}>
-                {/* Line with the patient's icon and name */}
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <MaterialIcons name="account-circle" size={60} color="#042456" />
-                  <Text style={{ marginLeft: 10 }}>
-                    <Text style={styles.h2}>{patient.firstName} {patient.lastName}</Text>{"\n"}
-                    <Text style={{ color: "#042456" }}>{calculateAge(patient.birthDate)} ans</Text>
-                  </Text>
+      <View style={styles.scrollArea}>
+        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+          <Text style={styles.h1}>Patients récents</Text>
+          {/* If the data is loading, a spinner is displayed */}
+          {loading ? (
+            <ActivityIndicator size="large" color="#042456" />
+          ) : (
+            // Otherwise, we display the list of patients
+            <View style={styles.patients}>
+              {patients.map((patient, index) => (
+                <View key={patient.id} style={styles.rectangle}>
+                  {/* Line with the patient's icon and name */}
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <MaterialIcons name="account-circle" size={60} color="#042456" />
+                    <Text style={{ marginLeft: 10 }}>
+                      <Text style={styles.h2}>{patient.firstName} {patient.lastName}</Text>{"\n"}
+                      <Text style={{ color: "#042456" }}>{calculateAge(patient.birthDate)} ans</Text>
+                    </Text>
+                  </View>
+                  {/* Button to view the patient's complete file */}
+                  <View style={{ alignItems: "center", marginTop: 10 }}>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      style={styles.button}
+                      onPress={() => navigation.navigate("PatientDetail", { patientId: patient.id })}
+                    >
+                      <Text style={styles.buttonText}>Voir Dossier</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                {/* Button to view the patient's complete file */}
-                <View style={{ alignItems: "center", marginTop: 10 }}>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={styles.button}
-                    onPress={() => navigation.navigate("PatientDetail", { patientId: patient.id })}
-                  >
-                    <Text style={styles.buttonText}>Voir Dossier</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
+              ))}
+            </View>
+          )}
+          {/* Button to see all patients */}
+          <View style={{ alignItems: "center", marginTop: 10 }}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.button1}
+              onPress={() => navigation.navigate("")}
+            >
+              <Text style={styles.buttonText1}>Voir tous les patients</Text>
+            </TouchableOpacity>
           </View>
-        )}
-        {/* Button to see all patients */}
-        <View style={{ alignItems: "center", marginTop: 10 }}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.button1}
-            onPress={() => navigation.navigate("")}
-          >
-            <Text style={styles.buttonText1}>Voir tous les patients</Text>
-          </TouchableOpacity>
-        </View>
-        {/* Quick Actions Section */}
-        <Text style={styles.h1}>Actions rapides</Text>
-        <View style={styles.allActions}>
-          {/* Teleconsultation button */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
-            <View style={styles.square}>
-              <FontAwesome name="video-camera" size={24} color="#042456" />
-              <Text style={{color: '#042456' }}>Téléconsultations</Text>
-            </View >
-          </TouchableOpacity>
-          {/* Alert button */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
-            <View style={styles.square}>
-              <Foundation name="alert" size={24} color="#042456" />
-              <Text style={{color: '#042456' }}>Alertes</Text>
-            </View>
-          </TouchableOpacity>
-          {/* Documents Button */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
-            <View style={styles.square}>
-              <FontAwesome name="folder" size={24} color="#042456" />
-              <Text style={{color: '#042456' }}>Documents</Text>
-            </View>
-          </TouchableOpacity>
-          {/* Calendar Button */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
-            <View style={styles.square}>
-              <MaterialCommunityIcons name="notebook" size={24} color="#042456" />
-              <Text style={{color: '#042456' }}>Agenda</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+          {/* Quick Actions Section */}
+          <Text style={styles.h1}>Actions rapides</Text>
+          <View style={styles.allActions}>
+            {/* Teleconsultation button */}
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+              <View style={styles.square}>
+                <FontAwesome name="video-camera" size={24} color="#042456" />
+                <Text style={{color: '#042456' }}>Téléconsultations</Text>
+              </View >
+            </TouchableOpacity>
+            {/* Alert button */}
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+              <View style={styles.square}>
+                <Foundation name="alert" size={24} color="#042456" />
+                <Text style={{color: '#042456' }}>Alertes</Text>
+              </View>
+            </TouchableOpacity>
+            {/* Documents Button */}
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+              <View style={styles.square}>
+                <FontAwesome name="folder" size={24} color="#042456" />
+                <Text style={{color: '#042456' }}>Documents</Text>
+              </View>
+            </TouchableOpacity>
+            {/* Calendar Button */}
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+              <View style={styles.square}>
+                <MaterialCommunityIcons name="notebook" size={24} color="#042456" />
+                <Text style={{color: '#042456' }}>Agenda</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
       <Footer/>
     </SafeAreaView>
     );
@@ -146,12 +148,16 @@ export default function HomePro({navigation}) {
 
 // Styles for the whole screen
 const styles = StyleSheet.create({
-  container: { 
-    backgroundColor: "#042456",
+  scrollArea: {
+    flex: 1,
+    marginTop: 70,
+    marginBottom: 80
+  },
+  container: {
     alignContent: 'center',
-    paddingVertical: 20,
+    //paddingVertical: 20,
     flexDirection: 'column',
-    paddingBottom: 40,
+    //paddingBottom: 80,
   },
   patients: {
     flexDirection: 'row',

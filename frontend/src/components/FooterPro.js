@@ -67,7 +67,7 @@ export default function Footer() {
         {/* Profile navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("ProfileProScreen")}
         >
           <FontAwesome name="user" size={22} color="#042456" />
           <Text style={styles.link}>Profil</Text>

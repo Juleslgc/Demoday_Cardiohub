@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://ski-emerald-suitable-faqs.trycloudflare.com/api";
+const API_URL = "https://reach-continuously-gained-auto.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -62,40 +62,34 @@ export async function registerPatient(patientData) {
 
 // Register or connection a professionnal
 export async function registerPro(proData) {
-	return apiRequest("/auth/register/pro", "POST", proData, true);
+	return apiRequest("/auth/register/pro", "POST", proData, false);
 };
 
 // Patient login
 export async function login(loginData) {
-	return apiRequest("/auth/login", "POST", loginData, true);
+	return apiRequest("/auth/login", "POST", loginData, false);
 };
 
 // Retrieves information from the connected patient
-export async function getMe() {
-  try {
-    const token = await AsyncStorage.getItem("token");
+export async function getMe(navigation) {
+    const token = await getToken();
     if (!token) throw new Error("Aucun token trouvé");
 
-    const response = await fetch(`${API_URL}/auth/me`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Erreur lors de la récupération du profil");
-    }
-
-    return data; // will contain the patient (id, firstName, etc.)
-  } catch (error) {
-    console.error("Erreur getMe():", error.message);
-    throw error;
-  }
+    const decoded = jwtDecode(token);
+    const patientId = decoded.id;
+    const proId = decoded.rpps;
+    return apiRequest(`/auth/patient/${patientId}` || `/pro/${proId}`, "GET", null, false, token)
 };
+
+export async function getMePro(navigation) {
+    const token = await getToken();
+    if (!token) throw new Error("Aucun token trouvé");
+
+    const decoded = jwtDecode(token);
+    const proId = decoded.rpps;
+    return apiRequest(`/pro/${proId}`, "GET", null, false, token)
+};
+
 export async function getPatients(navigation) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");

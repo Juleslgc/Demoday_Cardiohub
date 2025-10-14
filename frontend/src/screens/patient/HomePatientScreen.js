@@ -11,9 +11,9 @@
 import React from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, View, Text, ScrollView } from "react-native";
-import HeaderPatient from "../components/HeaderPatient.js";
-import FooterPatient from "../components/FooterPatient.js";
-import Button from "../components/Button.js";
+import HeaderPatient from "../../components/HeaderPatient.js";
+import FooterPatient from "../../components/FooterPatient.js";
+import Button from "../../components/Button.js";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 

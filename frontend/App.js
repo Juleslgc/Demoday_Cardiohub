@@ -17,18 +17,19 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // Import all screens
 import HomeScreen from "./src/screens/HomeScreen.js";
-import PatientRegisterScreen from "./src/screens/PatientRegisterScreen.js";
+import PatientRegisterScreen from "./src/screens/patient/PatientRegisterScreen.js";
 import LoginScreen from "./src/screens/LoginScreen.js";
 import ConditionsScreen from "./src/screens/ConditionsScreen.js";
 import ConfidentialiteScreen from "./src/screens/ConfidentialiteScreen.js";
-import SimulationPsc from './src/screens/SimulationPsc.js';
-import HomeProScreen from './src/screens/HomeProScreen.js';
-import HomePatientScreen from './src/screens/HomePatientScreen.js';
-import TeleconsultationScreen from "./src/screens/TeleconsultationScreen.js";
+import SimulationPsc from './src/screens/pro/SimulationPsc.js';
+import HomeProScreen from './src/screens/pro/HomeProScreen.js';
+import HomePatientScreen from './src/screens/patient/HomePatientScreen.js';
+import TeleconsultationScreen from "./src/screens/patient/TeleconsultationScreen.js";
 import MessagingScreen from "./src/screens/MessagingScreen.js";
-import EcgScreen from "./src/screens/EcgScreen.js";
-import ProfilScreen from "./src/screens/ProfilScreen.js";
+import EcgScreen from "./src/screens/patient/EcgScreen.js";
+import ProfileScreen from "./src/screens/patient/ProfilPatientScreen.js";
 import EditProfileScreen from "./src/screens/EditProfileScreen.js";
+import ProfileProScreen from "./src/screens/pro/ProfilProScreen.js";
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -49,7 +50,8 @@ export default function App() {
         <Stack.Screen name="TeleconsultationScreen" component={TeleconsultationScreen} />
         <Stack.Screen name="MessagingScreen" component={MessagingScreen} />
         <Stack.Screen name="EcgScreen" component={EcgScreen} />
-        <Stack.Screen name="ProfilScreen" component={ProfilScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="ProfileProScreen" component={ProfileProScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>

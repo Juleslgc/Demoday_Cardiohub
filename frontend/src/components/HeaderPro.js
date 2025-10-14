@@ -11,17 +11,32 @@
  * - Simple, clean design for reusability across screens
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getMePro } from "../services/api";
 
 // Functional component returning the header layout with text and logo
-export default function Header() {
+export default function HeaderPro() {
+   const [lastName, setLastName] = useState("");
+  
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const user = await getMePro(); // retrieves { firstName, ... }
+          setLastName(user.lastName || ""); // save the firstname
+        } catch (error) {
+          console.error("Erreur lors de la récupération du nom:", error.message);
+        }
+      };
+      fetchUser();
+    }, []);
+
   return (
     // Ensures header content stays below system elements (status bar, notch)
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Bonjour Dr. Dupont</Text>
+        <Text style={styles.headerText}>Bonjour {lastName ? lastName : "..."}</Text>
         <Image
           source={require("../assets/LogoCardioHub.png")}
           style={styles.logo}

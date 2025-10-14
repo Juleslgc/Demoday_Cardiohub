@@ -12,14 +12,15 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
-import HeaderPatient from "../components/HeaderPatient";
-import FooterPatient from "../components/FooterPatient";
-import { getMe } from "../services/api";
-import Button from "../components/Button";
-import Separator from "../components/Separator";
+import HeaderPro from "../../components/HeaderPro";
+import FooterPro from "../../components/FooterPro";
+import { getMePro } from "../../services/api";
+import Button from "../../components/Button";
+import Separator from "../../components/Separator";
+import LogOut from "../../utils/LogOut";
 
 // Functional component representing the patient profile page
-export default function ProfileScreen({ navigation }) {
+export default function ProfileProScreen({ navigation }) {
   // Holds the current user data retrieved from the API
   const [user, setUser] = useState(null);
 
@@ -27,7 +28,7 @@ export default function ProfileScreen({ navigation }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await getMe(); // API call to fetch logged-in user's profile
+        const data = await getMePro(); // API call to fetch logged-in user's profile
         setUser(data); // Store the retrieved user in state
       } catch (error) {
         console.error("Erreur lors du chargement du profil :", error);
@@ -38,7 +39,7 @@ export default function ProfileScreen({ navigation }) {
 
   // Redirects to the login screen (logout simulation)
   const handleLogout = () => {
-    navigation.navigate("LoginScreen");
+    LogOut(navigation);
   };
 
   // Redirects to the Edit Profile screen
@@ -48,7 +49,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderPatient />
+      <HeaderPro />
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Mon profil</Text>
@@ -62,19 +63,17 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.label}>Prénom</Text>
             <Text style={styles.value}>{user.firstName}</Text>
 
-            <Text style={styles.label}>Date de naissance</Text>
-            <Text style={styles.value}>
-              {new Date(user.birthDate).toLocaleDateString("fr-FR")}
-            </Text>
+            <Text style={styles.label}>Identification National (RPPS)</Text>
+            <Text style={styles.value}>{user.rpps}</Text>
 
-            <Text style={styles.label}>Email</Text>
-            <Text style={styles.value}>{user.email}</Text>
+            <Text style={styles.label}>Établissement</Text>
+            <Text style={styles.value}>{user.institution}</Text>
 
-            <Text style={styles.label}>Téléphone</Text>
-            <Text style={styles.value}>{user.phone || "Non renseigné"}</Text>
+            <Text style={styles.label}>Rôle</Text>
+            <Text style={styles.value}>{user.role}</Text>
 
-            <Text style={styles.label}>Adresse</Text>
-            <Text style={styles.value}>{user.address || "Non renseignée"}</Text>
+            <Text style={styles.label}>Spécialité</Text>
+            <Text style={styles.value}>{user.speciality}</Text>
           </View>
         ) : (
           <Text style={styles.loading}>Chargement du profil...</Text>
@@ -99,7 +98,7 @@ export default function ProfileScreen({ navigation }) {
         />
       </ScrollView>
 
-      <FooterPatient />
+      <FooterPro />
     </SafeAreaView>
   );
 }

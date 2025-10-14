@@ -42,7 +42,4 @@ router.post('/login', patientController.login);
 // Protected route: requires a valid JWT token
 router.get('/email/:email', authenticate, patientController.getByEmail);
 
-// Returns patient information based on JWT token
-router.get("/me", authenticate, patientController.getMe);
-
 export default router;

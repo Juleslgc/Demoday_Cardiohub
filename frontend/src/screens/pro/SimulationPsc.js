@@ -3,11 +3,11 @@ import { KeyboardAvoidingView, ScrollView, Text, StyleSheet, View, Platform, Tou
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from "@expo/vector-icons";
-import Input from "../components/Input.js";
-import Button from "../components/Button.js";
-import StyledPicker from "../components/Picker.js";
-import { registerPro } from "../services/api.js";
-import { storeToken } from '../utils/TokenStorage.js';
+import Input from "../../components/Input.js";
+import Button from "../../components/Button.js";
+import StyledPicker from "../../components/Picker.js";
+import { registerPro } from "../../services/api.js";
+import { storeToken } from '../../utils/TokenStorage.js';
 
 /**
 * Login simulation screen via "Pro Santé Connect"

@@ -21,9 +21,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from "react-native-safe-area-context";
-import Button from "../components/Button.js";
-import Input from "../components/Input.js";
-import { registerPatient } from "../services/api.js"; // Backend API call handler
+import Button from "../../components/Button.js";
+import Input from "../../components/Input.js";
+import { registerPatient } from "../../services/api.js"; // Backend API call handler
 
 export default function PatientRegisterScreen({ navigation }) {
   // Local states to store form values
@@ -176,7 +176,7 @@ export default function PatientRegisterScreen({ navigation }) {
           </TouchableOpacity>
 
           <Image
-            source={require("../assets/LogoCardioHub.png")}
+            source={require("../../assets/LogoCardioHub.png")}
             style={styles.logo}
             resizeMode="contain"
           />
