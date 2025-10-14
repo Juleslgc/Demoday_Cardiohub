@@ -15,7 +15,7 @@ import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Base API endpoint
-const API_URL = "https://margin-viruses-households-lauren.trycloudflare.com/api";
+const API_URL = "https://ski-emerald-suitable-faqs.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false) {
