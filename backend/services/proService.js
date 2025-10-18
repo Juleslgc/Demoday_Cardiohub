@@ -175,4 +175,25 @@ export default class ProService {
 
 		return 'Suppression réussie.';
 	}
+
+  // Chercher des patients par nom pour un pro
+  async searchPatients(proId, name) {
+    if (!name) {
+      throw new Error("Le nom du patient est requis.");
+    }
+
+    const patients = await proRepository.searchPatientsByName(proId, name);
+
+    if (!patients || patients.length === 0) {
+      throw new Error("Aucun patient trouvé avec ce nom.");
+    }
+
+    // Optionnel : formater les résultats
+    return patients.map(p => ({
+      id: p.id,
+      name: p.name,
+      age: p.age,
+      email: p.email,
+    }));
+  }
 }

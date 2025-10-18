@@ -68,4 +68,29 @@ export default class ProRepository extends BaseRepository {
     await pro.addPatients(patient);
     return patient;
   }
+
+   // Chercher les patients par nom pour un pro
+  async searchPatientsByName(proId, name) {
+    if (!proId || !name) {
+      throw new Error("Pro ou nom manquant.");
+    }
+
+    const patients = await Patient.findAll({
+      include: [
+        {
+          model: Pro,
+          as: "Pros",
+          where: { id: proId },
+          attributes: [], // on n’a pas besoin de données du pro ici
+          through: { attributes: [] } // ignore la table de relation
+        }
+      ],
+      where: {
+        name: { [Op.iLike]: `%${name}%` }, // recherche insensible à la casse (PostgreSQL)
+      },
+    });
+
+    return patients;
+  }
+  
 }

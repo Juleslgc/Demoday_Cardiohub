@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://reach-continuously-gained-auto.trycloudflare.com/api";
+const API_URL = "https://grateful-mind-clothing-dust.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -107,3 +107,22 @@ export async function getPatients(navigation) {
 
   return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
 };
+
+// Créer un rendez-vous
+export async function createAppointment({ proId, patientId, dateTime, duration }) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  return apiRequest("/appointment", "POST", { proId, patientId, dateTime, duration }, true, token);
+};
+
+// Rechercher un patient par nom
+export async function searchPatientsByName(name) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/pro/${proId}/patients?name=${name}`, "GET", null, false, token);
+}

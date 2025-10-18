@@ -30,6 +30,8 @@ import EcgScreen from "./src/screens/patient/EcgScreen.js";
 import ProfileScreen from "./src/screens/patient/ProfilPatientScreen.js";
 import EditProfileScreen from "./src/screens/EditProfileScreen.js";
 import ProfileProScreen from "./src/screens/pro/ProfilProScreen.js";
+import TeleconsultationProScreen from "./src/screens/pro/TeleconsultationProScreen.js";
+import AppointmentScreen from "./src/screens/pro/AppointmentScreen.js";
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -53,6 +55,8 @@ export default function App() {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="ProfileProScreen" component={ProfileProScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+        <Stack.Screen name="TeleconsultationProScreen" component={TeleconsultationProScreen} />
+        <Stack.Screen name="AppointmentScreen" component={AppointmentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

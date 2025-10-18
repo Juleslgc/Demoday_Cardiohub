@@ -111,4 +111,16 @@ export default class ProController {
       res.status(400).json({ message: err.message });
     }
   }
+
+   static async searchPatients(req, res) {
+    try {
+      const { proId } = req.params;
+      const { name } = req.query; // exemple: /api/pro/123/patients?name=Julie
+
+      const patients = await proService.searchPatients(proId, name);
+      res.status(200).json(patients);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
 }

@@ -29,4 +29,5 @@ export const sequelize = new Sequelize({
   host: process.env.DB_HOST, // Database server address
   port: process.env.DB_PORT, // Connection port
   dialect: "postgres", // Base type used: here PostgreSQL
+  timezone: '+02:00', // France time zone
 });

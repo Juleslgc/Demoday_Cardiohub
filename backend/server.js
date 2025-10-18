@@ -4,6 +4,7 @@ import express from 'express';
 import proRoutes from './routes/proRoute.js';
 import cors from 'cors';
 import patientRoutes from "./routes/patientRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoute.js";
 
 const app = express();
 const PORT = 3000;
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/api', proRoutes);
 app.use("/api/auth", patientRoutes);
+app.use("/api/appointment", appointmentRoutes);
 
 
 // 404 for routes not found

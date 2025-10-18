@@ -111,7 +111,7 @@ export default function HomePro({navigation}) {
           <Text style={styles.h1}>Actions rapides</Text>
           <View style={styles.allActions}>
             {/* Teleconsultation button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('TeleconsultationProScreen')}>
               <View style={styles.square}>
                 <FontAwesome name="video-camera" size={24} color="#042456" />
                 <Text style={{color: '#042456' }}>Téléconsultations</Text>
