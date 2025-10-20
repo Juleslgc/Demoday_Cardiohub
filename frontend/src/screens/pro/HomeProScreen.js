@@ -6,7 +6,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import HeaderPro from '../../components/HeaderPro.js';
-import Footer from "../../components/FooterPro.js";
+import FooterPro from "../../components/FooterPro.js";
 import { getPatients } from "../../services/api.js";
 import calculateAge from "../../utils/CalculateAge.js";
 /**
@@ -111,7 +111,7 @@ export default function HomePro({navigation}) {
           <Text style={styles.h1}>Actions rapides</Text>
           <View style={styles.allActions}>
             {/* Teleconsultation button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('TeleconsultationProScreen')}>
               <View style={styles.square}>
                 <FontAwesome name="video-camera" size={24} color="#042456" />
                 <Text style={{color: '#042456' }}>Téléconsultations</Text>
@@ -141,7 +141,7 @@ export default function HomePro({navigation}) {
           </View>
         </ScrollView>
       </View>
-      <Footer/>
+      <FooterPro />
     </SafeAreaView>
     );
   }

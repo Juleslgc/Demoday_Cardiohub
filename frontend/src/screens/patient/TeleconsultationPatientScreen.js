@@ -12,20 +12,72 @@
  * - Handle call permissions (camera, microphone) and connection states
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import HeaderPatient from "../../components/HeaderPatient";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, Linking } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import HeaderPage from "../../components/HeaderPage";
 import FooterPatient from "../../components/FooterPatient";
 import Button from "../../components/Button";
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { getTeleconsultationByAppointment } from "../../services/api";
+
+/**
+ * TeleconsultationScreen (Patient)
+ * ----------------------------------
+ * Affiche les détails d'une téléconsultation et
+ * permet au patient de rejoindre une salle Jitsi.
+ */
 
 // Functional component representing the teleconsultation area
-export default function TeleconsultationScreen() {
+export default function TeleconsultationPatientScreen() {
+  const navigation = useNavigation();
+  const [teleconsultation, setTeleconsultation] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Id temporaire pour test
+  const appointmentId = "94423030-694d-463e-9da7-526d37030823";
+
+  // Récupération périodique de la téléconsultation
+  const fetchTeleconsultation = async () => {
+    try {
+      const data = await getTeleconsultationByAppointment(appointmentId);
+      setTeleconsultation(data);
+    } catch (error) {
+      console.log("En attente de la création de la salle...");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeleconsultation();
+    const interval = setInterval(fetchTeleconsultation, 10000); // refresh every 10 sec
+    return () => clearInterval(interval);
+  }, []);
+
+  // Ouvre la consultation dans le navigateur
+  const handleJoinConsultation = () => {
+    if (!teleconsultation?.jitsiLink) {
+      Alert.alert("En attente du professionnel...", "La salle n'est pas encore ouverte");
+      return;
+    }
+    Alert.alert(
+      "Rejoindre la consultation",
+      "Vous allez être redirigé vers votre navigateur pour rejoindre la visio.",
+      [
+        {
+          text: "Ouvrir maintenant",
+          onPress: () => Linking.openURL(teleconsultation.jitsiLink),
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderPatient />
+      <HeaderPage title="Téléconsultations" />
 
       <View style={styles.scrollArea}>
         <ScrollView
@@ -48,9 +100,10 @@ export default function TeleconsultationScreen() {
 
             {/* Button */}
             <Button
-              title="Rejoindre la consultation"
-              //onPress={onPress}
+              title={teleconsultation?.jitsiLink ? "Rejoindre la consultation" : "En attente du pro..."}
+              onPress={handleJoinConsultation}
               variant="full"
+              disabled={!teleconsultation?.jitsiLink}
             />
           </View>
 

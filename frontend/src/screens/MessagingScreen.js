@@ -12,17 +12,16 @@
  * - Include read indicators, timestamps, and attachments
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
-import HeaderPatient from "../components/HeaderPatient";
-import FooterPatient from "../components/FooterPatient";
+import HeaderPage from "../components/HeaderPage";
 
 // Functional component representing the patient messaging space
 export default function MessagingScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderPatient />
+      <HeaderPage title="Messagerie" />
 
       <View style={styles.content}>
         <Text style={styles.title}>Espace Messagerie</Text>
@@ -31,7 +30,6 @@ export default function MessagingScreen() {
         </Text>
       </View>
 
-      <FooterPatient />
     </SafeAreaView>
     );
 }

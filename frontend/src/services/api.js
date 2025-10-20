@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://reach-continuously-gained-auto.trycloudflare.com/api";
+const API_URL = "https://export-expected-speech-norfolk.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -77,10 +77,10 @@ export async function getMe(navigation) {
 
     const decoded = jwtDecode(token);
     const patientId = decoded.id;
-    const proId = decoded.rpps;
-    return apiRequest(`/auth/patient/${patientId}` || `/pro/${proId}`, "GET", null, false, token)
+    return apiRequest(`/auth/patient/${patientId}`, "GET", null, false, token)
 };
 
+// Retrieves information from the connected pro
 export async function getMePro(navigation) {
     const token = await getToken();
     if (!token) throw new Error("Aucun token trouvé");
@@ -106,4 +106,18 @@ export async function getPatients(navigation) {
   const proId = decoded.id;
 
   return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
+};
+
+// Créer une téléconsultation (Pro uniquement)
+export async function createTeleconsultation(appointmentId) {
+  const token = await getToken();
+  if (!token) throw new Error("Aucun token trouvé");
+  return apiRequest(`/teleconsultations/${appointmentId}`, "POST", null, false, token)
+};
+
+// Récupérer une téléconsultation existante par rendez-vous
+export async function getTeleconsultationByAppointment(appointmentId) {
+  const token = await getToken();
+  if (!token) throw new Error("Aucun token trouvé");
+  return apiRequest(`/teleconsultations/${appointmentId}`, "GET", null, false, token)
 };

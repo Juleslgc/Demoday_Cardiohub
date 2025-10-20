@@ -16,6 +16,7 @@ import FooterPatient from "../../components/FooterPatient.js";
 import Button from "../../components/Button.js";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 // Functional component representing the patient's main home screen
 export default function HomePatientScreen({ navigation }) {
@@ -23,7 +24,7 @@ export default function HomePatientScreen({ navigation }) {
   // --- Navigation Handlers ---
   // Each function redirects the user to a specific patient feature screen
   const handleTeleconsultation = () => {
-    navigation.navigate("TeleconsultationScreen");
+    navigation.navigate("TeleconsultationPatientScreen");
   };
 
   const handleMessaging = () => {
@@ -88,7 +89,7 @@ export default function HomePatientScreen({ navigation }) {
             {/* --- Message preview list (recent messages) --- */}
             {messages.map((msg, index) => (
               <View key={index} style={styles.messageRow}>
-                <FontAwesome name="user-circle-o" size={35} color="#042456" style={styles.avatar} />
+                <MaterialIcons name="account-circle" size={35} color="#042456" style={styles.avatar} />
                 <View style={styles.messageTextContainer}>
                   <View style={styles.messageHeader}>
                     <Text style={styles.sender}>{msg.sender}</Text>
