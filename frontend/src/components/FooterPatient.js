@@ -20,7 +20,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 // Functional component returning the footer navigation bar for patients
-export default function Footer() {
+export default function FooterPatient() {
   const navigation = useNavigation(); // Hook for navigating between patient screens
 
   return (
@@ -39,7 +39,7 @@ export default function Footer() {
         {/* Video consultation navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("TeleconsultationScreen")}
+          onPress={() => navigation.navigate("TeleconsultationPatientScreen")}
         >
           <FontAwesome5 name="video" size={22} color="#042456" />
           <Text style={styles.link}>Téléconsulte</Text>
@@ -66,7 +66,7 @@ export default function Footer() {
         {/* Profile navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("ProfileScreen")}
+          onPress={() => navigation.navigate("ProfilePatientScreen")}
         >
           <FontAwesome name="user" size={22} color="#042456" />
           <Text style={styles.link}>Profil</Text>

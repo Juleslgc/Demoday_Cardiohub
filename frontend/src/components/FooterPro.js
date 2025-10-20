@@ -21,7 +21,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 // Functional component returning the footer navigation bar
-export default function Footer() {
+export default function FooterPro() {
   const navigation = useNavigation(); // Hook to handle navigation between screens
 
   return (
@@ -40,7 +40,7 @@ export default function Footer() {
         {/* Video consultation navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("TeleconsultationProScreen")}
         >
           <FontAwesome5 name="video" size={22} color="#042456" />
           <Text style={styles.link}>Téléconsulte</Text>
@@ -58,7 +58,7 @@ export default function Footer() {
         {/* Messaging navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("MessagingScreen")}
         >
           <FontAwesome name="envelope" size={22} color="#042456" />
           <Text style={styles.link}>Messagerie</Text>
