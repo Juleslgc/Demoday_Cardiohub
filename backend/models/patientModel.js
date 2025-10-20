@@ -28,7 +28,7 @@ class Patient extends BaseModel {
 
 Patient.init(
 	{
-			...baseModel, // ajoute id: UUID
+			...baseModel, // add id: UUID
 			lastName: { type: DataTypes.STRING(100), allowNull: false },
 			firstName: { type: DataTypes.STRING(100), allowNull: false },
 			birthDate: { type: DataTypes.DATE, allowNull: false },

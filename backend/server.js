@@ -1,9 +1,11 @@
 import "./models/relationModel.js"; 
 import './config/initDB.js';
 import express from 'express';
-import proRoutes from './routes/proRoute.js';
 import cors from 'cors';
+import proRoutes from './routes/proRoute.js';
 import patientRoutes from "./routes/patientRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoute.js";
+import teleconsultationRoutes from "./routes/teleconsultationRoutes.js";
 
 const app = express();
 const PORT = 3000;
@@ -16,6 +18,8 @@ app.use(express.json());
 // Routes
 app.use('/api', proRoutes);
 app.use("/api/auth", patientRoutes);
+app.use("/api/appointment", appointmentRoutes);
+app.use("/api/teleconsultations", teleconsultationRoutes);
 
 
 // 404 for routes not found
