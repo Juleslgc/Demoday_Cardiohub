@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://grateful-mind-clothing-dust.trycloudflare.com/api";
+const API_URL = "https://optimum-seek-wildlife-transport.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -78,7 +78,7 @@ export async function getMe(navigation) {
     const decoded = jwtDecode(token);
     const patientId = decoded.id;
     const proId = decoded.rpps;
-    return apiRequest(`/auth/patient/${patientId}` || `/pro/${proId}`, "GET", null, false, token)
+    return apiRequest(`/auth/patient/${patientId}`, "GET", null, false, token)
 };
 
 export async function getMePro(navigation) {
@@ -109,9 +109,12 @@ export async function getPatients(navigation) {
 };
 
 // Créer un rendez-vous
-export async function createAppointment({ proId, patientId, dateTime, duration }) {
+export async function createAppointment({ patientId, dateTime, duration }) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
 
   return apiRequest("/appointment", "POST", { proId, patientId, dateTime, duration }, true, token);
 };
@@ -125,4 +128,15 @@ export async function searchPatientsByName(name) {
   const proId = decoded.id;
 
   return apiRequest(`/pro/${proId}/patients?name=${name}`, "GET", null, false, token);
-}
+};
+
+// Recupèrer rendez-vous côté pro
+export async function getAppointmentPro()  {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/appointment/pro/${proId}`, "GET", null, false, token);
+};

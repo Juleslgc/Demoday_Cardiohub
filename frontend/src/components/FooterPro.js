@@ -40,7 +40,7 @@ export default function Footer() {
         {/* Video consultation navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("TeleconsultationProScreen")}
         >
           <FontAwesome5 name="video" size={22} color="#042456" />
           <Text style={styles.link}>Téléconsulte</Text>

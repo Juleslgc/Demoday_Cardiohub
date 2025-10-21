@@ -12,7 +12,7 @@ export default class AppointmentService {
   //Créer un rendz-vous (seul le pro peut créer)
   async createAppointment({ proId, patientId, dateTime, duration }) {
     if (!proId) {
-      throw new Error('Seul un professionnel peut créer un rendz-vous');
+      throw new Error('Seul un professionnel peut créer un rendez-vous');
     }
     const patient = await Patient.findByPk(patientId);
     if (!patient) {

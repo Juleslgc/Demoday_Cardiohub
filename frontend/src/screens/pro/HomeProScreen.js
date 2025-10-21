@@ -132,7 +132,7 @@ export default function HomePro({navigation}) {
               </View>
             </TouchableOpacity>
             {/* Calendar Button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('CalendarScreen')}>
               <View style={styles.square}>
                 <MaterialCommunityIcons name="notebook" size={24} color="#042456" />
                 <Text style={{color: '#042456' }}>Agenda</Text>

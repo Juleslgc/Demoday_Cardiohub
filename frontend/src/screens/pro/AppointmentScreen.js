@@ -6,6 +6,7 @@ import Button from "../../components/Button";
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { searchPatientsByName, createAppointment } from "../../services/api";
 // Functional component representing the teleconsultation area
 export default function AppointmentScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,7 +21,7 @@ export default function AppointmentScreen({ navigation }) {
   "16:00", "17:00", "18:00"
   ];
   const durationSlots = [
-  "30 min", "45 min", "60 min"
+  "30", "45", "60"
   ];
 
   // Rechercher les patients quand on tape dans le TextInput
@@ -37,6 +38,55 @@ export default function AppointmentScreen({ navigation }) {
     };
     fetchPatients();
   }, [searchQuery]);
+
+  const isValidDate = () => {
+    const errors = {
+      empty: false,
+      invalidFormat: false,
+      invalidDayMonth: false,
+      pastDate: false,
+    };
+
+    if (!selectedDate || !selectedTime) {
+      errors.empty = true;
+      return errors;
+    }
+
+    const [dayStr, monthStr, yearStr] = selectedDate.split('/');
+    const day = parseInt(dayStr, 10);
+    const month = parseInt(monthStr, 10);
+    const year = parseInt(yearStr, 10);
+
+    // Vérification du format
+    if (!dayStr || !monthStr || !yearStr || dayStr.length !== 2 || monthStr.length !== 2 || yearStr.length !== 4) {
+      errors.invalidFormat = true;
+      return errors;
+    }
+
+    // Vérification des valeurs
+    if (day < 1 || month < 1 || month > 12) {
+      errors.invalidDayMonth = true;
+      return errors;
+    }
+
+    const dateTime = new Date(`${year}-${month}-${day}T${selectedTime}:00`);
+
+    // Vérification de la correspondance exacte
+    if (dateTime.getDate() !== day || dateTime.getMonth() + 1 !== month || dateTime.getFullYear() !== year) {
+      errors.invalidDayMonth = true;
+      return errors;
+    }
+
+    // Vérifier si la date est passée
+    if (dateTime < new Date()) {
+      errors.pastDate = true;
+      return errors;
+    }
+
+    return errors;
+  };
+
+  const dateErrors = isValidDate();
 
   const handleDateChange = (text) => {
     // Supprime tout sauf les chiffres
@@ -70,7 +120,7 @@ export default function AppointmentScreen({ navigation }) {
         dateTime: dateTimeISO,
         duration: selectedDuration
       });
-      Alert.alert("Succès", "Rendez-vous créé !");
+      navigation.goBack();
     } catch (err) {
       Alert.alert("Erreur", err.message);
     }
@@ -95,29 +145,52 @@ export default function AppointmentScreen({ navigation }) {
         >
           <View style={{marginBottom: -10}}>
             <Text style={styles.text}>Patients</Text>
+            {/* Barre de recherche */}
             <View style={styles.searchSection}>
-            <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
+              <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
               <TextInput
-              style={styles.searchInput}
-              placeholder="Rechercher un patient"
-              placeholderTextColor="#666"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
+                style={styles.searchInput}
+                placeholder="Rechercher un patient..."
+                placeholderTextColor="#666"
+                value={searchQuery}
+                onChangeText={async (text) => {
+                  setSearchQuery(text);
+                  setSelectedPatient(null); // désélectionne le patient si on tape
+
+                  if (text.length < 2) {
+                    setPatients([]);
+                    return;
+                  }
+
+                  // Appel API pour rechercher les patients
+                  try {
+                    const results = await searchPatientsByName(text);
+                    setPatients(results);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
               />
-              <FlatList
-              scrollEnabled={false}
-              data={patients}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[styles.patientItem, selectedPatient?.id === item.id && styles.patientSelected]}
-                  onPress={() => setSelectedPatient(item)}
-                >
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-          )}
-        />
-          </View>
+            </View>
+
+            {/* Dropdown */}
+            {patients.length > 0 && !selectedPatient && (
+              <View style={styles.dropdown}>
+                {patients.map((patient) => (
+                  <TouchableOpacity
+                    key={patient.id}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedPatient(patient);
+                      setSearchQuery(`${patient.lastName} ${patient.firstName}`);
+                      setPatients([]); // ferme le dropdown
+                    }}
+                  >
+                    <Text style={{color: "#042456"}}>{patient.lastName} {patient.firstName}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
           <View style={{marginBottom: -10}}>
             <Text style={styles.text}>Date</Text>
@@ -131,6 +204,11 @@ export default function AppointmentScreen({ navigation }) {
               onChangeText={handleDateChange}
               keyboardType="numeric"
               />
+            </View>
+            <View style={{ marginTop: -40, marginBottom: 20 }}>
+              {dateErrors.invalidFormat && <Text style={styles.errorText}>Format incorrect, jj/mm/aaaa</Text>}
+              {dateErrors.invalidDayMonth && <Text style={styles.errorText}>Jour ou mois ou année invalide</Text>}
+              {dateErrors.pastDate && <Text style={styles.errorText}>La date ou l'heure est déjà passée</Text>}
             </View>
           </View>
           <View style={{marginBottom: -10}}>
@@ -148,13 +226,13 @@ export default function AppointmentScreen({ navigation }) {
             <View style={styles.allActions}>
               {durationSlots.map((duration, index) => (
                 <TouchableOpacity key={index} style={[styles.square, selectedDuration === duration && { backgroundColor: "#A9A9A9" }]} onPress={() => setSelectedDuration(duration)}>
-                  <Text style={[styles.squareText, selectedDuration === duration && { color: '#fff' }]}>{duration}</Text>
+                  <Text style={[styles.squareText, selectedDuration === duration && { color: '#fff' }]}>{duration} min</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
           <View style={{marginTop: 30}}>
-            <TouchableOpacity style={styles.saveButton} onPress={handleCreateAppointment}>
+            <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleCreateAppointment}>
               <Text style={styles.saveButtonText}>Enregistrer</Text>
             </TouchableOpacity>
           </View>
@@ -167,7 +245,7 @@ export default function AppointmentScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#042456",
+    backgroundColor: "#fff",
   },
   /** HEADER **/
   header: {
@@ -205,6 +283,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 12,
     paddingBottom: 100, // pour ne pas cacher le bas sous le footer
+    backgroundColor: "#042456"
   },
   /** BARRE DE RECHERCHE **/
   searchSection: {
@@ -228,6 +307,24 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#042456",
   },
+  dropdown: {
+  backgroundColor: "#ccc",
+  borderRadius: 6,
+  marginHorizontal: 10,
+  marginTop: -40,
+  marginBottom: 20,
+  maxHeight: 150,
+  borderWidth: 1,
+  borderColor: "#aba9a9ff",
+  zIndex: 5, // s'assurer que ça soit au-dessus
+},
+dropdownItem: {
+  paddingVertical: 10,
+  paddingHorizontal: 15,
+  borderBottomWidth: 1,
+  borderBottomColor: "#aba9a9ff",
+},
+
   allActions: {
   flexDirection: 'row',
   flexWrap: 'wrap',
@@ -261,5 +358,11 @@ saveButtonText: {
   color: '#042456',
   fontSize: 18,
   fontWeight: '600',
+},
+errorText: {
+  color: 'red',
+  marginLeft: 15,
+  marginTop: 5,
+  fontSize: 13,
 },
 });
