@@ -51,52 +51,46 @@ export default function ProfileProScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <HeaderPro />
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Mon profil</Text>
-
-        {/* Conditional rendering: display user info once loaded */}
-        {user ? (
-          <View style={styles.infoBox}>
-            <Text style={styles.label}>Nom</Text>
-            <Text style={styles.value}>{user.lastName}</Text>
-            
-            <Text style={styles.label}>Prénom</Text>
-            <Text style={styles.value}>{user.firstName}</Text>
-
-            <Text style={styles.label}>Identification National (RPPS)</Text>
-            <Text style={styles.value}>{user.rpps}</Text>
-
-            <Text style={styles.label}>Établissement</Text>
-            <Text style={styles.value}>{user.institution}</Text>
-
-            <Text style={styles.label}>Rôle</Text>
-            <Text style={styles.value}>{user.role}</Text>
-
-            <Text style={styles.label}>Spécialité</Text>
-            <Text style={styles.value}>{user.speciality}</Text>
-          </View>
-        ) : (
-          <Text style={styles.loading}>Chargement du profil...</Text>
-        )}
-
-        {/* Button to navigate to profile editing screen */}
-        <Button
-          title="Modifier mes informations"
-          onPress={handleEditProfile}
-          variant="full"
-          icon="account-edit"
-        />
-
-        <Separator />
-
-        {/* Bouton to log out (redirecting to login screen) */}
-        <Button
-          title="Se déconnecter"
-          onPress={handleLogout}
-          variant="full"
-          icon="logout"
-        />
-      </ScrollView>
+      <View style={styles.scrollArea}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.title}>Mon profil</Text>
+          {/* Conditional rendering: display user info once loaded */}
+          {user ? (
+            <View style={styles.infoBox}>
+              <Text style={styles.label}>Nom</Text>
+              <Text style={styles.value}>{user.lastName}</Text>
+        
+              <Text style={styles.label}>Prénom</Text>
+              <Text style={styles.value}>{user.firstName}</Text>
+              <Text style={styles.label}>Identification National (RPPS)</Text>
+              <Text style={styles.value}>{user.rpps}</Text>
+              <Text style={styles.label}>Établissement</Text>
+              <Text style={styles.value}>{user.institution}</Text>
+              <Text style={styles.label}>Rôle</Text>
+              <Text style={styles.value}>{user.role}</Text>
+              <Text style={styles.label}>Spécialité</Text>
+              <Text style={styles.value}>{user.speciality}</Text>
+            </View>
+          ) : (
+            <Text style={styles.loading}>Chargement du profil...</Text>
+          )}
+          {/* Button to navigate to profile editing screen */}
+          <Button
+            title="Modifier mes informations"
+            onPress={handleEditProfile}
+            variant="full"
+            icon="account-edit"
+          />
+          <Separator />
+          {/* Bouton to log out (redirecting to login screen) */}
+          <Button
+            title="Se déconnecter"
+            onPress={handleLogout}
+            variant="full"
+            icon="logout"
+          />
+        </ScrollView>
+      </View>
 
       <FooterPro />
     </SafeAreaView>
@@ -109,8 +103,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F7FA", // Light background for readability
   },
+  scrollArea: {
+    flex: 1,
+    marginTop: 70,      // header height (50) + margin of 20
+    marginBottom: 80,   // footer height (60) + margin of 20
+  },
   content: {
-    paddingTop: 70,         // Offset for header height
     paddingBottom: 80,      // Offset for footer height
     paddingHorizontal: 20,  // Horizontal inner spacing
   },
