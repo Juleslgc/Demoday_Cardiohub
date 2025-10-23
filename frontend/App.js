@@ -32,6 +32,7 @@ import ProfilePatientScreen from "./src/screens/patient/ProfilePatientScreen.js"
 import ProfileProScreen from "./src/screens/pro/ProfileProScreen.js";
 import EditProfileScreen from "./src/screens/EditProfileScreen.js";
 import JitsiWebViewScreen from "./src/screens/JitsiWebViewScreen.js";
+import PatientsList from "./src/screens/pro/PatientsList.js";
 
 
 // Create the navigation stack
@@ -58,6 +59,7 @@ export default function App() {
         <Stack.Screen name="ProfileProScreen" component={ProfileProScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="JitsiWebViewScreen" component={JitsiWebViewScreen} />
+        <Stack.Screen name="PatientsList" component={PatientsList} />
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -271,7 +271,7 @@ export default function PatientRegisterScreen({ navigation }) {
           label="Mot de passe"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
+          secureTextEntry={true}
           placeholder="Votre mot de passe"
           required
         />
@@ -279,7 +279,7 @@ export default function PatientRegisterScreen({ navigation }) {
           label="Confirmer le mot de passe"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          secureTextEntry
+          secureTextEntry={true}
           placeholder="Votre mot de passe"
           required
           error={password !== confirmPassword && confirmPassword.length > 0 

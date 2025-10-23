@@ -12,7 +12,7 @@
  * - Include read indicators, timestamps, and attachments
  */
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
 import HeaderPage from "../components/HeaderPage";

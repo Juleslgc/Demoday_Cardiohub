@@ -49,7 +49,7 @@ export default function FooterPro() {
         {/* Patient list navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("PatientsList")}
         >
           <FontAwesome6 name="user-group" size={24} color="#b3b1b1" />
           <Text style={styles.link}>Patient</Text>
