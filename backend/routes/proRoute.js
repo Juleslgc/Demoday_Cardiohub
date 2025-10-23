@@ -47,4 +47,8 @@ router.get('/pro/:proId/patients/:patientId', authenticate, ProController.getPat
 // Rechercher un patient par son nom
 router.get("/:proId/patients", ProController.searchPatients);
 
+// Rechercher tout les patients
+router.get("/patients/all", ProController.searchAllPatients);
+
+
 export default router;

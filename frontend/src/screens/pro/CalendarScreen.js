@@ -1,55 +1,127 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { useFocusEffect } from '@react-navigation/native';
 import HeaderPage from '../../components/HeaderPage';
 import Footer from '../../components/FooterPro';
+import { getAppointmentPro } from "../../services/api";
 
 export default function CalendarScreen() {
+  const [appointments, setAppointments] = useState([]);
+  const [markedDates, setMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Exemple de rendez-vous simulés
-  const appointments = {
-    '2025-10-21': [
-      { id: '1', title: 'Dentiste à 10h' },
-      { id: '2', title: 'Réunion à 14h' },
-    ],
-    '2025-10-22': [
-      { id: '3', title: 'Cours de yoga à 18h' },
-    ],
-  };
+  // Chargement des rendez-vous à chaque focus de la page
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const fetchAppointment = async () => {
+        try {
+          setLoading(true);
+          const response = await getAppointmentPro();
+          console.log(response);
+          const data = Array.isArray(response) ? response : response.appointments || [];
+
+          if (isActive) {
+            setAppointments(data);
+            // Convertit les rendez-vous en "markedDates"
+            const marks = {};
+            data.forEach((rdv) => {
+              const rawDate = rdv.dateTime; // <-- ton champ
+              if (rawDate) {
+                // Conversion du format "27/10/2025 14:00:00" en "2025-10-27"
+                const [day, month, yearAndTime] = rawDate.split('/');
+                const [year] = yearAndTime.split(' ');
+                const formattedDate = `${year}-${month}-${day}`;
+                marks[formattedDate] = { marked: true, dotColor: '#00BFFF' };
+              }
+            });
+            setMarkedDates(marks);
+          }
+        } catch (err) {
+          console.error('Erreur lors du chargement des rendez-vous :', err);
+        } finally {
+          if (isActive) setLoading(false);
+        }
+      };
+
+      fetchAppointment();
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
   };
 
+  // Filtre les rendez-vous pour la date sélectionnée
+  const rdvForSelectedDate = appointments.filter((rdv) => {
+    if (!rdv.dateTime) return false;
+    const [day, month, yearAndTime] = rdv.dateTime.split('/');
+    const [year] = yearAndTime.split(' ');
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate === selectedDate;
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderPage title="Agenda" />
-      <Calendar
-        style={{marginTop: 50}}
-        onDayPress={handleDayPress}
-        markedDates={{
-          [selectedDate]: { selected: true, selectedColor: '#042456' },
-        }}
-      />
 
-      {selectedDate && (
-        <View style={styles.appointmentsContainer}>
-          <Text style={styles.dateTitle}>Rendez-vous du {selectedDate}</Text>
-          {appointments[selectedDate] ? (
-            <FlatList
-              data={appointments[selectedDate]}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <Text style={styles.appointmentItem}>- {item.title}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#fff" style={{ marginTop: 50 }} />
+      ) : (
+        <>
+          <Calendar
+            style={{ marginTop: 50 }}
+            onDayPress={handleDayPress}
+            theme={{
+              calendarBackground: '#042456',
+              dayTextColor: '#fff',
+              monthTextColor: '#fff',
+              arrowColor: '#fff',
+              todayTextColor: '#00BFFF',
+            }}
+            markedDates={{
+              ...markedDates,
+              ...(selectedDate && {
+                [selectedDate]: {
+                  selected: true,
+                  selectedColor: '#00BFFF',
+                  marked: markedDates[selectedDate]?.marked,
+                  dotColor: '#fff',
+                },
+              }),
+            }}
+          />
+
+          {selectedDate && (
+            <View style={styles.appointmentsContainer}>
+              <Text style={styles.dateTitle}> Rendez-vous du {selectedDate ? selectedDate.split('-').reverse().join('/') : ''}</Text>
+
+              {rdvForSelectedDate.length > 0 ? (
+                <FlatList
+                  data={rdvForSelectedDate}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => (
+                    <Text style={styles.appointmentItem}>
+                      • {item.patient?.firstName} {item.patient?.lastName} - {item.dateTime}
+                    </Text>
+                  )}
+                />
+              ) : (
+                <Text style={{ color: '#fff' }}>Aucun rendez-vous</Text>
               )}
-            />
-          ) : (
-            <Text style={{color: "#fff"}}>Aucun rendez-vous</Text>
+            </View>
           )}
-        </View>
+        </>
       )}
+
       <Footer />
     </SafeAreaView>
   );

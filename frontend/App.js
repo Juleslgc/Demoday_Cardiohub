@@ -33,6 +33,8 @@ import ProfileProScreen from "./src/screens/pro/ProfilProScreen.js";
 import TeleconsultationProScreen from "./src/screens/pro/TeleconsultationProScreen.js";
 import AppointmentScreen from "./src/screens/pro/AppointmentScreen.js";
 import CalendarScreen from "./src/screens/pro/CalendarScreen.js";
+import AddPatientScreen from "./src/screens/pro/AddPatientScreen.js";
+import PatientList from "./src/screens/pro/PatientsList.js";
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -42,8 +44,25 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }}>
-       
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="PatientRegisterScreen" component={PatientRegisterScreen} />
+        <Stack.Screen name="SimulationPsc" component={SimulationPsc} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="ConditionsScreen" component={ConditionsScreen} />
+        <Stack.Screen name="ConfidentialiteScreen" component={ConfidentialiteScreen} />
+        <Stack.Screen name="HomeProScreen" component={HomeProScreen} />
+        <Stack.Screen name="HomePatientScreen" component={HomePatientScreen} />
+        <Stack.Screen name="TeleconsultationScreen" component={TeleconsultationScreen} />
+        <Stack.Screen name="MessagingScreen" component={MessagingScreen} />
+        <Stack.Screen name="EcgScreen" component={EcgScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="ProfileProScreen" component={ProfileProScreen} />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+        <Stack.Screen name="TeleconsultationProScreen" component={TeleconsultationProScreen} />
+        <Stack.Screen name="AppointmentScreen" component={AppointmentScreen} />
         <Stack.Screen name="CalendarScreen" component={CalendarScreen} />
+        <Stack.Screen name="AddPatientScreen" component={AddPatientScreen} />
+        <Stack.Screen name="PatientList" component={PatientList} />
       </Stack.Navigator>
     </NavigationContainer>
   )

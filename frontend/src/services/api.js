@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://optimum-seek-wildlife-transport.trycloudflare.com/api";
+const API_URL = "https://cleaner-watershed-using-amongst.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -105,7 +105,7 @@ export async function getPatients(navigation) {
   const decoded = jwtDecode(token);
   const proId = decoded.id;
 
-  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
+  return apiRequest(`/pro/${proId}/patients`, "GET", null, false, token)
 };
 
 // Créer un rendez-vous
@@ -130,6 +130,14 @@ export async function searchPatientsByName(name) {
   return apiRequest(`/pro/${proId}/patients?name=${name}`, "GET", null, false, token);
 };
 
+// Rechercher tout les patients
+export async function searchAllPatients(name) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  return apiRequest(`/patients/all?name=${name}`, "GET", null, false, token);
+}
+
 // Recupèrer rendez-vous côté pro
 export async function getAppointmentPro()  {
   const token = await getToken();
@@ -139,4 +147,25 @@ export async function getAppointmentPro()  {
   const proId = decoded.id;
 
   return apiRequest(`/appointment/pro/${proId}`, "GET", null, false, token);
+};
+
+// Recupèrer rendez-vous côté pratient
+export async function getAppointmentPatient()  {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const patientId = decoded.id;
+
+  return apiRequest(`/appointment/patient/${patientId}`, "GET", null, false, token);
+};
+
+export async function addPatient(patientId) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/add/pro/${proId}/patients/${patientId}`, "POST", null, false, token);
 };

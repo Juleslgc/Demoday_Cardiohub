@@ -123,4 +123,14 @@ export default class ProController {
       res.status(400).json({ message: err.message });
     }
   }
+
+  static async searchAllPatients(req, res) {
+    try {
+      const { name } = req.query;
+      const patients = await proService.searchAllPatients(name);
+      res.status(200).json(patients);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
 }

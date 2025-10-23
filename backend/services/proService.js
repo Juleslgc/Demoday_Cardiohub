@@ -196,4 +196,23 @@ export default class ProService {
       email: p.email,
     }));
   }
+
+  async searchAllPatients(name) {
+    if (!name) throw new Error("Le nom du patient est requis.");
+
+    const patients = await proRepository.searchAllPatientsByName(name);
+
+    if (!patients || patients.length === 0) {
+      throw new Error("Aucun patient trouvé avec ce nom.");
+    }
+
+    return patients.map(p => ({
+      id: p.id,
+      firstName: p.firstName,
+      lastName: p.lastName,
+      email: p.email,
+      birthDate: p.birthDate,
+      alreadyLinked: p.Pros.length > 0,
+    }));
+  }
 }

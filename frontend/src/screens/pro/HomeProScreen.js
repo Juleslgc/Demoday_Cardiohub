@@ -58,6 +58,13 @@ export default function HomePro({navigation}) {
     fetchPatients(); // We start patient recovery
   }, []); // The empty array [] means that this action is only done once on loading
 
+  // Trier du plus récent au plus ancien
+  const recentPatients = patients
+    .slice() // pour ne pas modifier le tableau original
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3); // prendre les 3 premiers
+
+
   // Display part of the component
   return (
     // SafeAreaView to properly handle non-visible screen areas
@@ -73,7 +80,7 @@ export default function HomePro({navigation}) {
           ) : (
             // Otherwise, we display the list of patients
             <View style={styles.patients}>
-              {patients.map((patient, index) => (
+              {recentPatients.map((patient, index) => (
                 <View key={patient.id} style={styles.rectangle}>
                   {/* Line with the patient's icon and name */}
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -102,7 +109,7 @@ export default function HomePro({navigation}) {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.button1}
-              onPress={() => navigation.navigate("")}
+              onPress={() => navigation.navigate("PatientList")}
             >
               <Text style={styles.buttonText1}>Voir tous les patients</Text>
             </TouchableOpacity>
