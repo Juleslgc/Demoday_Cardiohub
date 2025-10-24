@@ -1,15 +1,30 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Alert, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { searchPatientsByName, addPatient, searchAllPatients } from "../../services/api";
+import { addPatient, searchAllPatients } from "../../services/api";
 import HeaderPage from "../../components/HeaderPage";
 import FooterPro from '../../components/FooterPro';
 import Button from '../../components/Button';
 
+/**
+* Screen: Add Patient
+* ----------------------------------------------------
+* Allows a healthcare professional to:
+* - search for a patient in the database
+* - view the results
+* - associate a patient with their account
+*/
 export default function AddPatientScreen({navigation}) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [foundPatients, setFoundPatients] = useState([]);
+  // States managing the search
+  const [searchTerm, setSearchTerm] = useState(""); // Last name or first name to search for
+  const [foundPatients, setFoundPatients] = useState([]); // Search results
 
+  /**
+  * Searches for patients via the API
+  * - Checks that the field is not empty
+  * - Calls `searchAllPatients()`
+  * - Updates the list of results
+  */
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       return Alert.alert("Erreur", "Veuillez entrer un nom ou un prénom");
@@ -19,14 +34,14 @@ export default function AddPatientScreen({navigation}) {
       const data = await searchAllPatients(searchTerm.trim());
       console.log("🔍 Résultat API :", data);
 
-      // Normalisation et calcul alreadyLinked pour le pro connecté
+      // Normalization and calculation of alreadyLinked for the connected pro
       const patients = Array.isArray(data)
         ? data.map((p) => ({
             id: p.id,
             firstname: p.firstname || p.firstName,
             lastname: p.lastname || p.lastName,
             email: p.email,
-            alreadyLinked: p.alreadyLinked,
+            alreadyLinked: p.alreadyLinked, // boolean indicating whether the patient is already associated
           }))
         : [];
 
@@ -42,10 +57,15 @@ export default function AddPatientScreen({navigation}) {
     }
   };
 
+  /**
+  * Associates a patient with the logged-in professional.
+  * - Calls `addPatient(patientId)`
+  * - Removes the patient from the list after adding them.
+  */
   const handleAdd = async (patientId) => {
     try {
       await addPatient(patientId);
-      Alert.alert("Succès", "Patient associé avec succès !");
+      Alert.alert("Patient associé avec succès !");
       setFoundPatients((prev) => prev.filter((p) => p.id !== patientId));
     } catch (err) {
       console.error("Erreur ajout patient :", err);
@@ -55,8 +75,11 @@ export default function AddPatientScreen({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* === HEADER === */}
       <HeaderPage title="Ajout de patient" />
+      {/* === SCROLLING CONTENT === */}
       <ScrollView style={{flex: 1}} contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        {/* --- Search field --- */}
         <View>
           <TextInput
             style={styles.input}
@@ -65,10 +88,12 @@ export default function AddPatientScreen({navigation}) {
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
+          {/* --- Search button --- */}
           <TouchableOpacity style={styles.button} onPress={handleSearch}>
             <Text style={{color: "#042456", fontWeight: "bold"}}>Rechercher</Text>
           </TouchableOpacity>
         </View>
+        {/* --- List of results --- */}
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
             {foundPatients.length > 0 ? (
@@ -76,6 +101,7 @@ export default function AddPatientScreen({navigation}) {
                 <View key={patient.id} style={styles.patientCard}>
                   <Text style={styles.text}>{patient.firstname} {patient.lastname}</Text>
                   <Text style={styles.text}>Email : {patient.email}</Text>
+                  {/* Association button */}
                   <Button
                     variant= 'full'
                     title={patient.alreadyLinked ? "Déjà associé" : "Associer au pro"}
@@ -90,11 +116,13 @@ export default function AddPatientScreen({navigation}) {
           </View>
         </View>
       </ScrollView>
+      {/* === FOOTER === */}
       <FooterPro />
     </SafeAreaView>
   );
 }
 
+// Component styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -106,7 +134,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 12, // Inner horizontal padding for content alignment
-    marginBottom: 80,
+    marginBottom: 80, // space for the footer
   },
   input: {
     borderWidth: 1,

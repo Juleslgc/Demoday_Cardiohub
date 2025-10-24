@@ -11,14 +11,26 @@ import { ActivityIndicator } from "react-native";
 import { getAppointmentPro } from "../../services/api";
 import calculateAge from "../../utils/CalculateAge.js";
 
-// Functional component representing the teleconsultation area
+/**
+*  TeleconsultationProScreen
+* ---------------------------------------------------------
+* Main screen for healthcare professionals to manage teleconsultations. 
+* - Displays upcoming appointments
+* - Allows filtering by time period (day, week, all)
+* - Offers patient search functionality
+* - Allows creating or modifying appointments
+*/
 export default function TeleconsultationProScreen({ navigation }) {
-  const [appointments, setAppointments] = useState([]); // liste de tous les rdv
-  const [searchText, setSearchText] = useState(""); // texte tapé dans la recherche
-  const [searchPatient, setSearchPatient] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("Aujourd'hui");
-  const [loading, setLoading] = useState(true);
+  // === Screen states ===
+  const [appointments, setAppointments] = useState([]); // Complete list of appointments
+  const [searchText, setSearchText] = useState(""); // Text typed for patient search
+  const [selectedFilter, setSelectedFilter] = useState("Aujourd'hui"); // Active filter
+  const [loading, setLoading] = useState(true); // Indicates whether the data is loading
 
+  /**
+  * Loading appointments each time the screen is in focus.
+  * useFocusEffect = automatic reloading as soon as you return to the page.
+  */
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -28,6 +40,7 @@ export default function TeleconsultationProScreen({ navigation }) {
           setLoading(true);
           const response = await getAppointmentPro();
           if (isActive) {
+            // We handle returns in both direct array and object format.
             setAppointments(Array.isArray(response) ? response : response.appointments || []);
           }
         } catch (err) {
@@ -38,14 +51,16 @@ export default function TeleconsultationProScreen({ navigation }) {
       };
 
       fetchAppointment();
-
       return () => {
-        isActive = false; // évite les updates après démontage
+        isActive = false; // Prevents an update if the component is unmounted
       };
     }, [])
   );
 
-  // Convertir la date au format ISO
+  /**
+  * Converts a date in the French format "dd/mm/yyyy hh:mm:ss"
+  * into a usable JavaScript Date object (ISO format). 
+  */
   const parseFrenchDate = (dateStr) => {
     // Exemple : "18/10/2025 14:00:00"
     const [datePart, timePart] = dateStr.split(' ');
@@ -55,23 +70,29 @@ export default function TeleconsultationProScreen({ navigation }) {
   };
 
 
-  // Filtrage dynamique
+  /**
+  * Dynamic filtering:
+  * - Removes past appointments
+  * - Filters according to the selected type (Today / Week / All)
+  * - Searches by patient name
+  * - Sorts by chronological date
+  */
   const filteredAppointments = appointments.filter((appointment) => {
     const appointmentDate = parseFrenchDate(appointment.dateTime);
 
-    // bornes du jour
+    // Day boundaries
     const today = new Date();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-    // bornes de la semaine
+    // Week boundaries
     const startOfWeek = new Date(todayStart);
-    startOfWeek.setDate(todayStart.getDate() - todayStart.getDay()); // dimanche
+    startOfWeek.setDate(todayStart.getDate() - todayStart.getDay());
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // samedi
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    // Supprime les rendez-vous passés
+    // On exclut les rendez-vous passés
     if (appointmentDate < todayStart) return false;
 
     // Filtrage selon le filtre actif
@@ -82,16 +103,16 @@ export default function TeleconsultationProScreen({ navigation }) {
       return appointmentDate >= startOfWeek && appointmentDate <= endOfWeek;
     }
 
-    // “Tous” -> on garde tout ce qui n’est pas passé
+    // “Tous” = no specific filter
     return true;
   })
-  // Ensuite, filtrage par recherche (nom)
+  // Next, filter by searching for first or last name.
   .filter((appointment) => {
     if (!searchText) return true;
     const fullName = `${appointment.patient.firstName} ${appointment.patient.lastName}`.toLowerCase();
     return fullName.includes(searchText.toLowerCase());
   })
-  // Et enfin, tri par ordre chronologique
+  // And finally, sort in chronological order
   .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
 
 
@@ -101,7 +122,7 @@ export default function TeleconsultationProScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={{flex: 1, backgroundColor: "#042456"}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        {/* === Header personnalisé === */}
+        {/* === HEADER === */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <MaterialIcons name="arrow-back" size={26} color="#042456" />
@@ -110,7 +131,7 @@ export default function TeleconsultationProScreen({ navigation }) {
             <Text style={styles.headerTitle}>Téléconsultations</Text>
           </View>
         </View>
-        {/* === Section fixe : Nouveau rendez-vous === */}
+        {/* === SECTION: Appointment creation === */}
         <View style={styles.fixedAction}>
           <Button
             title="Nouveau rendez-vous"
@@ -119,12 +140,12 @@ export default function TeleconsultationProScreen({ navigation }) {
             icon="calendar-plus"
           />
         </View>
-          {/* === Contenu défilant === */}
+          {/* === SCROLLABLE CONTENT === */}
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
             showsVerticalScrollIndicator={false}
           >
-            {/* === Barre de filtres === */}
+            {/* Dynamic filters */}
             <View style={styles.filterContainer}>
               {["Aujourd'hui", "Semaine", "Tous"].map((filter) => (
                 <TouchableOpacity
@@ -138,7 +159,7 @@ export default function TeleconsultationProScreen({ navigation }) {
                 </TouchableOpacity>
               ))}
           </View>
-            {/* If the data is loading, a spinner is displayed */}
+            {/* Loading or displaying appointments */}
             {loading ? (
               <ActivityIndicator size="large" color="#042456" />
             ) : filteredAppointments.length === 0 ? (
@@ -157,16 +178,28 @@ export default function TeleconsultationProScreen({ navigation }) {
                         <Text style={styles.patientAge}>{calculateAge(appointment.patient.birthDate)} ans</Text>
                       </View>
                     </View>
-                    <Button
-                      title="Lancer la consultation"
-                      //onPress={onPress}
-                      variant="full"
-                    />
+                    <View style={styles.buttonRow}>
+                      <Button
+                        title="Lancer la consultation"
+                        variant="full"
+                        onPress={() => {
+                          // Navigation ou logique de lancement
+                          navigation.navigate('');
+                        }}
+                      />
+
+                      <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => navigation.navigate('EditAppointmentScreen', {appointment})}
+                      >
+                        <Text style={styles.editButtonText}>Modifier</Text>
+                      </TouchableOpacity>
+                    </View>
                 </View>
               ))
             )}
           </ScrollView>
-          {/* === BARRE DE RECHERCHE === */}
+          {/* === SEARCH BAR === */}
           <View style={styles.searchSection}>
             <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
             <TextInput
@@ -177,11 +210,13 @@ export default function TeleconsultationProScreen({ navigation }) {
               onChangeText={setSearchText}
             />
           </View>
-        <FooterPro />
       </KeyboardAvoidingView>
+      {/* === FOOTER === */}
+      <FooterPro />
     </SafeAreaView>
   );
 }
+
 // Component styles
 const styles = StyleSheet.create({
   container: {
@@ -213,7 +248,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#042456",
   },
-  /** SECTION FIXE : bouton “Nouveau rendez-vous” **/
+  /** SECTION: "New appointment" button **/
   fixedAction: {
     backgroundColor: "#F5F7FA",
     width: "100%",
@@ -223,10 +258,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },
-  /** BARRE DE FILTRES **/
+  /** FILTER BAR **/
   filterContainer: {
     flexDirection: "row",
-    backgroundColor: "#E6E6E6", // gris clair de fond
+    backgroundColor: "#E6E6E6", // light gray background
     borderRadius: 10,
     overflow: "hidden",
     marginTop: 6,
@@ -237,11 +272,11 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#E6E6E6", // inactif
+    backgroundColor: "#E6E6E6", // inactive
     borderRadius: 10,
   },
   filterItemActive: {
-    backgroundColor: "#fff", // blanc quand actif
+    backgroundColor: "#fff", // white when active
   },
   filterText: {
     fontSize: 18,
@@ -252,10 +287,10 @@ const styles = StyleSheet.create({
     color: "#042456",
     fontWeight: "600",
   },
-  /** CONTENU SCROLLABLE **/
+  /** SCROLLABLE CONTENT **/
   scrollContainer: {
     padding: 12,
-    paddingBottom: 100, // pour ne pas cacher le bas sous le footer
+    paddingBottom: 100, // to prevent the bottom from being hidden under the footer
   },
   rowCenter: {
     flexDirection: "row",
@@ -281,13 +316,13 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     color: "#042456",
-    marginBottom: 2, // petit espace entre nom et âge
+    marginBottom: 2, // small space between name and age
   },
   patientAge: {
     fontSize: 16,
     color: "#042456",
   },
-  /** BARRE DE RECHERCHE **/
+  /** SEARCH BAR **/
   searchSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -298,7 +333,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 15,
     marginHorizontal: 10,
-    marginBottom: 80,
+    marginBottom: 70,
   },
   searchIcon: {
     marginRight: 10,
@@ -308,4 +343,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#042456",
   },
+  buttonRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 10,
+  gap: 10, // to space out the buttons
+},
+
+editButton: {
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#042456',
+  paddingVertical: 11,
+  paddingHorizontal: 18,
+  borderRadius: 5,
+  marginBottom: -10
+},
+
+editButtonText: {
+  color: '#042456',
+  fontSize: 15,
+  fontWeight: '600',
+},
 });

@@ -4,61 +4,39 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatLi
 import FooterPro from "../../components/FooterPro";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { searchPatientsByName, createAppointment } from "../../services/api";
+import { updatedAppointment } from "../../services/api";
 
 /**
-* Screen for creating an appointment for a professional.
-* Allows the user to:
-*  - search for a patient,
-*  - choose a date, time, and duration,
-*  - and then create an appointment in the database. 
+* Appointment Modification Screen (EditAppointmentScreen)
+* ----------------------------------------------------------------
+* Allows a healthcare professional to:
+* - view the patient concerned
+* - modify the date, time, and duration of the appointment
+* - confirm the modification by calling the backend API
 */
-export default function AppointmentScreen({ navigation }) {
-  // --- Screen states ---
-  const [searchQuery, setSearchQuery] = useState("");
-  const [patients, setPatients] = useState([]);
-  const [selectedPatient, setSelectedPatient] = useState(null);
+export default function EditAppointmentScreen({ navigation, route }) {
+  const { appointment } = route.params; // Retrieving the appointment transmitted from the previous screen
+
+  // Local States
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState(30); // default 30 min
-  // Proposed time slots
+
+  // Available time slots
   const timeSlots = [
   "08:00", "09:00", "10:00",
   "11:00", "14:00", "15:00",
   "16:00", "17:00", "18:00"
   ];
-  // Proposed durations
+
+  // Possible durations
   const durationSlots = [
   "30", "45", "60"
   ];
 
-  // Search for patients as soon as the search query exceeds 2 characters
-  useEffect(() => {
-    if (searchQuery.length < 2) return; // avoid too many requests
-    const fetchPatients = async () => {
-      try {
-        const results = await searchPatientsByName(searchQuery);
-        setPatients(results);
-      } catch (err) {
-        console.error(err);
-        Alert.alert("Erreur", err.message);
-      }
-    };
-    fetchPatients();
-  }, [searchQuery])
-
-  // Local filtering to keep only the matching patients
-  const filteredPatients = patients.filter((patient) => {
-    if (!searchQuery) return true; // si rien n'est tapé, on garde tout
-    const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
-    return fullName.includes(searchQuery.toLowerCase());
-  });
-
   /**
-  * Checks the validity of the entered date:
-  * - correct format (dd/mm/yyyy)
-  * - valid day/month
-  * - not in the past
+  * Validates the entered date and time.
+  * Returns an object with different possible error types.
   */
   const isValidDate = () => {
     const errors = {
@@ -140,17 +118,16 @@ export default function AppointmentScreen({ navigation }) {
   };
 
   /**
-  *  Appointment creation
-  * API call: createAppointment()
+  * Saves the appointment modifications.
+  * API call: updatedAppointment()
   */
-  const handleCreateAppointment = async () => {
-    if (!selectedPatient) return Alert.alert("Erreur", "Veuillez sélectionner un patient");
+  const handleEditAppointment = async () => {
     if (!selectedDate || !selectedTime) return Alert.alert("Erreur", "Veuillez sélectionner la date et l'heure");
 
     const dateTimeISO = getDateTimeISO();
     try {
-      await createAppointment({
-        patientId: selectedPatient.id,
+      const result = await updatedAppointment(appointment.id, {
+        patientId: appointment.patient.id,
         dateTime: dateTimeISO,
         duration: selectedDuration
       });
@@ -163,68 +140,26 @@ export default function AppointmentScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* === HEADER === */}
+      {/* === Custom Header === */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={26} color="#042456" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Prise de rendez-vous</Text>
+          <Text style={styles.headerTitle}>Modification de rendez-vous</Text>
         </View>
       </View>
-        {/* === SCROLLABLE CONTENT === */}
+        {/* === Scrolling content === */}
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
           <View style={{marginBottom: -10}}>
             <Text style={styles.text}>Patients</Text>
-            {/* Search bar */}
+            {/* --- Patient concerned --- */}
             <View style={styles.searchSection}>
-              <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Rechercher un patient..."
-                placeholderTextColor="#666"
-                value={searchQuery}
-                onChangeText={async (text) => {
-                  setSearchQuery(text);
-                  setSelectedPatient(null); // deselect the patient if typing
-
-                  if (text.length < 2) {
-                    setPatients([]);
-                    return;
-                  }
-
-                  // Appel API pour rechercher les patients
-                  try {
-                    const results = await searchPatientsByName(text);
-                    setPatients(results);
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
-              />
+              <Text style={styles.textPatient}>{appointment.patient.lastName} {appointment.patient.firstName}</Text>
             </View>
-
-            {/* Dropdown list of patients */}
-            {filteredPatients.length > 0 && !selectedPatient && (
-              <View style={styles.dropdown}>
-                {filteredPatients.map((patient) => (
-                  <TouchableOpacity
-                    key={patient.id}
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setSelectedPatient(patient);
-                      setSearchQuery(`${patient.lastName} ${patient.firstName}`);
-                      setPatients([]); // ferme le dropdown
-                    }}
-                  >
-                    <Text style={{color: "#042456"}}>{patient.lastName} {patient.firstName}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
           </View>
           {/* --- Date selection --- */}
           <View style={{marginBottom: -10}}>
@@ -271,7 +206,7 @@ export default function AppointmentScreen({ navigation }) {
           </View>
           {/* --- Save button --- */}
           <View style={{marginTop: 30}}>
-            <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleCreateAppointment}>
+            <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleEditAppointment}>
               <Text style={styles.saveButtonText}>Enregistrer</Text>
             </TouchableOpacity>
           </View>
@@ -281,6 +216,7 @@ export default function AppointmentScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+
 // Component styles
 const styles = StyleSheet.create({
   container: {
@@ -325,7 +261,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // to prevent the bottom from being hidden under the footer
     backgroundColor: "#042456"
   },
-  /** SEARCH BAR **/
+  /** PATIENT CONCERNED **/
   searchSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -339,6 +275,9 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 5,
   },
+  textPatient: {
+    color: "#042456",
+  },
   searchIcon: {
     marginRight: 10,
   },
@@ -347,24 +286,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#042456",
   },
-  dropdown: {
-  backgroundColor: "#ccc",
-  borderRadius: 6,
-  marginHorizontal: 10,
-  marginTop: -40,
-  marginBottom: 20,
-  maxHeight: 150,
-  borderWidth: 1,
-  borderColor: "#aba9a9ff",
-  zIndex: 5, // make sure it's on top
-},
-dropdownItem: {
-  paddingVertical: 10,
-  paddingHorizontal: 15,
-  borderBottomWidth: 1,
-  borderBottomColor: "#aba9a9ff",
-},
-
   allActions: {
   flexDirection: 'row',
   flexWrap: 'wrap',
@@ -387,7 +308,7 @@ squareText: {
   color: '#042456',
 },
 saveButton: {
-  backgroundColor: '#fff', // main blue tone
+  backgroundColor: '#fff',
   paddingVertical: 15,
   borderRadius: 8,
   alignItems: 'center',

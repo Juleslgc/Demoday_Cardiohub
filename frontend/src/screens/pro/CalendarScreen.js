@@ -1,19 +1,48 @@
 import React, { useState, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View, FlatList, ActivityIndicator } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useFocusEffect } from '@react-navigation/native';
 import HeaderPage from '../../components/HeaderPage';
 import Footer from '../../components/FooterPro';
 import { getAppointmentPro } from "../../services/api";
 
+/**
+* Schedule Screen (professional)
+* Displays a calendar with days containing appointments,
+* and lists the appointments for the selected day. 
+*/
 export default function CalendarScreen() {
-  const [appointments, setAppointments] = useState([]);
-  const [markedDates, setMarkedDates] = useState({});
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // --- Local States ---
+  const [appointments, setAppointments] = useState([]); // complete list of appointments
+  const [markedDates, setMarkedDates] = useState({}); // days marked on the calendar
+  const [selectedDate, setSelectedDate] = useState(null); // currently selected day
+  const [loading, setLoading] = useState(false); // loading indicator
 
-  // Chargement des rendez-vous à chaque focus de la page
+  // --- Calendar configuration in French ---
+  LocaleConfig.locales['fr'] = {
+    monthNames: [
+      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    ],
+    monthNamesShort: [
+      'Janv.', 'Févr.', 'Mars', 'Avr.', 'Mai', 'Juin',
+      'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'
+    ],
+    dayNames: [
+      'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'
+    ],
+    dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+    today: "Aujourd'hui"
+  };
+
+  // Activates the French language by default
+  LocaleConfig.defaultLocale = 'fr';
+
+  /**
+  * Automatically loads appointments every time
+  * the page is displayed (screen is in focus).
+  */
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -22,17 +51,16 @@ export default function CalendarScreen() {
         try {
           setLoading(true);
           const response = await getAppointmentPro();
-          console.log(response);
           const data = Array.isArray(response) ? response : response.appointments || [];
 
           if (isActive) {
             setAppointments(data);
-            // Convertit les rendez-vous en "markedDates"
+            // Converts the appointments into a "markedDates" object
             const marks = {};
             data.forEach((rdv) => {
               const rawDate = rdv.dateTime; // <-- ton champ
               if (rawDate) {
-                // Conversion du format "27/10/2025 14:00:00" en "2025-10-27"
+                // Conversion from FR format to ISO format
                 const [day, month, yearAndTime] = rawDate.split('/');
                 const [year] = yearAndTime.split(' ');
                 const formattedDate = `${year}-${month}-${day}`;
@@ -49,18 +77,19 @@ export default function CalendarScreen() {
       };
 
       fetchAppointment();
-
+      // Cleanup: prevents state updates after unmounting
       return () => {
         isActive = false;
       };
     }, [])
   );
 
+  // When a day is selected in the calendar
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
   };
 
-  // Filtre les rendez-vous pour la date sélectionnée
+  // --- Filtering appointments for the selected day ---
   const rdvForSelectedDate = appointments.filter((rdv) => {
     if (!rdv.dateTime) return false;
     const [day, month, yearAndTime] = rdv.dateTime.split('/');
@@ -71,6 +100,7 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* === HEADER ===*/}
       <HeaderPage title="Agenda" />
 
       {loading ? (
@@ -80,6 +110,7 @@ export default function CalendarScreen() {
           <Calendar
             style={{ marginTop: 50 }}
             onDayPress={handleDayPress}
+            firstDay={1} // To make the first day Monday and not Sunday
             theme={{
               calendarBackground: '#042456',
               dayTextColor: '#fff',
@@ -99,7 +130,7 @@ export default function CalendarScreen() {
               }),
             }}
           />
-
+          {/* === List of appointments for the day === */}
           {selectedDate && (
             <View style={styles.appointmentsContainer}>
               <Text style={styles.dateTitle}> Rendez-vous du {selectedDate ? selectedDate.split('-').reverse().join('/') : ''}</Text>
@@ -121,7 +152,7 @@ export default function CalendarScreen() {
           )}
         </>
       )}
-
+      {/* === FOOTER === */}
       <Footer />
     </SafeAreaView>
   );

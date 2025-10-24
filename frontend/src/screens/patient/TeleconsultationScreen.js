@@ -93,7 +93,7 @@ export default function TeleconsultationScreen() {
             <ActivityIndicator size="large" color="#042456" />
           ) : (
             filteredAppointments.map((patient) => (
-              <View style={styles.card}>
+              <View key={patient.id} style={styles.card}>
                 {/* Date section */}
                 <View style={styles.rowCenter}>
                   <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />

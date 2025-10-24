@@ -39,11 +39,12 @@ export default class AppointmentController {
   // Mettre à jour le rendez-vous
   static async updateAppointment(req, res) {
     try {
-      const { dateTime, duration, patientId } = req.body;
+      const { dateTime, duration, patientId, proId } = req.body;
       const appointment = await appointmentService.updateAppointment(req.params.id, {
         dateTime: dateTime ? new Date(dateTime) : undefined,
         duration,
         patientId,
+        proId,
       });
       res.json(appointment);
     } catch (err) {

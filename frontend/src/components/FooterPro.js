@@ -58,7 +58,7 @@ export default function Footer() {
         {/* Messaging navigation button */}
         <TouchableOpacity 
           style={styles.homeButton}
-          onPress={() => navigation.navigate("")}
+          onPress={() => navigation.navigate("MessagingProScreen")}
         >
           <FontAwesome name="envelope" size={22} color="#042456" />
           <Text style={styles.link}>Messagerie</Text>

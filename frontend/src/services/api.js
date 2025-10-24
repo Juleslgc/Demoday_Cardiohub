@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://cleaner-watershed-using-amongst.trycloudflare.com/api";
+const API_URL = "https://noticed-bradford-gary-printers.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -81,6 +81,7 @@ export async function getMe(navigation) {
     return apiRequest(`/auth/patient/${patientId}`, "GET", null, false, token)
 };
 
+// Retrieves information from the connected pro
 export async function getMePro(navigation) {
     const token = await getToken();
     if (!token) throw new Error("Aucun token trouvé");
@@ -90,6 +91,7 @@ export async function getMePro(navigation) {
     return apiRequest(`/pro/${proId}`, "GET", null, false, token)
 };
 
+// Get patient by pro
 export async function getPatients(navigation) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -108,7 +110,7 @@ export async function getPatients(navigation) {
   return apiRequest(`/pro/${proId}/patients`, "GET", null, false, token)
 };
 
-// Créer un rendez-vous
+// Created appointment by the pro
 export async function createAppointment({ patientId, dateTime, duration }) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -119,7 +121,18 @@ export async function createAppointment({ patientId, dateTime, duration }) {
   return apiRequest("/appointment", "POST", { proId, patientId, dateTime, duration }, true, token);
 };
 
-// Rechercher un patient par nom
+// Updated appointment by the pro
+export async function updatedAppointment(id, { patientId, dateTime, duration }) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/appointment/${id}`, "PUT", {proId, patientId, dateTime, duration}, true, token);
+};
+
+// Search for a patient by name
 export async function searchPatientsByName(name) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -130,7 +143,7 @@ export async function searchPatientsByName(name) {
   return apiRequest(`/pro/${proId}/patients?name=${name}`, "GET", null, false, token);
 };
 
-// Rechercher tout les patients
+// Search for all patients
 export async function searchAllPatients(name) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -138,7 +151,7 @@ export async function searchAllPatients(name) {
   return apiRequest(`/patients/all?name=${name}`, "GET", null, false, token);
 }
 
-// Recupèrer rendez-vous côté pro
+// Retrieve appointments on the professional side
 export async function getAppointmentPro()  {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -149,7 +162,7 @@ export async function getAppointmentPro()  {
   return apiRequest(`/appointment/pro/${proId}`, "GET", null, false, token);
 };
 
-// Recupèrer rendez-vous côté pratient
+// Retrieve appointments on the patient side
 export async function getAppointmentPatient()  {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -160,6 +173,7 @@ export async function getAppointmentPatient()  {
   return apiRequest(`/appointment/patient/${patientId}`, "GET", null, false, token);
 };
 
+// Adding a patient by the pro
 export async function addPatient(patientId) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
