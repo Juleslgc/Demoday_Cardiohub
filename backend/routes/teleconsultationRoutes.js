@@ -1,10 +1,11 @@
 /**
- * Teleconsultation Routes
- * --------------------------------------------
- * Gère les endpoints relatifs aux téléconsultations :
- *  - Création d’une téléconsultation par un professionnel
- *  - Récupération sécurisée d’une téléconsultation
- *  - Mise à jour du statut (en cours, terminée, annulée)
+ * Handles API endpoints related to teleconsultations:
+ *  - Creation of a teleconsultation by a professional
+ *  - Secure retrieval of a teleconsultation (for authorized users)
+ *
+ * Notes:
+ * - All routes are protected by authentication middleware.
+ * - Routes delegate business logic to the TeleconsultationController.
  */
 
 import { Router } from "express";
@@ -13,13 +14,10 @@ import teleconsultationController from "../controllers/teleconsultationControlle
 
 const router = Router();
 
-// Crée une téléconsultation (pro uniquement)
+// Creates a new teleconsultation (accessible only to professionals)
 router.post("/:appointmentId", authenticate, teleconsultationController.createTeleconsultation);
 
-// Récupère une téléconsultation (patient ou pro concerné)
+// Retrieves a teleconsultation (accessible to the corresponding patient or professional)
 router.get("/:appointmentId", authenticate, teleconsultationController.getByAppointment);
-
-// Met à jour le statut (ex: "in_progress", "completed", "cancelled")
-router.put("/:id/status", authenticate, teleconsultationController.updateStatus);
 
 export default router;

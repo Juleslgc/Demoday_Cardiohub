@@ -1,3 +1,19 @@
+/**
+ * Teleconsultation Service
+ * ----------------------------------------------------
+ * This service handles the business logic related to teleconsultations.
+ * It interacts with the repository and other models to manage teleconsultation creation and retrieval.
+ *
+ * Responsibilities:
+ * - Create a teleconsultation linked to an existing appointment
+ * - Retrieve a teleconsultation by appointment ID
+ *
+ * Notes:
+ * - Ensures that a teleconsultation is created only once per appointment
+ * - Automatically generates a unique Jitsi link for each teleconsultation
+ * - Throws errors for missing or invalid appointment data
+ */
+
 import TeleconsultationRepository from "../repositories/teleconsultationRepository.js";
 import Appointment from "../models/appointmentModel.js";
 import { v4 as uuidv4 } from "uuid";
@@ -5,64 +21,50 @@ import { v4 as uuidv4 } from "uuid";
 const teleconsultationRepository = new TeleconsultationRepository();
 
 export default class TeleconsultationService {
-  // Crée une téléconsultation pour un rendez-vous existant.
-  // Le pro et le patient sont récupérés depuis le rendez-vous.
+  // Creates a teleconsultation for an existing appointment.
+  // The professional (pro) and patient are retrieved automatically from the appointment record.
   async createTeleconsultation(appointmentId) {
-    // Vérifie si une téléconsultation existe déjà pour ce rendez-vous
+    // Checks if a teleconsultation already exists for this appointment
     const existing = await teleconsultationRepository.findByAppointment(appointmentId);
     if (existing) {
       console.log("Téléconsultation déjà existante, renvoi du même lien :", existing.jitsiLink);
-      return existing; // on renvoie la même instance sans recréer
+      return existing; // Returns the same instance instead of creating a new one
     }
   
-    // Vérifie que le rendez-vous existe
+    // Verifies that the appointment exists in the database
     const appointment = await Appointment.findByPk(appointmentId);
     if (!appointment) {
       throw new Error("Rendez-vous introuvable");
     }
   
-    // Récupère automatiquement les IDs liés à l’appointment
+    // Retrieves the professional and patient IDs associated with this appointment
     const { proId, patientId } = appointment;
   
     if (!proId || !patientId) {
       throw new Error("Le rendez-vous n’est pas lié à un professionnel ou un patient.");
     }
   
-    // Génère un lien Jitsi unique
-    const shortId = uuidv4().split("-")[0]; // prend juste le premier segment
+    // Generates a unique Jitsi meeting link (using only the first UUID segment for simplicity)
+    const shortId = uuidv4().split("-")[0];
     const jitsiLink = `https://meet.jit.si/consultation-${shortId}`;
   
-    // Crée la téléconsultation avec tous les liens nécessaires
+    // Creates a new teleconsultation record with all necessary data
     const teleconsultation = await teleconsultationRepository.create({
       appointmentId,
       proId,
       patientId,
       jitsiLink,
-      status: "scheduled", // statut par défaut
     });
   
     console.log(" Nouvelle téléconsultation créée :", teleconsultation.jitsiLink);
     return teleconsultation;
   }
-  
 
-  // Récupère la téléconsultation associée à un rendez-vous donné.
+  // Retrieves the teleconsultation associated with a given appointment ID.
   async getByAppointment(appointmentId) {
     const teleconsultation = await teleconsultationRepository.findByAppointment(appointmentId);
     if (!teleconsultation) throw new Error("Aucune téléconsultation trouvée pour ce rendez-vous.");
     return teleconsultation;
   }
 
-  // Met à jour le statut d'une téléconsultation (ex : "in_progress", "ended", "canceled").
-  async updateStatus(id, status) {
-    const validStatuses = ["scheduled", "in_progress", "ended", "canceled"];
-    if (!validStatuses.includes(status)) {
-      throw new Error("Statut invalide");
-    }
-
-    const updated = await teleconsultationRepository.updateStatus(id, status);
-    if (!updated) throw new Error("Téléconsultation introuvable");
-
-    return updated;
-  }
 }

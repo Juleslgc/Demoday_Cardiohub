@@ -1,9 +1,17 @@
 {
-  "android": {
-    "package": "com.anonymous.frontend"
-  },
-  "ios": {
-    "bundleIdentifier": "com.anonymous.frontend"
+  "expo": {
+    "name": "CardioHub",
+    "slug": "cardiohub",
+    "scheme": "cardiohub",
+    "ios": {
+      "bundleIdentifier": "com.anonymous.frontend"
+    },
+    "android": {
+      "package": "com.anonymous.frontend"
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   },
   "plugins": [
     "expo-font"

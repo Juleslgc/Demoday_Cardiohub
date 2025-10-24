@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://baseball-select-discussion-calls.trycloudflare.com/api";
+const API_URL = "https://fabrics-capacity-news-corner.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {

@@ -1,22 +1,37 @@
+/**
+ * This repository handles database operations related to teleconsultations.
+ * It interacts directly with Sequelize models and abstracts persistence logic from services.
+ *
+ * Responsibilities:
+ * - Create a new teleconsultation linked to an appointment
+ * - Retrieve teleconsultations by appointment ID or by teleconsultation ID
+ *
+ * Notes:
+ * - Each method returns Sequelize model instances or null if no record is found.
+ * - Uses eager loading (via `include`) to fetch related Appointment, Pro, and Patient data.
+ */
+
 import Teleconsultation from "../models/teleconsultationModel.js";
 import Appointment from "../models/appointmentModel.js";
 import Pro from "../models/proModel.js";
 import Patient from "../models/patientModel.js";
 
 export default class TeleconsultationRepository {
-  // Crée une nouvelle téléconsultation liée à un rendez-vous
-  async create({ appointmentId, proId, patientId, jitsiLink, status = "scheduled" }) {
+  // Creates a new teleconsultation linked to a specific appointment
+  async create({ appointmentId, proId, patientId, jitsiLink }) {
+    // Inserts a new record in the teleconsultations table
     return await Teleconsultation.create({
       appointmentId,
       proId,
       patientId,
       jitsiLink,
-      status,
     });
   }
 
-  // Récupère une téléconsultation par son rendez-vous
+  // Retrieves a teleconsultation by its associated appointment ID
   async findByAppointment(appointmentId) {
+    // Searches for one teleconsultation that matches the given appointment ID
+    // Includes related Appointment, Pro, and Patient data for joined context
     return await Teleconsultation.findOne({
       where: { appointmentId },
       include: [
@@ -27,8 +42,10 @@ export default class TeleconsultationRepository {
     });
   }
 
-  // Récupère une téléconsultation par son ID
+  // Retrieves a teleconsultation by its primary key (ID)
   async findById(id) {
+    // Looks up a teleconsultation by ID using Sequelize's findByPk method
+    // Includes related models to return complete contextual data
     return await Teleconsultation.findByPk(id, {
       include: [
         { model: Appointment, as: "appointment" },
@@ -37,16 +54,4 @@ export default class TeleconsultationRepository {
       ],
     });
   }
-
-  // Met à jour le statut d’une téléconsultation
-  async updateStatus(id, status) {
-    const teleconsultation = await Teleconsultation.findByPk(id);
-    if (!teleconsultation) return null;
-
-    teleconsultation.status = status;
-    await teleconsultation.save();
-
-    return teleconsultation;
-  }
-
 }

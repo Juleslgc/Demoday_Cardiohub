@@ -2,7 +2,6 @@ import Pro from "./proModel.js";
 import Patient from "./patientModel.js";
 import Appointment from "./appointmentModel.js";
 import Teleconsultation from "./teleconsultationModel.js";
-//import Appointment from "./appointmentModel.js";
 
 // Relation plusieurs-à-plusieurs
 Pro.belongsToMany(Patient, { through: "ProPatient", as: "Patients" });
@@ -28,4 +27,4 @@ Teleconsultation.belongsTo(Pro, { foreignKey: "proId", as: "pro" });
 Patient.hasMany(Teleconsultation, { foreignKey: "patientId", as: "teleconsultations" });
 Teleconsultation.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 
-export { Pro, Patient, Appointment, Teleconsultation }; // Ajouter Appointment
+export { Pro, Patient, Appointment, Teleconsultation };
