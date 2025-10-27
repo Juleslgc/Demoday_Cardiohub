@@ -22,7 +22,7 @@ import { Patient } from '../models/relationModel.js';
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET;
 
-export default class ProService {
+class ProService {
 
 	// Creates a new Pro or returns the existing Pro
 	async createOrLoginPro(data) {
@@ -212,3 +212,5 @@ export default class ProService {
     }));
   }
 }
+
+export default new ProService();
