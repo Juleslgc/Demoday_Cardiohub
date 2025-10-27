@@ -8,19 +8,45 @@
  * - Scrollable layout with consistent styling and responsive design
  */
 
-import React from "react";
+import React, { useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, View, Text, ScrollView } from "react-native";
+import { StyleSheet, View, Text, ScrollView, ActivityIndicator } from "react-native";
 import HeaderPatient from "../../components/HeaderPatient.js";
 import FooterPatient from "../../components/FooterPatient.js";
 import Button from "../../components/Button.js";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { getAppointmentPatient } from "../../services/api.js";
 
 // Functional component representing the patient's main home screen
 export default function HomePatientScreen({ navigation }) {
-  
+  const [appointment, setAppointment] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchAppointment = async () => {
+        try {
+          setLoading(true);
+          const response = await getAppointmentPatient();
+          const data = Array.isArray(response) ? response : (response && response.appointment) ? response.appointment : [];
+          setAppointment(data);
+        } catch (err) {
+          console.error('Erreur lors du chargement du rendez-vous :', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchAppointment();
+    }, [])
+  );
+  const recentAppointment = appointment
+    .slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 1);
+
   // --- Navigation Handlers ---
   // Each function redirects the user to a specific patient feature screen
   const handleTeleconsultation = () => {
@@ -53,21 +79,25 @@ export default function HomePatientScreen({ navigation }) {
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          {/* --- Teleconsultation section --- */}
-          <View style={styles.card}>
-            <FontAwesome5 name="video" size={22} color="#042456" style={styles.icon} />
-            <Text style={styles.title}>Téléconsultation</Text>
-            <Text style={styles.text}>Prochain rendez-vous :</Text>
-            <Text style={styles.text}>15 décembre 2025 à 10:00</Text>
-            <Text style={styles.text}>Dr DUPONT - Cardiologue</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color="#042456" />
+          ) : (
+            recentAppointment.map((patient) => (
+              <View key={patient.id} style={styles.card}>
+                <FontAwesome5 name="video" size={22} color="#042456" style={styles.icon} />
+                <Text style={styles.title}>Téléconsultation</Text>
+                <Text style={styles.text}>Prochain rendez-vous :</Text>
+                <Text style={styles.text}>{patient.dateTime}</Text>
+                <Text style={styles.text}>Dr {patient.pro.lastName} - {patient.pro.speciality}</Text>
 
-            <Button
-              title="Voir mes téléconsultations"
-              onPress={handleTeleconsultation}
-              variant="full"
-            />
-          </View>
-
+                <Button
+                  title="Voir mes téléconsultations"
+                  onPress={handleTeleconsultation}
+                  variant="full"
+                />
+              </View>
+            ))
+          )}
           {/* --- ECG Sensor section --- */}
           <View style={styles.card}>
             <FontAwesome name="heartbeat" size={22} color="#F35330" style={styles.icon} />

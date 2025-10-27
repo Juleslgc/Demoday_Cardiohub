@@ -9,6 +9,7 @@ import HeaderPro from '../../components/HeaderPro.js';
 import FooterPro from "../../components/FooterPro.js";
 import { getPatients } from "../../services/api.js";
 import calculateAge from "../../utils/CalculateAge.js";
+import { Dimensions } from 'react-native';
 /**
 * HomePro.js
 *
@@ -32,6 +33,7 @@ import calculateAge from "../../utils/CalculateAge.js";
 * - Icons are imported from `@expo/vector-icons` to illustrate the various actions.
 * - The code is designed to be responsive and organized into clear sections: recent patients and quick actions.
 */
+const { width } = Dimensions.get('window');
 
 export default function HomePro({navigation}) {
   // Declaration of the "patients" state to store the list of patients
@@ -58,6 +60,13 @@ export default function HomePro({navigation}) {
     fetchPatients(); // We start patient recovery
   }, []); // The empty array [] means that this action is only done once on loading
 
+  // Trier du plus récent au plus ancien
+  const recentPatients = patients
+    .slice() // pour ne pas modifier le tableau original
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3); // prendre les 3 premiers
+
+
   // Display part of the component
   return (
     // SafeAreaView to properly handle non-visible screen areas
@@ -73,7 +82,7 @@ export default function HomePro({navigation}) {
           ) : (
             // Otherwise, we display the list of patients
             <View style={styles.patients}>
-              {patients.map((patient, index) => (
+              {recentPatients.map((patient) => (
                 <View key={patient.id} style={styles.rectangle}>
                   {/* Line with the patient's icon and name */}
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -102,7 +111,7 @@ export default function HomePro({navigation}) {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.button1}
-              onPress={() => navigation.navigate("")}
+              onPress={() => navigation.navigate("PatientList")}
             >
               <Text style={styles.buttonText1}>Voir tous les patients</Text>
             </TouchableOpacity>
@@ -118,21 +127,21 @@ export default function HomePro({navigation}) {
               </View >
             </TouchableOpacity>
             {/* Alert button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('AlertScreen')}>
               <View style={styles.square}>
                 <Foundation name="alert" size={24} color="#042456" />
                 <Text style={{color: '#042456' }}>Alertes</Text>
               </View>
             </TouchableOpacity>
             {/* Documents Button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('DocumentScreen')}>
               <View style={styles.square}>
                 <FontAwesome name="folder" size={24} color="#042456" />
                 <Text style={{color: '#042456' }}>Documents</Text>
               </View>
             </TouchableOpacity>
             {/* Calendar Button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('CalendarScreen')}>
               <View style={styles.square}>
                 <MaterialCommunityIcons name="notebook" size={24} color="#042456" />
                 <Text style={{color: '#042456' }}>Agenda</Text>
@@ -167,7 +176,7 @@ const styles = StyleSheet.create({
     gap: 5
   },
   rectangle: {
-    width: 340,
+    width: width * 0.9,
     minHeight: 100,
     backgroundColor: '#fff',
     borderRadius: 5,    
@@ -180,8 +189,8 @@ const styles = StyleSheet.create({
     gap: 15
   },
   square: {
-    width: 161,
-    height: 100,
+    width: width * 0.45,
+    height: width * 0.28,
     backgroundColor: '#fff',
     borderRadius: 5,
     justifyContent: 'space-evenly',
@@ -204,7 +213,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#042456',
-    width: 320,
+    width: width * 0.85,
     minHeight: 30,
     borderRadius: 5,
     alignItems: 'center',
@@ -219,7 +228,7 @@ const styles = StyleSheet.create({
   },
   button1: {
     backgroundColor: '#fff',
-    width: 340,
+    width: width * 0.9,
     minHeight: 30,
     borderRadius: 5,
     alignItems: 'center',

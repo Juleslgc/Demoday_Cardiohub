@@ -31,8 +31,16 @@ import EcgScreen from "./src/screens/patient/EcgScreen.js";
 import ProfilePatientScreen from "./src/screens/patient/ProfilePatientScreen.js";
 import ProfileProScreen from "./src/screens/pro/ProfileProScreen.js";
 import EditProfileScreen from "./src/screens/EditProfileScreen.js";
-import PatientsList from "./src/screens/pro/PatientsList.js";
-
+import ProfileProScreen from "./src/screens/pro/ProfilProScreen.js";
+import TeleconsultationProScreen from "./src/screens/pro/TeleconsultationProScreen.js";
+import AppointmentScreen from "./src/screens/pro/AppointmentScreen.js";
+import CalendarScreen from "./src/screens/pro/CalendarScreen.js";
+import AddPatientScreen from "./src/screens/pro/AddPatientScreen.js";
+import PatientList from "./src/screens/pro/PatientsList.js";
+import EditAppointmentScreen from "./src/screens/pro/EditAppointmentScreen.js";
+import MessagingProScreen from "./src/screens/pro/MessagingProScreen.js";
+import AlertScreen from "./src/screens/pro/AlertScreen.js";
+import DocumentScreen from "./src/screens/pro/DocumentScreen.js";
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -53,11 +61,19 @@ export default function App() {
         <Stack.Screen name="TeleconsultationPatientScreen" component={TeleconsultationPatientScreen} />
         <Stack.Screen name="TeleconsultationProScreen" component={TeleconsultationProScreen} />
         <Stack.Screen name="MessagingScreen" component={MessagingScreen} />
+        <Stack.Screen name="MessagingProScreen" component={MessagingProScreen} />
         <Stack.Screen name="EcgScreen" component={EcgScreen} />
         <Stack.Screen name="ProfilePatientScreen" component={ProfilePatientScreen} />
         <Stack.Screen name="ProfileProScreen" component={ProfileProScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
-        <Stack.Screen name="PatientsList" component={PatientsList} />
+        <Stack.Screen name="TeleconsultationProScreen" component={TeleconsultationProScreen} />
+        <Stack.Screen name="AppointmentScreen" component={AppointmentScreen} />
+        <Stack.Screen name="CalendarScreen" component={CalendarScreen} />
+        <Stack.Screen name="AddPatientScreen" component={AddPatientScreen} />
+        <Stack.Screen name="PatientList" component={PatientList} />
+        <Stack.Screen name="EditAppointmentScreen" component={EditAppointmentScreen} />
+        <Stack.Screen name="AlertScreen" component={AlertScreen} />
+        <Stack.Screen name="DocumentScreen" component={DocumentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

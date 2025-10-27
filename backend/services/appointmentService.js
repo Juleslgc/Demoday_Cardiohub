@@ -12,7 +12,7 @@ export default class AppointmentService {
   //Créer un rendz-vous (seul le pro peut créer)
   async createAppointment({ proId, patientId, dateTime, duration }) {
     if (!proId) {
-      throw new Error('Seul un professionnel peut créer un rendz-vous');
+      throw new Error('Seul un professionnel peut créer un rendez-vous');
     }
     const patient = await Patient.findByPk(patientId);
     if (!patient) {
@@ -96,11 +96,18 @@ export default class AppointmentService {
   }
 
   // Mettre à jour un rendez-vous (date, durée, patient)
-  async updateAppointment(id, { dateTime, duration, patientId }) {
+  async updateAppointment(id, { proId, dateTime, duration, patientId }) {
     if (patientId) {
       const patient = await Patient.findByPk(patientId);
       if (!patient) {
         throw new Error('Patient non trouvé');
+      }
+    }
+
+    if (proId) {
+      const pro = await Pro.findByPk(proId);
+      if (!pro) {
+        throw new Error('Professionel non trouvé');
       }
     }
     const updated = await appointmentRepository.updateAppointment(id, { dateTime, duration, patientId });

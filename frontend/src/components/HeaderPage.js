@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
 /**
  * HeaderPage générique pour les pages internes :
  *  - Affiche une flèche de retour
@@ -25,7 +24,6 @@ export default function HeaderPage({ title }) {
           >
             <MaterialIcons name="arrow-back" size={26} color="#042456" />
           </TouchableOpacity>
-
           <View style={styles.headerCenter}>
             <Text style={styles.headerTitle}>{title}</Text>
           </View>
@@ -33,7 +31,6 @@ export default function HeaderPage({ title }) {
       </SafeAreaView>
   );
 }
-
 // Component styles
 const styles = StyleSheet.create({
   safeArea: {

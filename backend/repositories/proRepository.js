@@ -15,6 +15,8 @@
 */
 import BaseRepository from './baseRepository.js';
 import { Pro, Patient } from '../models/relationModel.js'
+import { Op } from 'sequelize';
+
 
 export default class ProRepository extends BaseRepository {
 	constructor() {
@@ -67,5 +69,53 @@ export default class ProRepository extends BaseRepository {
 
     await pro.addPatients(patient);
     return patient;
+  }
+
+   // Chercher les patients par nom pour un pro
+  async searchPatientsByName(proId, name) {
+    if (!proId || !name) {
+      throw new Error("Pro ou nom manquant.");
+    }
+
+    const patients = await Patient.findAll({
+      include: [
+        {
+          model: Pro,
+          as: "Pros",
+          where: { id: proId },
+          required: false,
+          attributes: [], // on n’a pas besoin de données du pro ici
+          through: { attributes: [] } // ignore la table de relation
+        }
+      ],
+      where: {
+        lastName: { [Op.iLike]: `%${name}%` }, // recherche insensible à la casse (PostgreSQL)
+      },
+    });
+
+    return patients;
+  }
+
+  async searchAllPatientsByName(name) {
+    if (!name) throw new Error("Nom du patient manquant.");
+
+    const patients = await Patient.findAll({
+      where: {
+        [Op.or]: [
+          { firstName: { [Op.iLike]: `%${name}%` } },
+          { lastName: { [Op.iLike]: `%${name}%` } },
+        ],
+      },
+      include: [
+        {
+          model: Pro,
+          as: "Pros",
+          attributes: ["id"],
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    return patients;
   }
 }

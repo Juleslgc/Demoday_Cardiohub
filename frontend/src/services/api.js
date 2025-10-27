@@ -77,6 +77,7 @@ export async function getMe(navigation) {
 
     const decoded = jwtDecode(token);
     const patientId = decoded.id;
+    const proId = decoded.rpps;
     return apiRequest(`/auth/patient/${patientId}`, "GET", null, false, token)
 };
 
@@ -90,6 +91,7 @@ export async function getMePro(navigation) {
     return apiRequest(`/pro/${proId}`, "GET", null, false, token)
 };
 
+// Get patient by pro
 export async function getPatients(navigation) {
   const token = await getToken();
   if (!token) throw new Error("Utilisateur non authentifié");
@@ -105,7 +107,81 @@ export async function getPatients(navigation) {
   const decoded = jwtDecode(token);
   const proId = decoded.id;
 
-  return apiRequest(`/pro/${proId}/patients?limit=3`, "GET", null, false, token)
+  return apiRequest(`/pro/${proId}/patients`, "GET", null, false, token)
+};
+
+// Created appointment by the pro
+export async function createAppointment({ patientId, dateTime, duration }) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest("/appointment", "POST", { proId, patientId, dateTime, duration }, true, token);
+};
+
+// Updated appointment by the pro
+export async function updatedAppointment(id, { patientId, dateTime, duration }) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/appointment/${id}`, "PUT", {proId, patientId, dateTime, duration}, true, token);
+};
+
+// Search for a patient by name
+export async function searchPatientsByName(name) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/pro/${proId}/patients?name=${name}`, "GET", null, false, token);
+};
+
+// Search for all patients
+export async function searchAllPatients(name) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  return apiRequest(`/patients/all?name=${name}`, "GET", null, false, token);
+}
+
+// Retrieve appointments on the professional side
+export async function getAppointmentPro()  {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/appointment/pro/${proId}`, "GET", null, false, token);
+};
+
+// Retrieve appointments on the patient side
+export async function getAppointmentPatient()  {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const patientId = decoded.id;
+
+  return apiRequest(`/appointment/patient/${patientId}`, "GET", null, false, token);
+};
+
+// Adding a patient by the pro
+export async function addPatient(patientId) {
+  const token = await getToken();
+  if (!token) throw new Error("Utilisateur non authentifié");
+
+  const decoded = jwtDecode(token);
+  const proId = decoded.id;
+
+  return apiRequest(`/add/pro/${proId}/patients/${patientId}`, "POST", null, false, token);
 };
 
 // Créer une téléconsultation (Pro uniquement)
