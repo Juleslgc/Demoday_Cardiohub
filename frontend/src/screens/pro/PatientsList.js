@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 15,
     marginHorizontal: 10,
-    marginBottom: 60,
+    marginBottom: 80,
   },
   searchIcon: {
     marginRight: 10,

@@ -1,29 +1,28 @@
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet } from "react-native";
-import HeaderPro from "../../components/HeaderPro";
-import Footer from "../../components/FooterPro"
-
 /**
 * Screen: Alert Area
 * ------------------------------------------------------
 * Temporary screen serving as a placeholder for the future
 * management of alert messages (emergencies, notifications, etc.). 
 */
+
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, StyleSheet } from "react-native";
+import HeaderPage from "../../components/HeaderPage";
+
+// Functional component representing the pro alert screen
 export default function AlertScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      {/* === HEADER === */}
-      <HeaderPro />
-      {/* === MAIN CONTENT === */}
+      <HeaderPage title="Alerte" />
+
       <View style={styles.content}>
         <Text style={styles.title}>Espace Alerte</Text>
         <Text style={styles.text}>
-          Future message d'alerte à implémenter.
+          Futur message d'alerte à implémenter.
         </Text>
       </View>
-      {/* === FOOTER === */}
-      <Footer />
+
     </SafeAreaView>
     );
 }

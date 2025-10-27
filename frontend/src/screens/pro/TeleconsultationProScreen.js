@@ -1,15 +1,16 @@
 import React, { useState, useCallback } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import FooterPro from "../../components/FooterPro";
 import Button from "../../components/Button";
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { ActivityIndicator } from "react-native";
-import { getAppointmentPro } from "../../services/api";
+import { getAppointmentPro, createTeleconsultation } from "../../services/api";
 import calculateAge from "../../utils/CalculateAge.js";
+import * as WebBrowser from "expo-web-browser";
 
 /**
 *  TeleconsultationProScreen
@@ -26,6 +27,7 @@ export default function TeleconsultationProScreen({ navigation }) {
   const [searchText, setSearchText] = useState(""); // Text typed for patient search
   const [selectedFilter, setSelectedFilter] = useState("Aujourd'hui"); // Active filter
   const [loading, setLoading] = useState(true); // Indicates whether the data is loading
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handles the teleconsultation start process for a given appointment
   const handleStartConsultation = async (appointmentId) => {

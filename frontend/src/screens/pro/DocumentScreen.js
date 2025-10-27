@@ -1,29 +1,27 @@
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet } from "react-native";
-import HeaderPro from "../../components/HeaderPro";
-import Footer from "../../components/FooterPro"
-
 /**
 * Screen: Document Space (coming soon)
 * ------------------------------------------------------
 * Placeholder screen for future document management. 
 * Serves as a visual marker and basic structure. 
 */
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, StyleSheet } from "react-native";
+import HeaderPage from "../../components/HeaderPage";
+
+// Functional component representing the patient messaging space
 export default function DocumentScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      {/* === HEADER === */}
-      <HeaderPro />
-      {/* === MAIN CONTENT === */}
+      <HeaderPage title="Document" />
+
       <View style={styles.content}>
         <Text style={styles.title}>Espace Document</Text>
         <Text style={styles.text}>
-          Future document à implémenter.
+          Futur document à implémenter.
         </Text>
       </View>
-      {/* === FOOTER === */}
-      <Footer />
+
     </SafeAreaView>
     );
 }
