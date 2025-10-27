@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import HeaderPage from "../../components/HeaderPage.js";
 import FooterPro from "../../components/FooterPro";
 import Button from "../../components/Button";
 import Entypo from '@expo/vector-icons/Entypo';
@@ -166,22 +167,12 @@ export default function TeleconsultationProScreen({ navigation }) {
   // And finally, sort in chronological order
   .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
 
-
-
-
-
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={{flex: 1, backgroundColor: "#042456"}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        {/* === HEADER === */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialIcons name="arrow-back" size={26} color="#042456" />
-          </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>Téléconsultations</Text>
-          </View>
-        </View>
+      <HeaderPage title="Téléconsultations" />
+        <KeyboardAvoidingView style={{flex: 1, backgroundColor: "#042456", paddingTop: 50, zIndex: -1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        
+
         {/* === SECTION: Appointment creation === */}
         <View style={styles.fixedAction}>
           <Button
