@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -43,22 +44,24 @@ export default function HomePro({navigation}) {
 
 
   // useEffect allows you to execute an action when the component is displayed
-  useEffect(() => {
-    // Function to retrieve patients from the API
-    const fetchPatients = async () => {
-      try {
-        const response = await getPatients(navigation); // API call
-        // If the response is an array, we use it directly, otherwise we take response.patients
-        setPatients(Array.isArray(response) ? response : response.patients || []);
-      } catch (error) {
-        console.error("Erreur lors du chargement des patients :", error);
-      } finally {
-        setLoading(false); // Once finished (success or error), we stop loading
-      }
-    };
-
-    fetchPatients(); // We start patient recovery
-  }, []); // The empty array [] means that this action is only done once on loading
+  useFocusEffect(
+    useCallback(() => {
+      // Function to retrieve patients from the API
+      const fetchPatients = async () => {
+        try {
+          const response = await getPatients(navigation); // API call
+          // If the response is an array, we use it directly, otherwise we take response.patients
+          setPatients(Array.isArray(response) ? response : response.patients || []);
+        } catch (error) {
+          console.error("Erreur lors du chargement des patients :", error);
+        } finally {
+          setLoading(false); // Once finished (success or error), we stop loading
+        }
+      };
+      
+      fetchPatients(); // We start patient recovery
+    }, []) // The empty array [] means that this action is only done once on loading
+  );
 
   // Trier du plus récent au plus ancien
   const recentPatients = patients

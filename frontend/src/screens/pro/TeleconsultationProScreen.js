@@ -113,7 +113,7 @@ export default function TeleconsultationProScreen({ navigation }) {
   * into a usable JavaScript Date object (ISO format). 
   */
   const parseFrenchDate = (dateStr) => {
-    // Exemple : "18/10/2025 14:00:00"
+    // Example : "18/10/2025 14:00:00"
     const [datePart, timePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
     const [hours, minutes, seconds] = timePart.split(':').map(Number);

@@ -42,10 +42,22 @@ export default function HomePatientScreen({ navigation }) {
       fetchAppointment();
     }, [])
   );
+
+  /**
+  * Converts a date in the French format "dd/mm/yyyy hh:mm:ss"
+  * into a usable JavaScript Date object (ISO format). 
+  */
+  const parseFrenchDate = (dateStr) => {
+    // Example : "18/10/2025 14:00:00"
+    const [datePart, timePart] = dateStr.split(' ');
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds || 0);
+  };
+
   const recentAppointment = appointment
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 1);
+    .filter(a => new Date(parseFrenchDate(a.dateTime)) >= new Date()) 
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   // --- Navigation Handlers ---
   // Each function redirects the user to a specific patient feature screen
