@@ -14,17 +14,13 @@
 * The service focuses on business logic, validation, and JWT generation,
 * while the repository only manages CRUD access to the database.
 */
-import ProRepository from '../repositories/proRepository.js';
+import proRepository from '../repositories/proRepository.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Patient } from '../models/relationModel.js';
 
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET;
-
-
-// Create an instance of the repository to access the DB
-const proRepository = new ProRepository();
 
 export default class ProService {
 

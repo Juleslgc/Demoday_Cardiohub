@@ -14,13 +14,11 @@
  * - Throws errors for missing or invalid appointment data
  */
 
-import TeleconsultationRepository from "../repositories/teleconsultationRepository.js";
+import teleconsultationRepository from "../repositories/teleconsultationRepository.js";
 import Appointment from "../models/appointmentModel.js";
 import { v4 as uuidv4 } from "uuid";
 
-const teleconsultationRepository = new TeleconsultationRepository();
-
-export default class TeleconsultationService {
+class TeleconsultationService {
   // Creates a teleconsultation for an existing appointment.
   // The professional (pro) and patient are retrieved automatically from the appointment record.
   async createTeleconsultation(appointmentId) {
@@ -68,3 +66,5 @@ export default class TeleconsultationService {
   }
 
 }
+
+export default new TeleconsultationService();

@@ -17,8 +17,7 @@ import BaseRepository from './baseRepository.js';
 import { Pro, Patient } from '../models/relationModel.js'
 import { Op } from 'sequelize';
 
-
-export default class ProRepository extends BaseRepository {
+class ProRepository extends BaseRepository {
 	constructor() {
 		super(Pro);
 	}
@@ -119,3 +118,5 @@ export default class ProRepository extends BaseRepository {
     return patients;
   }
 }
+
+export default new ProRepository();
