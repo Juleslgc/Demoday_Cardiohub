@@ -28,12 +28,11 @@ export default function TeleconsultationProScreen({ navigation }) {
   const [selectedFilter, setSelectedFilter] = useState("Aujourd'hui"); // Active filter
   const [loading, setLoading] = useState(true); // Indicates whether the data is loading
   const [isLoading, setIsLoading] = useState(false);
-
+  
   // Handles the teleconsultation start process for a given appointment
   const handleStartConsultation = async (appointmentId) => {
     try {
       setIsLoading(true);
-
       //  Create a teleconsultation via the backend API
       const teleconsultation = await createTeleconsultation(appointmentId);
       console.log("Téléconsultation créée :", teleconsultation);
@@ -233,7 +232,7 @@ export default function TeleconsultationProScreen({ navigation }) {
                     <View style={styles.buttonRow}>
                        <Button
                           title={isLoading ? "Création en cours..." : "Lancer la consultation"}
-                          onPress={() => handleStartConsultation("5596d1d6-fb02-457f-9726-3b3db9e6abee")}
+                          onPress={() => handleStartConsultation(appointment.id)}
                           variant="full"
                           disabled={isLoading}
                         />

@@ -15,47 +15,97 @@
  * - Automatically redirects the patient back to the home screen after closing the browser.
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import HeaderPage from "../../components/HeaderPage";
 import FooterPatient from "../../components/FooterPatient";
 import Button from "../../components/Button";
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { getTeleconsultationByAppointment } from "../../services/api";
+import { getTeleconsultationByAppointment, getAppointmentPatient } from "../../services/api";
 import * as WebBrowser from "expo-web-browser";
 
 export default function TeleconsultationPatientScreen() {
   const navigation = useNavigation();
   const [teleconsultation, setTeleconsultation] = useState(null);
+  const [appointment, setAppointment] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Temporary appointment ID used for testing
-  const appointmentId = "5596d1d6-fb02-457f-9726-3b3db9e6abee";
+  useFocusEffect(
+      useCallback(() => {
+        const fetchAppointment = async () => {
+          try {
+            setLoading(true);
+            const response = await getAppointmentPatient();
+            const data = Array.isArray(response) ? response : (response && response.appointment) ? response.appointment : [];
+            setAppointment(data);
+          } catch (err) {
+            console.error('Erreur lors du chargement du rendez-vous :', err);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchAppointment();
+      }, [])
+    );
 
-  // Periodically fetches teleconsultation data from the API
-  const fetchTeleconsultation = async () => {
-    try {
-      const data = await getTeleconsultationByAppointment(appointmentId);
-      setTeleconsultation(data);
-    } catch (error) {
-      console.log("En attente de la création de la salle...");
-    } finally {
-      setIsLoading(false);
-    }
+    // Convertir la date au format ISO
+  const parseFrenchDate = (dateStr) => {
+    // Exemple : "18/10/2025 14:00:00"
+    const [datePart, timePart] = dateStr.split(' ');
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds || 0);
   };
 
-  // Runs once at mount, then refreshes data every 10 seconds
-  useEffect(() => {
-    fetchTeleconsultation();
-    const interval = setInterval(fetchTeleconsultation, 10000); // refresh every 10 sec
-    return () => clearInterval(interval);
-  }, []);
+
+  // Filtrage dynamique
+  const filteredAppointments = appointment.filter((appointment) => {
+    const appointmentDate = parseFrenchDate(appointment.dateTime);
+
+    // bornes du jour
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+    // bornes de la semaine
+    const startOfWeek = new Date(todayStart);
+    startOfWeek.setDate(todayStart.getDate() - todayStart.getDay()); // dimanche
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // samedi
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Supprime les rendez-vous passés
+    if (appointmentDate < todayStart) return false;
+
+    return true;
+  })
+  .slice()
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  // Temporary appointment ID used for testing
+  //const { appointments } = route.params;
+
+ 
 
   // Opens the Jitsi consultation in the browser using expo-web-browser
-  const handleJoinConsultation = async () => {
-    const jitsiLink = teleconsultation?.jitsiLink || "https://meet.jit.si/test-visio-demo";
+  const handleJoinConsultation = async (appointmentId) => {
+    //const jitsiLink = teleconsultation?.jitsiLink || "https://meet.jit.si/test-visio-demo";
+    //console.log(jitsiLink);
+    const data = await getTeleconsultationByAppointment(appointmentId);
+
+    if (!data || !data.jitsiLink) {
+      Alert.alert(
+        "Téléconsultation indisponible",
+        "La téléconsultation n'est pas encore créée pour ce rendez-vous."
+      );
+      return;
+    }
+
+    const jitsiLink = data.jitsiLink;
 
     Alert.alert(
       "Rejoindre la consultation",
@@ -66,7 +116,7 @@ export default function TeleconsultationPatientScreen() {
           onPress: async () => {
             try {
               // Opens the browser with the teleconsultation link
-              const result = await WebBrowser.openBrowserAsync(teleconsultation.jitsiLink, {
+              const result = await WebBrowser.openBrowserAsync(jitsiLink, {
                 presentationStyle: "pageSheet", // iOS appearance style
                 controlsColor: "#042456",       // iOS toolbar color
                 toolbarColor: "#fff",        // Android toolbar color
@@ -89,33 +139,39 @@ export default function TeleconsultationPatientScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderPage title="Téléconsultations" />
+      <HeaderPage title="Téléconsultations"/>
 
       <View style={styles.scrollArea}>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.card}>
-            {/* Date section */}
-            <View style={styles.rowCenter}>
-              <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
-              <Text style={styles.title}>16/10/2025 - 14h00</Text>
-            </View>
+          {loading ? (
+            <ActivityIndicator size="large" color="#042456" />
+          ) : (
+            filteredAppointments.map((patient) => (
+              <View key={patient.id} style={styles.card}>
+                {/* Date section */}
+                <View style={styles.rowCenter}>
+                  <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
+                  <Text style={styles.title}>{patient.dateTime}</Text>
+                </View>
 
-            {/* Doctor section */}
-            <View style={styles.rowCenter}>
-              <FontAwesome6 name="user-doctor" size={22} color="#042456" style={styles.iconInline} />
-              <Text style={styles.text}>Dr. DUPONT</Text>
-            </View>
+                {/* Doctor section */}
+                <View style={styles.rowCenter}>
+                  <FontAwesome6 name="user-doctor" size={22} color="#042456" style={styles.iconInline} />
+                  <Text style={styles.text}>Dr. {patient.pro.lastName}</Text>
+                </View>
 
-            {/* Button */}
-            <Button
-              title="Rejoindre la consultation"
-              onPress={handleJoinConsultation}
-              variant="full"
-            />
+                {/* Button */}
+                <Button
+                  title="Rejoindre la consultation"
+                  onPress={() => handleJoinConsultation(patient.id)}
+                  variant="full"
+                />
           </View>
+            ))
+          )}
         </ScrollView>
       </View>
 
