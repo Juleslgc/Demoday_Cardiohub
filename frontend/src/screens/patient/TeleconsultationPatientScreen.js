@@ -61,6 +61,16 @@ export default function TeleconsultationPatientScreen() {
     return new Date(year, month - 1, day, hours, minutes, seconds || 0);
   };
 
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return "";
+    const date = parseFrenchDate(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year} à ${hours}:${minutes}`;
+  };
 
   // Filtrage dynamique
   const filteredAppointments = appointment.filter((appointment) => {
@@ -84,22 +94,33 @@ export default function TeleconsultationPatientScreen() {
     return true;
   })
   .slice()
-  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
- 
+  .sort((a, b) => new Date(parseFrenchDate(a.dateTime)) - new Date(parseFrenchDate(b.dateTime)));
+
   // Opens the Jitsi consultation in the browser using expo-web-browser
   const handleJoinConsultation = async (appointmentId) => {
-
-    const data = await getTeleconsultationByAppointment(appointmentId);
-
-    if (!data || !data.jitsiLink) {
-      Alert.alert(
-        "Téléconsultation indisponible",
-        "La téléconsultation n'est pas encore créée pour ce rendez-vous."
-      );
-      return;
-    }
-
-    const jitsiLink = data.jitsiLink;
+    try {
+      let data;
+      try {
+        data = await getTeleconsultationByAppointment(appointmentId);
+      } catch (error) {
+        Alert.alert(
+          "Salle non encore ouverte",
+          "Votre professionnel de santé n’a pas encore lancé la téléconsultation.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+  
+      if (!data || data.message || !data.jitsiLink) {
+        Alert.alert(
+          "Salle non encore ouverte",
+          "Votre professionnel de santé n’a pas encore lancé la téléconsultation.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+    
+      const jitsiLink = data.jitsiLink;
 
     Alert.alert(
       "Rejoindre la consultation",
@@ -121,7 +142,6 @@ export default function TeleconsultationPatientScreen() {
                 navigation.navigate("HomePatientScreen");
               }
             } catch (error) {
-              console.error("Erreur d'ouverture du navigateur :", error);
               Alert.alert("Erreur", "Impossible d’ouvrir la visioconférence.");
             }
           },
@@ -129,7 +149,10 @@ export default function TeleconsultationPatientScreen() {
         { text: "Annuler", style: "cancel" },
       ]
     );
-  };
+  } catch (error) {
+    Alert.alert("Erreur", "Une erreur est survenue lors de la tentative de connexion.");
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -142,13 +165,13 @@ export default function TeleconsultationPatientScreen() {
         >
           {loading ? (
             <ActivityIndicator size="large" color="#042456" />
-          ) : (
+          ) : filteredAppointments.length > 0 ? (
             filteredAppointments.map((patient) => (
               <View key={patient.id} style={styles.card}>
                 {/* Date section */}
                 <View style={styles.rowCenter}>
                   <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
-                  <Text style={styles.title}>{patient.dateTime}</Text>
+                  <Text style={styles.dateText}>{formatDateTime(patient.dateTime)}</Text>
                 </View>
 
                 {/* Doctor section */}
@@ -163,9 +186,20 @@ export default function TeleconsultationPatientScreen() {
                   onPress={() => handleJoinConsultation(patient.id)}
                   variant="full"
                 />
-          </View>
+              </View>
             ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>Aucune téléconsultation disponible</Text>
+              <Text style={styles.emptyText}>
+                Vous n’avez actuellement aucune téléconsultation prévue ni passée.
+              </Text>
+              <Text style={styles.emptyText}>
+                Votre professionnel de santé vous en programmera une lorsque ce sera nécessaire.
+              </Text>
+            </View>
           )}
+
         </ScrollView>
       </View>
 
@@ -200,6 +234,11 @@ const styles = StyleSheet.create({
     padding: 10,
     position: "relative",
   },
+  dateText: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#042456",
+  },  
   iconInline: {
     marginRight: 8,
   },
@@ -212,5 +251,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#042456",
     fontWeight: "500",
+  },
+  emptyContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    marginTop: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#042456",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  emptyText: {
+    fontSize: 15,
+    color: "#042456",
+    textAlign: "center",
+    marginBottom: 8,
+    opacity: 0.8,
   },
 });

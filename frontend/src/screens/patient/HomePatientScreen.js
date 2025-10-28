@@ -55,9 +55,22 @@ export default function HomePatientScreen({ navigation }) {
     return new Date(year, month - 1, day, hours, minutes, seconds || 0);
   };
 
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return "";
+    const date = parseFrenchDate(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+  
+    return `${day}/${month}/${year} à ${hours}:${minutes}`;
+  };
+  
+
   const recentAppointment = appointment
     .filter(a => new Date(parseFrenchDate(a.dateTime)) >= new Date()) 
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    .sort((a, b) => new Date(parseFrenchDate(a.dateTime)) - new Date(parseFrenchDate(b.dateTime)));
 
   // --- Navigation Handlers ---
   // Each function redirects the user to a specific patient feature screen
@@ -91,25 +104,45 @@ export default function HomePatientScreen({ navigation }) {
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
+          {/* --- Teleconsultation section --- */}
           {loading ? (
             <ActivityIndicator size="large" color="#042456" />
           ) : (
-            recentAppointment.map((patient) => (
-              <View key={patient.id} style={styles.card}>
-                <FontAwesome5 name="video" size={22} color="#042456" style={styles.icon} />
-                <Text style={styles.title}>Téléconsultation</Text>
-                <Text style={styles.text}>Prochain rendez-vous :</Text>
-                <Text style={styles.text}>{patient.dateTime}</Text>
-                <Text style={styles.text}>Dr {patient.pro.lastName} - {patient.pro.speciality}</Text>
+            <>
+              {recentAppointment.length > 0 ? (
+                <View key={recentAppointment[0].id} style={styles.card}>
+                  <FontAwesome5 name="video" size={22} color="#042456" style={styles.icon} />
+                  <Text style={styles.title}>Téléconsultation</Text>
+                  <Text style={styles.text}>Prochain rendez-vous :</Text>
+                  <Text style={styles.dateText}>{formatDateTime(recentAppointment[0].dateTime)}</Text>
+                  <Text style={styles.text}>
+                    Dr {recentAppointment[0].pro.lastName} - {recentAppointment[0].pro.speciality}
+                  </Text>
 
-                <Button
-                  title="Voir mes téléconsultations"
-                  onPress={handleTeleconsultation}
-                  variant="full"
-                />
-              </View>
-            ))
+                  <Button
+                    title="Voir mes téléconsultations"
+                    onPress={handleTeleconsultation}
+                    variant="full"
+                  />
+                </View>
+              ) : (
+                <View style={styles.card}>
+                  <FontAwesome5 name="video" size={22} color="#042456" style={styles.icon} />
+                  <Text style={styles.title}>Téléconsultation</Text>
+                  <Text style={styles.text}>
+                    Vous n’avez pas encore de téléconsultation prévue.
+                  </Text>
+
+                  <Button
+                    title="Voir mes téléconsultations"
+                    onPress={handleTeleconsultation}
+                    variant="full"
+                  />
+                </View>
+              )}
+            </>
           )}
+
           {/* --- ECG Sensor section --- */}
           <View style={styles.card}>
             <FontAwesome name="heartbeat" size={22} color="#F35330" style={styles.icon} />
@@ -191,6 +224,12 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     color: "#042456",
+    marginBottom: 7,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#042456",
+    fontWeight: "500", // légèrement bold
     marginBottom: 7,
   },
 
