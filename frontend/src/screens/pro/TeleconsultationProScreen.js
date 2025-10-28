@@ -207,11 +207,16 @@ export default function TeleconsultationProScreen({ navigation }) {
             ) : filteredAppointments.length === 0 ? (
               <Text style={{ color: "#fff", textAlign: "center", marginTop: 20 }}>Aucun rendez-vous à afficher</Text>
             ) : (
-              filteredAppointments.map((appointment) => (
-                <View key={appointment.id} style={styles.card}>
+              filteredAppointments.map((appointment) => {
+                const [datePart, timePart] = appointment.dateTime.split(' ');
+                const [hour, minute] = timePart ? timePart.split(':') : ['', ''];
+                const formattedTime = `${hour}:${minute}`;
+                
+                return (
+                  <View key={appointment.id} style={styles.card}>
                     <View style={styles.rowCenter}>
                       <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
-                      <Text style={styles.title}>{appointment.dateTime}</Text>
+                      <Text style={styles.title}>{datePart} à {formattedTime}</Text>
                     </View>
                     <View style={styles.rowCenter}>
                       <MaterialIcons name="account-circle" size={45} color="#042456" style={styles.iconInline} />
@@ -236,8 +241,9 @@ export default function TeleconsultationProScreen({ navigation }) {
                       </TouchableOpacity>
                     </View>
                 </View>
-              ))
-            )}
+              );
+            })
+          )}
           </ScrollView>
           {/* === SEARCH BAR === */}
           <View style={styles.searchSection}>
@@ -261,31 +267,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff"
-  },
-  /** HEADER **/
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    height: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    position: "relative",
-  },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    zIndex: 2,
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#042456",
   },
   /** SECTION: "New appointment" button **/
   fixedAction: {
@@ -333,11 +314,10 @@ const styles = StyleSheet.create({
   },
   rowCenter: {
     flexDirection: "row",
-    backgroundColor: "#E6E6E6",
     borderRadius: 10,
     overflow: "hidden",
-    marginTop: 6,
-    marginBottom: 18,
+    marginTop: 4,
+    marginBottom: 5,
   },
   filterItem: {
     flex: 1,
@@ -351,19 +331,21 @@ const styles = StyleSheet.create({
   filterText: { fontSize: 18, color: "#042456", fontWeight: "500" },
   filterTextActive: { color: "#042456", fontWeight: "600" },
   scrollContainer: { padding: 12, paddingBottom: 100 },
-  rowCenter: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   card: {
     backgroundColor: "#fff",
     marginBottom: 20,
     borderRadius: 7,
-    padding: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     position: "relative",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   iconInline: {
     marginRight: 8,
   },
   title: {
-    fontSize: 19,
+    fontSize: 18,
     fontWeight: "600",
     color: "#042456",
   },
@@ -402,7 +384,7 @@ const styles = StyleSheet.create({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: 10,
+  marginTop: 2,
   gap: 10, // to space out the buttons
 },
 

@@ -14,9 +14,13 @@ import { getAppointmentPro } from "../../services/api";
 */
 export default function CalendarScreen() {
   // --- Local States ---
+  const today = new Date().toISOString().split('T')[0]; // retrieves only the date
+
   const [appointments, setAppointments] = useState([]); // complete list of appointments
-  const [markedDates, setMarkedDates] = useState({}); // days marked on the calendar
-  const [selectedDate, setSelectedDate] = useState(null); // currently selected day
+  const [markedDates, setMarkedDates] = useState({
+    [today]: { selected: true, selectedColor: "#00BFFF"},
+  }); // days marked on the calendar
+  const [selectedDate, setSelectedDate] = useState(today); // currently selected day
   const [loading, setLoading] = useState(false); // loading indicator
 
   // --- Calendar configuration in French ---
@@ -67,7 +71,13 @@ export default function CalendarScreen() {
                 marks[formattedDate] = { marked: true, dotColor: '#00BFFF' };
               }
             });
-            setMarkedDates(marks);
+            setMarkedDates({
+              ...marks,
+              [today]: { ...(marks[today] || {}), selected: true, selectedColor: "#00BFFF" },
+            });
+
+            // Forces today's date as selected
+            setSelectedDate(today);
           }
         } catch (err) {
           console.error('Erreur lors du chargement des rendez-vous :', err);
@@ -86,7 +96,25 @@ export default function CalendarScreen() {
 
   // When a day is selected in the calendar
   const handleDayPress = (day) => {
-    setSelectedDate(day.dateString);
+    const ds = day.dateString;
+
+    setSelectedDate(ds);
+
+    setMarkedDates((prev) => {
+      // Removes "selected" from all previous dates
+      const cleared = Object.fromEntries(
+        Object.entries(prev).map(([date, props]) => [
+          date,
+          { ...props, selected: false },
+        ])
+      );
+
+      // Only mark the new date as selected
+      return {
+        ...cleared,
+        [ds]: { ...(cleared[ds] || {}), selected: true, selectedColor: "#00BFFF" },
+      };
+    });
   };
 
   // --- Filtering appointments for the selected day ---
@@ -107,7 +135,9 @@ export default function CalendarScreen() {
         <ActivityIndicator size="large" color="#fff" style={{ marginTop: 50 }} />
       ) : (
         <>
+        <View style={styles.content}>
           <Calendar
+            current={selectedDate}
             style={{ marginTop: 50 }}
             onDayPress={handleDayPress}
             firstDay={1} // To make the first day Monday and not Sunday
@@ -120,36 +150,41 @@ export default function CalendarScreen() {
             }}
             markedDates={{
               ...markedDates,
-              ...(selectedDate && {
-                [selectedDate]: {
-                  selected: true,
-                  selectedColor: '#00BFFF',
-                  marked: markedDates[selectedDate]?.marked,
-                  dotColor: '#fff',
-                },
-              }),
-            }}
+              [selectedDate]: {
+                ...(markedDates[selectedDate] || {}),
+                selected: true,
+                selectedColor: '#00BFFF',
+                dotColor: '#fff',
+              },
+              }}
           />
           {/* === List of appointments for the day === */}
           {selectedDate && (
-            <View style={styles.appointmentsContainer}>
-              <Text style={styles.dateTitle}> Rendez-vous du {selectedDate ? selectedDate.split('-').reverse().join('/') : ''}</Text>
-
-              {rdvForSelectedDate.length > 0 ? (
-                <FlatList
-                  data={rdvForSelectedDate}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => (
-                    <Text style={styles.appointmentItem}>
-                      • {item.patient?.firstName} {item.patient?.lastName} - {item.dateTime}
-                    </Text>
-                  )}
-                />
-              ) : (
-                <Text style={{ color: '#fff' }}>Aucun rendez-vous</Text>
-              )}
-            </View>
+              <View style={styles.appointmentsContainer}>
+                <Text style={styles.dateTitle}>Rendez-vous du {selectedDate ? selectedDate.split('-').reverse().join('/') : ''}</Text>
+                {rdvForSelectedDate.length > 0 ? (
+                  <FlatList
+                    data={rdvForSelectedDate}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => {
+                      // Exemple : "28/10/2025 14:00:00"
+                      const [datePart, timePart] = item.dateTime.split(' '); // ["28/10/2025", "14:00:00"]
+                      const time = timePart ? timePart.slice(0, 5) : ''; // "14:00"
+                      
+                      return (
+                      <Text style={styles.appointmentItem}>
+                        <Text style={{ fontWeight: "600" }}>{time}</Text>
+                         {` : ${item.patient?.firstName} ${item.patient?.lastName}`}
+                      </Text>
+                      );
+                    }}
+                  />
+                ) : (
+                  <Text style={{ color: '#042456', fontSize: 16 }}>Aucun rendez-vous</Text>
+                )}
+              </View>
           )}
+          </View>
         </>
       )}
       {/* === FOOTER === */}
@@ -164,19 +199,29 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: '#042456',
   },
+  content: {
+    flex: 1,
+    paddingBottom: 10,
+  },
   appointmentsContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    marginHorizontal: 10,
     marginTop: 20,
+    marginBottom: 70,
+    borderRadius: 8,
+    paddingVertical: 15,
     paddingHorizontal: 20,
   },
   dateTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: "#fff"
+    color: "#042456",
   },
   appointmentItem: {
     fontSize: 16,
     marginBottom: 5,
-    color: "#fff"
+    color: "#042456",
   },
 });

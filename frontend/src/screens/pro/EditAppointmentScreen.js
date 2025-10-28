@@ -5,6 +5,7 @@ import FooterPro from "../../components/FooterPro";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { updatedAppointment } from "../../services/api";
+import HeaderPage from "../../components/HeaderPage";
 
 /**
 * Appointment Modification Screen (EditAppointmentScreen)
@@ -141,16 +142,10 @@ export default function EditAppointmentScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       {/* === Custom Header === */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={26} color="#042456" />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Modification de rendez-vous</Text>
-        </View>
-      </View>
+      <HeaderPage title="Modification de rendez-vous" />
         {/* === Scrolling content === */}
         <ScrollView
+          style={{ flex: 1, marginTop: 60 }}
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
@@ -221,7 +216,7 @@ export default function EditAppointmentScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#042456",
   },
   /** HEADER **/
   header: {

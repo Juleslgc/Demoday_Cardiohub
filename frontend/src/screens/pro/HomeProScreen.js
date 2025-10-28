@@ -93,7 +93,7 @@ export default function HomePro({navigation}) {
                     <MaterialIcons name="account-circle" size={53} color="#042456" />
                     <Text style={{ marginLeft: 10 }}>
                       <Text style={styles.h2}>{patient.firstName} {patient.lastName}</Text>{"\n"}
-                      <Text style={{ color: "#042456" }}>{calculateAge(patient.birthDate)} ans</Text>
+                      <Text style={{ color: "#042456", fontSize: 16 }}>{calculateAge(patient.birthDate)} ans</Text>
                     </Text>
                   </View>
                   {/* Button to view the patient's complete file */}
@@ -213,9 +213,8 @@ const styles = StyleSheet.create({
   },
   h2 : {
     color: '#042456',
-    fontWeight: 'bold',
-    fontSize: 16
-
+    fontWeight: '600',
+    fontSize: 17
   },
   button: {
     backgroundColor: '#042456',

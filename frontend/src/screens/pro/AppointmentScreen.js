@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native";
 import FooterPro from "../../components/FooterPro";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { searchPatientsByName, createAppointment } from "../../services/api";
+import HeaderPage from "../../components/HeaderPage";
 
 /**
 * Screen for creating an appointment for a professional.
@@ -160,74 +160,70 @@ export default function AppointmentScreen({ navigation }) {
     }
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* === HEADER === */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={26} color="#042456" />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Prise de rendez-vous</Text>
-        </View>
-      </View>
-        {/* === SCROLLABLE CONTENT === */}
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
+      <HeaderPage title="Prise de rendez-vous" />
+      
+      {/* === SCROLLABLE CONTENT === */}
+      <ScrollView
+        style={{ flex: 1, marginTop: 60 }}
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
         >
-          <View style={{marginBottom: -10}}>
-            <Text style={styles.text}>Patients</Text>
-            {/* Search bar */}
-            <View style={styles.searchSection}>
-              <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Rechercher un patient..."
-                placeholderTextColor="#666"
-                value={searchQuery}
-                onChangeText={async (text) => {
-                  setSearchQuery(text);
-                  setSelectedPatient(null); // deselect the patient if typing
+          {/* --- Patients section --- */}
+          <View style={styles.content}>
+            <View style={[styles.sectionContainer, { position: "relative" }]}>
+              <Text style={styles.text}>Patients</Text>
+              {/* Search bar */}
+              <View style={styles.searchSection}>
+                <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Rechercher un patient..."
+                  placeholderTextColor="#666"
+                  value={searchQuery}
+                  onChangeText={async (text) => {
+                    setSearchQuery(text);
+                    setSelectedPatient(null); // deselect the patient if typing
 
-                  if (text.length < 2) {
-                    setPatients([]);
-                    return;
-                  }
+                    if (text.length < 2) {
+                      setPatients([]);
+                      return;
+                    }
 
-                  // Appel API pour rechercher les patients
-                  try {
-                    const results = await searchPatientsByName(text);
-                    setPatients(results);
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
-              />
+                    // Call API to search patients
+                    try {
+                      const results = await searchPatientsByName(text);
+                      setPatients(results);
+                    } catch (err) {
+                      console.error(err);
+                    }
+                  }}
+                />
+              </View>
+
+              {/* Dropdown list of patients */}
+              {filteredPatients.length > 0 && !selectedPatient && (
+                <View style={styles.dropdown}>
+                  {filteredPatients.map((patient) => (
+                    <TouchableOpacity
+                      key={patient.id}
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        setSelectedPatient(patient);
+                        setSearchQuery(`${patient.lastName} ${patient.firstName}`);
+                        setPatients([]); // ferme le dropdown
+                      }}
+                    >
+                      <Text style={{color: "#042456"}}>{patient.lastName} {patient.firstName}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
 
-            {/* Dropdown list of patients */}
-            {filteredPatients.length > 0 && !selectedPatient && (
-              <View style={styles.dropdown}>
-                {filteredPatients.map((patient) => (
-                  <TouchableOpacity
-                    key={patient.id}
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setSelectedPatient(patient);
-                      setSearchQuery(`${patient.lastName} ${patient.firstName}`);
-                      setPatients([]); // ferme le dropdown
-                    }}
-                  >
-                    <Text style={{color: "#042456"}}>{patient.lastName} {patient.firstName}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
           {/* --- Date selection --- */}
-          <View style={{marginBottom: -10}}>
+          <View style={styles.sectionContainer}>
             <Text style={styles.text}>Date</Text>
             <View style={styles.searchSection}>
             <FontAwesome name="calendar" size={20} color="#042456" style={styles.searchIcon} />
@@ -241,14 +237,15 @@ export default function AppointmentScreen({ navigation }) {
               />
             </View>
             {/* Dynamic error display */}
-            <View style={{ marginTop: -40, marginBottom: 20 }}>
+            <View style={{ marginTop: -10 }}>
               {dateErrors.invalidFormat && <Text style={styles.errorText}>Format incorrect, jj/mm/aaaa</Text>}
               {dateErrors.invalidDayMonth && <Text style={styles.errorText}>Jour ou mois ou année invalide</Text>}
               {dateErrors.pastDate && <Text style={styles.errorText}>La date ou l'heure est déjà passée</Text>}
             </View>
           </View>
+
           {/* --- Time selection --- */}
-          <View style={{marginBottom: -10}}>
+          <View style={styles.sectionContainer}>
             <Text style={styles.text}>Heure</Text>
             <View style={styles.allActions}>
               {timeSlots.map((time, index) => (
@@ -258,8 +255,9 @@ export default function AppointmentScreen({ navigation }) {
               ))}
             </View>
           </View>
+
           {/* --- Duration selection --- */}
-          <View style={{marginBottom: -10}}>
+          <View style={styles.sectionContainer}>
             <Text style={styles.text}>Durée</Text>
             <View style={styles.allActions}>
               {durationSlots.map((duration, index) => (
@@ -269,13 +267,14 @@ export default function AppointmentScreen({ navigation }) {
               ))}
             </View>
           </View>
+
           {/* --- Save button --- */}
-          <View style={{marginTop: 30}}>
             <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleCreateAppointment}>
               <Text style={styles.saveButtonText}>Enregistrer</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+
+          </ScrollView>
       {/* === FOOTER === */}
       <FooterPro />
     </SafeAreaView>
@@ -285,45 +284,28 @@ export default function AppointmentScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-  },
-  /** HEADER **/
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    height: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    position: "relative",
-  },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    zIndex: 2,
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#042456",
-  },
-  text: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "500",
-    marginBottom: 10,
-    marginLeft: 10,
+    backgroundColor: "#042456",
   },
   /** SCROLLABLE CONTENT **/
   scrollContainer: {
     padding: 12,
     paddingBottom: 100, // to prevent the bottom from being hidden under the footer
     backgroundColor: "#042456"
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingBottom: 80, // évite que le footer masque le bouton
+  },
+  sectionContainer: {
+    marginBottom: 20, // même espacement entre chaque bloc
+  },
+  text: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "500",
+    marginBottom: 10,
+    marginLeft: 5,
   },
   /** SEARCH BAR **/
   searchSection: {
@@ -334,29 +316,30 @@ const styles = StyleSheet.create({
     borderTopColor: "#ddd",
     borderRadius: 6,
     marginHorizontal: 10,
-    marginBottom: 40,
+    marginBottom: 10,
     minHeight: 50,
     paddingLeft: 10,
     paddingRight: 5,
   },
-  searchIcon: {
+searchIcon: {
     marginRight: 10,
   },
-  searchInput: {
+searchInput: {
     flex: 1,
     fontSize: 15,
     color: "#042456",
   },
-  dropdown: {
+dropdown: {
   backgroundColor: "#ccc",
+  position: "absolute",
+  top: 70, // légèrement plus précis : juste sous la barre de recherche
+  left: 10, // aligne avec le marginHorizontal de la barre
+  right: 10, // idem de l’autre côté
   borderRadius: 6,
-  marginHorizontal: 10,
-  marginTop: -40,
-  marginBottom: 20,
-  maxHeight: 150,
   borderWidth: 1,
   borderColor: "#aba9a9ff",
-  zIndex: 5, // make sure it's on top
+  maxHeight: 150,
+  //zIndex: 10, // pour passer au-dessus de tout
 },
 dropdownItem: {
   paddingVertical: 10,
@@ -364,13 +347,12 @@ dropdownItem: {
   borderBottomWidth: 1,
   borderBottomColor: "#aba9a9ff",
 },
-
-  allActions: {
+allActions: {
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'space-between', // uniform spacing between columns
   marginHorizontal: 10,
-  marginBottom: -30
+  marginBottom: -70
 },
 square: {
   width: '30%', // 3 columns → 30% + gaps
@@ -392,7 +374,7 @@ saveButton: {
   borderRadius: 8,
   alignItems: 'center',
   marginHorizontal: 20,
-  marginTop: 20,
+  marginTop: 50,
 },
 saveButtonText: {
   color: '#042456',
