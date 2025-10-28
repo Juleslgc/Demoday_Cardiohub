@@ -1,6 +1,5 @@
-import AppointmentService from "../services/appointmentService.js";
+import appointmentService from "../services/appointmentService.js";
 
-const appointmentService = new AppointmentService();
 
 export default class AppointmentController {
 
@@ -8,7 +7,6 @@ export default class AppointmentController {
   static async createAppointment(req, res ){
     try {
       const appointment = await appointmentService.createAppointment(req.body);
-      console.log("Controlleur appelé");
       res.status(201).json(appointment);
     } catch (err) {
       res.status(400).json({ message: err.message });
