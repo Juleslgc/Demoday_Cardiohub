@@ -16,7 +16,7 @@ import Appointment from "../models/appointmentModel.js";
 import Pro from "../models/proModel.js";
 import Patient from "../models/patientModel.js";
 
-export default class TeleconsultationRepository {
+class TeleconsultationRepository {
   // Creates a new teleconsultation linked to a specific appointment
   async create({ appointmentId, proId, patientId, jitsiLink }) {
     // Inserts a new record in the teleconsultations table
@@ -55,3 +55,5 @@ export default class TeleconsultationRepository {
     });
   }
 }
+
+export default new TeleconsultationRepository();

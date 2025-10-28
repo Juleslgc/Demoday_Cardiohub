@@ -1,7 +1,7 @@
 import BaseRepository from "./baseRepository.js";
 import { Pro, Patient, Appointment } from "../models/relationModel.js";
 
-export default class AppointmentRepository extends BaseRepository {
+class AppointmentRepository extends BaseRepository {
   constructor() {
     super(Appointment);
   }
@@ -13,7 +13,7 @@ export default class AppointmentRepository extends BaseRepository {
       proId,
       dateTime: new Date(dateTime),
       duration,
-      status: "À  venir"
+      status: "À venir"
     });
     return appointment;
   }
@@ -79,3 +79,5 @@ export default class AppointmentRepository extends BaseRepository {
     return new Date(datetime.getTime() + appointment.duration * 60000);
   }
 }
+
+export default new AppointmentRepository();

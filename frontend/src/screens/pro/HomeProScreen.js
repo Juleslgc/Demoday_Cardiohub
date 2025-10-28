@@ -3,6 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Foundation from '@expo/vector-icons/Foundation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -89,14 +90,14 @@ export default function HomePro({navigation}) {
                 <View key={patient.id} style={styles.rectangle}>
                   {/* Line with the patient's icon and name */}
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <MaterialIcons name="account-circle" size={60} color="#042456" />
+                    <MaterialIcons name="account-circle" size={53} color="#042456" />
                     <Text style={{ marginLeft: 10 }}>
                       <Text style={styles.h2}>{patient.firstName} {patient.lastName}</Text>{"\n"}
                       <Text style={{ color: "#042456" }}>{calculateAge(patient.birthDate)} ans</Text>
                     </Text>
                   </View>
                   {/* Button to view the patient's complete file */}
-                  <View style={{ alignItems: "center", marginTop: 10 }}>
+                  <View style={{ alignItems: "center", marginTop: 5 }}>
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={styles.button}
@@ -120,33 +121,33 @@ export default function HomePro({navigation}) {
             </TouchableOpacity>
           </View>
           {/* Quick Actions Section */}
-          <Text style={styles.h1}>Actions rapides</Text>
+          <Text style={[styles.h1, { marginTop: 20 }]}>Actions rapides</Text>
           <View style={styles.allActions}>
             {/* Teleconsultation button */}
             <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('TeleconsultationProScreen')}>
               <View style={styles.square}>
-                <FontAwesome name="video-camera" size={24} color="#042456" />
+                <FontAwesome5 name="video" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Téléconsultations</Text>
               </View >
             </TouchableOpacity>
             {/* Alert button */}
             <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('AlertScreen')}>
               <View style={styles.square}>
-                <Foundation name="alert" size={24} color="#042456" />
+                <Foundation name="alert" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Alertes</Text>
               </View>
             </TouchableOpacity>
             {/* Documents Button */}
             <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('DocumentScreen')}>
               <View style={styles.square}>
-                <FontAwesome name="folder" size={24} color="#042456" />
+                <FontAwesome name="folder" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Documents</Text>
               </View>
             </TouchableOpacity>
             {/* Calendar Button */}
             <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('CalendarScreen')}>
               <View style={styles.square}>
-                <MaterialCommunityIcons name="notebook" size={24} color="#042456" />
+                <MaterialCommunityIcons name="notebook" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Agenda</Text>
               </View>
             </TouchableOpacity>
@@ -182,7 +183,9 @@ const styles = StyleSheet.create({
     width: width * 0.9,
     minHeight: 100,
     backgroundColor: '#fff',
-    borderRadius: 5,    
+    borderRadius: 5,
+    marginBottom: 6,
+    paddingHorizontal: 7
   },
   allActions: {
     flexDirection: 'row',
@@ -205,7 +208,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 10,
-    marginTop: 10,
+    //marginTop: 10,
     marginLeft: 20
   },
   h2 : {
@@ -216,8 +219,8 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#042456',
-    width: width * 0.85,
-    minHeight: 30,
+    width: width * 0.84,
+    //minHeight: 30,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -228,9 +231,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    margin: 7
   },
   button1: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F7FA',
     width: width * 0.9,
     minHeight: 30,
     borderRadius: 5,
@@ -242,5 +246,6 @@ const styles = StyleSheet.create({
     color: '#042456',
     fontWeight: 'bold',
     fontSize: 16,
+    margin: 10,
   },
 });

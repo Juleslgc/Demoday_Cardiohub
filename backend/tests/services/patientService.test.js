@@ -15,7 +15,7 @@ describe('PatientService', () => {
 
   // --- REGISTER PATIENT ---
   describe('registerPatient', () => {
-    it('doit créer un patient avec un mot de passe hashé', async () => {
+    it('must create a patient with a hashed password', async () => {
       const data = {
         firstName: 'Alice',
         lastName: 'Dupont',
@@ -38,13 +38,13 @@ describe('PatientService', () => {
       });
     });
 
-    it('doit lever une erreur si le mail existe déjà', async () => {
+    it('must raise an error if the email already exists', async () => {
       const data = { email: 'test@example.com', firstName: 'A', lastName: 'B', password: '123', birthDate: '1990-01-01' };
       patientRepository.findByEmail.mockResolvedValue({ id: 1 });
       await expect(patientService.registerPatient(data)).rejects.toThrow('Email déjà utilisé');
     });
 
-    it('doit lever une erreur si la date de naissance est dans le futur', async () => {
+    it('must raise an error if the date of birth is in the future', async () => {
       const futureDate = new Date();
       futureDate.setFullYear(futureDate.getFullYear() + 1);
       const data = { firstName: 'A', lastName: 'B', email: 'a@a.com', password: '123', birthDate: futureDate.toISOString() };
@@ -55,13 +55,13 @@ describe('PatientService', () => {
 
   // --- GET PATIENT BY ID ---
   describe('getPatientById', () => {
-    it('retourne un patient si trouvé', async () => {
+    it('returns a patient if found', async () => {
       patientRepository.findById.mockResolvedValue({ id: 1, name: 'Alice' });
       const result = await patientService.getPatientById(1);
       expect(result).toEqual({ id: 1, name: 'Alice' });
     });
 
-    it('lève une erreur si patient introuvable', async () => {
+    it('raises an error if the patient is not found', async () => {
       patientRepository.findById.mockResolvedValue(null);
       await expect(patientService.getPatientById(999)).rejects.toThrow('Patient introuvable');
     });
@@ -69,7 +69,7 @@ describe('PatientService', () => {
 
   // --- UPDATE PATIENT ---
   describe('updatePatient', () => {
-    it('hash le mot de passe si fourni', async () => {
+    it('hash the password if provided', async () => {
       bcrypt.hash.mockResolvedValue('hashed');
       patientRepository.update.mockResolvedValue({ id: 1 });
       const result = await patientService.updatePatient(1, { password: 'newpass' });
@@ -77,7 +77,7 @@ describe('PatientService', () => {
       expect(result).toEqual({ id: 1 });
     });
 
-    it('lève une erreur si patient non modifié', async () => {
+    it('raises an error if the patient is not modified', async () => {
       patientRepository.update.mockResolvedValue(null);
       await expect(patientService.updatePatient(1, {})).rejects.toThrow('Patient introuvable ou non modifié');
     });
@@ -85,13 +85,13 @@ describe('PatientService', () => {
 
   // --- DELETE PATIENT ---
   describe('deletePatient', () => {
-    it('supprime un patient', async () => {
+    it('deletes a patient', async () => {
       patientRepository.delete.mockResolvedValue(true);
       const result = await patientService.deletePatient(1);
       expect(result).toEqual({ message: 'Patient supprimé avec succès' });
     });
 
-    it('lève une erreur si patient introuvable', async () => {
+    it('raises an error if the patient is not found', async () => {
       patientRepository.delete.mockResolvedValue(false);
       await expect(patientService.deletePatient(999)).rejects.toThrow('Patient introuvable');
     });
@@ -99,21 +99,21 @@ describe('PatientService', () => {
 
   // --- GET BY EMAIL ---
   describe('getByEmail', () => {
-    it('retourne le patient trouvé', async () => {
+    it('returns the found patient', async () => {
       patientRepository.findByEmail.mockResolvedValue({ id: 1, email: 'test@test.com' });
       const result = await patientService.getByEmail('test@test.com');
       expect(result).toEqual({ id: 1, email: 'test@test.com' });
     });
 
-    it('lève une erreur si email manquant', async () => {
+    it('raises an error if email is missing', async () => {
       await expect(patientService.getByEmail('')).rejects.toThrow('Email manquant');
     });
 
-    it('lève une erreur si format email invalide', async () => {
+    it('raises an error if the email format is invalid', async () => {
       await expect(patientService.getByEmail('invalid')).rejects.toThrow('Format email non valide');
     });
 
-    it('lève une erreur si patient non trouvé', async () => {
+    it('raises an error if the patient is not found', async () => {
       patientRepository.findByEmail.mockResolvedValue(null);
       await expect(patientService.getByEmail('a@b.com')).rejects.toThrow('Email introuvable');
     });
@@ -121,7 +121,7 @@ describe('PatientService', () => {
 
   // --- LOGIN ---
   describe('login', () => {
-    it('retourne user et token si succès', async () => {
+    it('returns user and token if successful', async () => {
       const user = { id: 1, email: 'a@b.com', password: 'hashed' };
       Patient.findOne.mockResolvedValue(user);
       bcrypt.compare.mockResolvedValue(true);
@@ -131,12 +131,12 @@ describe('PatientService', () => {
       expect(result).toEqual({ user, token: 'fakeToken' });
     });
 
-    it('lève une erreur si utilisateur non trouvé', async () => {
+    it('raises an error if the user is not found', async () => {
       Patient.findOne.mockResolvedValue(null);
       await expect(patientService.login('a@b.com', '123')).rejects.toThrow('Utilisateur non trouvé');
     });
 
-    it('lève une erreur si mot de passe invalide', async () => {
+    it('raises an error if the password is invalid', async () => {
       Patient.findOne.mockResolvedValue({ id: 1, email: 'a@b.com', password: 'hashed' });
       bcrypt.compare.mockResolvedValue(false);
       await expect(patientService.login('a@b.com', 'wrong')).rejects.toThrow('Mot de passe invalide');

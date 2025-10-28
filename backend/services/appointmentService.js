@@ -1,15 +1,13 @@
-import AppointmentRepository from "../repositories/appointmentRepository.js";
+import appointmentRepository from "../repositories/appointmentRepository.js";
 import { Patient, Pro, Appointment } from "../models/relationModel.js";
 
-const appointmentRepository = new AppointmentRepository();
-
-export default class AppointmentService {
+class AppointmentService {
   // Méthode pour la date et heure local
   formatDate(dateTime) {
   return new Date(dateTime).toLocaleString('fr-FR', { hour12: false });
 }
 
-  //Créer un rendz-vous (seul le pro peut créer)
+  //Créer un rendez-vous (seul le pro peut créer)
   async createAppointment({ proId, patientId, dateTime, duration }) {
     if (!proId) {
       throw new Error('Seul un professionnel peut créer un rendez-vous');
@@ -107,7 +105,7 @@ export default class AppointmentService {
     if (proId) {
       const pro = await Pro.findByPk(proId);
       if (!pro) {
-        throw new Error('Professionel non trouvé');
+        throw new Error('Professionnel non trouvé');
       }
     }
     const updated = await appointmentRepository.updateAppointment(id, { dateTime, duration, patientId });
@@ -154,3 +152,5 @@ export default class AppointmentService {
     return appointmentRepository.getEndTime(appointment);
   }
 }
+
+export default new AppointmentService();
