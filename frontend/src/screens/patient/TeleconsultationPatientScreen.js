@@ -52,9 +52,9 @@ export default function TeleconsultationPatientScreen() {
       }, [])
     );
 
-    // Convertir la date au format ISO
+    // Convert the date to ISO format
   const parseFrenchDate = (dateStr) => {
-    // Exemple : "18/10/2025 14:00:00"
+    // Example : "18/10/2025 14:00:00"
     const [datePart, timePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
     const [hours, minutes, seconds] = timePart.split(':').map(Number);
@@ -85,16 +85,10 @@ export default function TeleconsultationPatientScreen() {
   })
   .slice()
   .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  // Temporary appointment ID used for testing
-  //const { appointments } = route.params;
-
  
-
   // Opens the Jitsi consultation in the browser using expo-web-browser
   const handleJoinConsultation = async (appointmentId) => {
-    //const jitsiLink = teleconsultation?.jitsiLink || "https://meet.jit.si/test-visio-demo";
-    //console.log(jitsiLink);
+
     const data = await getTeleconsultationByAppointment(appointmentId);
 
     if (!data || !data.jitsiLink) {

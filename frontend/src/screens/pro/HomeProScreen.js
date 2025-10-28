@@ -63,11 +63,11 @@ export default function HomePro({navigation}) {
     }, []) // The empty array [] means that this action is only done once on loading
   );
 
-  // Trier du plus récent au plus ancien
+  // Sort from newest to oldest
   const recentPatients = patients
-    .slice() // pour ne pas modifier le tableau original
+    .slice() // to avoid modifying the original array
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 3); // prendre les 3 premiers
+    .slice(0, 3); // take the first 3
 
 
   // Display part of the component
