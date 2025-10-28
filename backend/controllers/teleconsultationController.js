@@ -11,10 +11,7 @@
  * - Returns JSON responses with appropriate HTTP status codes.
  */
 
-import TeleconsultationService from "../services/teleconsultationService.js";
-
-// Initializes the service layer responsible for teleconsultation logic
-const teleconsultationService = new TeleconsultationService();
+import teleconsultationService from "../services/teleconsultationService.js";
 
 export default class TeleconsultationController {
   // Create a new teleconsultation from an appointment ID

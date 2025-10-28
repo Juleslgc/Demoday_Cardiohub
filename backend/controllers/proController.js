@@ -15,9 +15,7 @@
 * - The methods call the service functions (`proService`) and return
 * an appropriate JSON response with an HTTP code.
 */
-import ProService from '../services/proService.js';
-
-const proService = new ProService();
+import proService from '../services/proService.js';
 
 export default class ProController {
 

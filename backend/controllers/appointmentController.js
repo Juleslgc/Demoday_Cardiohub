@@ -1,6 +1,4 @@
-import AppointmentService from "../services/appointmentService.js";
-
-const appointmentService = new AppointmentService();
+import appointmentService from "../services/appointmentService.js";
 
 export default class AppointmentController {
 

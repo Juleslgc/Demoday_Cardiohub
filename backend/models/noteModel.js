@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../config/db";
-import BaseModel, { baseModel } from "./baseModel";
-import Teleconsultation from "./teleconsultationModel";
+import { sequelize } from "../config/db.js";
+import BaseModel, { baseModel } from "./baseModel.js";
+import Teleconsultation from "./teleconsultationModel.js";
 
 export default class Note extends BaseModel{}
 
