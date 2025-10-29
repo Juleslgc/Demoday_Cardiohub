@@ -36,6 +36,7 @@ export default function PatientRegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,6 +56,7 @@ export default function PatientRegisterScreen({ navigation }) {
     email.trim() !== "" &&
     !emailError &&
     password.trim() !== "" &&
+    !passwordError &&
     confirmPassword.trim() !== "" &&
     password === confirmPassword &&
     accepted;
@@ -115,6 +117,33 @@ export default function PatientRegisterScreen({ navigation }) {
     return regex.test(text);
   };
 
+  // Check the password strength
+  const validatePasswordStrength = (password) => {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (password.length < minLength) {
+    return "Le mot de passe doit contenir au moins 8 caractères.";
+  }
+  if (!hasUpperCase) {
+    return "Le mot de passe doit contenir au moins une majuscule.";
+  }
+  if (!hasLowerCase) {
+    return "Le mot de passe doit contenir au moins une minuscule.";
+  }
+  if (!hasNumber) {
+    return "Le mot de passe doit contenir au moins un chiffre.";
+  }
+  if (!hasSpecialChar) {
+    return "Le mot de passe doit contenir au moins un caractère spécial.";
+  }
+
+  return ""; // valid password
+  };
+
   // Check that the phone contains exactly 10 digits
   const isValidPhone = (text) => {
     const regex = /^[0-9]{10}$/;
@@ -123,6 +152,11 @@ export default function PatientRegisterScreen({ navigation }) {
 
   // Handle account creation
   const handleRegister = async () => {
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }    
+    
     if (!isFormValid) {
       setError("Veuillez remplir tous les champs obligatoires.");
       return;
@@ -270,10 +304,15 @@ export default function PatientRegisterScreen({ navigation }) {
         <Input
           label="Mot de passe"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            const validationMessage = validatePasswordStrength(text);
+            setPasswordError(validationMessage);
+          }}
           secureTextEntry={true}
           placeholder="Votre mot de passe"
           required
+          error={passwordError}
         />
         <Input
           label="Confirmer le mot de passe"

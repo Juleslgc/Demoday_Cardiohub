@@ -20,7 +20,7 @@ describe('PatientService', () => {
         firstName: 'Alice',
         lastName: 'Dupont',
         email: 'alice@example.com',
-        password: '123456',
+        password: 'P@ssword123',
         birthDate: '1990-01-01'
       };
       patientRepository.findByEmail.mockResolvedValue(null);
@@ -30,7 +30,7 @@ describe('PatientService', () => {
       const result = await patientService.registerPatient(data);
 
       expect(patientRepository.findByEmail).toHaveBeenCalledWith('alice@example.com');
-      expect(bcrypt.hash).toHaveBeenCalledWith('123456', 10);
+      expect(bcrypt.hash).toHaveBeenCalledWith('P@ssword123', 10);
       expect(patientRepository.create).toHaveBeenCalled();
       expect(result).toEqual({
         message: expect.any(String),
@@ -39,7 +39,7 @@ describe('PatientService', () => {
     });
 
     it('must raise an error if the email already exists', async () => {
-      const data = { email: 'test@example.com', firstName: 'A', lastName: 'B', password: '123', birthDate: '1990-01-01' };
+      const data = { email: 'test@example.com', firstName: 'A', lastName: 'B', password: 'Test@1234', birthDate: '1990-01-01' };
       patientRepository.findByEmail.mockResolvedValue({ id: 1 });
       await expect(patientService.registerPatient(data)).rejects.toThrow('Email déjà utilisé');
     });
@@ -47,10 +47,65 @@ describe('PatientService', () => {
     it('must raise an error if the date of birth is in the future', async () => {
       const futureDate = new Date();
       futureDate.setFullYear(futureDate.getFullYear() + 1);
-      const data = { firstName: 'A', lastName: 'B', email: 'a@a.com', password: '123', birthDate: futureDate.toISOString() };
+      const data = { firstName: 'A', lastName: 'B', email: 'a@a.com', password: 'Test@1234', birthDate: futureDate.toISOString() };
       patientRepository.findByEmail.mockResolvedValue(null);
       await expect(patientService.registerPatient(data)).rejects.toThrow('La date de naissance ne peut pas être dans le futur.');
     });
+
+    it('must raise an error if the password is weak', async () => {
+      const data = {
+        firstName: 'Alice',
+        lastName: 'Dupont',
+        email: 'alice@example.com',
+        password: 'abc123',
+        birthDate: '1990-01-01'
+      };
+
+      patientRepository.findByEmail.mockResolvedValue(null);
+
+      await expect(patientService.registerPatient(data))
+        .rejects
+        .toThrow("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.");
+    });
+
+    it('must accept a strong password', async () => {
+      const data = {
+        firstName: 'Alice',
+        lastName: 'Dupont',
+        email: 'alice@example.com',
+        password: 'Azerty1@',
+        birthDate: '1990-01-01'
+      };
+
+      patientRepository.findByEmail.mockResolvedValue(null);
+      bcrypt.hash.mockResolvedValue('hashedPassword');
+      patientRepository.create.mockResolvedValue({ id: 1, ...data });
+
+      const result = await patientService.registerPatient(data);
+
+      expect(bcrypt.hash).toHaveBeenCalledWith('Azerty1@', 10);
+      expect(result).toEqual({
+        message: expect.any(String),
+        userId: 1
+      });
+    });
+
+    it('must raise an error if the phone number is invalid', async () => {
+      const data = {
+        firstName: 'Alice',
+        lastName: 'Dupont',
+        email: 'alice@example.com',
+        password: 'Azerty1@',
+        phone: '12345',
+        birthDate: '1990-01-01'
+      };
+
+      patientRepository.findByEmail.mockResolvedValue(null);
+      await expect(patientService.registerPatient(data))
+        .rejects
+        .toThrow('Le numéro de téléphone doit comporter exactement 10 chiffres.');
+    });
+
   });
 
   // --- GET PATIENT BY ID ---

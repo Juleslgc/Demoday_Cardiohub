@@ -38,7 +38,7 @@ class PatientService {
     if (!data.lastName) {
       throw new Error('Le nom est obligatoire.');
     }
-		// Valiidation nom et prénom
+		// Validation lastname and firstname
 		if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(data.lastName)) {
     	throw new Error('Le nom doit contenir uniquement des lettres.');
   		}
@@ -63,6 +63,14 @@ class PatientService {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(data.email)) {
 			throw new Error('Format email non valide');
+		}
+
+		// Check the password strength
+		if (
+			!data.password ||
+			!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(data.password)
+		) {
+			throw new Error("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.");
 		}
 
     // Validation birthDate
