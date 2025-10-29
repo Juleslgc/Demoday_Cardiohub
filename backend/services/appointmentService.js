@@ -26,7 +26,7 @@ class AppointmentService {
     const endTime = new Date(startTime.getTime() + duration * 60000);
 
     // Récupérer tous les rdv du pro et du patient
-    const existingAppointments = await appointmentRepository.getAppointments({ proId, patientId });
+    const existingAppointments = await appointmentRepository.getAppointments({ proId });
 
     // Vérifier chevauchement
     const conflict = existingAppointments.some(a => {
