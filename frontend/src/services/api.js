@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://gap-anthony-kissing-legs.trycloudflare.com/api";
+const API_URL = "https://mas-plaza-recruitment-seeking.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -196,4 +196,12 @@ export async function getTeleconsultationByAppointment(appointmentId) {
   const token = await getToken();
   if (!token) throw new Error("Aucun token trouvé");
   return apiRequest(`/teleconsultations/${appointmentId}`, "GET", null, false, token)
+};
+
+// Create note
+export async function createNote(appointmentId, description) {
+  const token = await getToken();
+  if (!token) throw new Error("Aucun token trouvé");
+
+  return apiRequest(`/notes/appointment/${appointmentId}`, "POST", description, false, token);
 };

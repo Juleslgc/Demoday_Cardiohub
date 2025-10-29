@@ -28,8 +28,8 @@ Teleconsultation.belongsTo(Pro, { foreignKey: "proId", as: "pro" });
 Patient.hasMany(Teleconsultation, { foreignKey: "patientId", as: "teleconsultations" });
 Teleconsultation.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 
-// Relation Teleconsultation Note
-Teleconsultation.hasOne(Note, { foreignKey: "teleconsultationId", as: "note" });
-Note.belongsTo(Teleconsultation, { foreignKey: "teleconsultationId", as: "teleconsultation" });
+// Relation Appointment Note
+Appointment.hasOne(Note, { foreignKey: "appointmentId", as: "note" });
+Note.belongsTo(Teleconsultation, { foreignKey: "appointmentId", as: "appointment" });
 
 export { Pro, Patient, Appointment, Teleconsultation, Note };

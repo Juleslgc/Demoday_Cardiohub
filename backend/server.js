@@ -6,6 +6,7 @@ import proRoutes from './routes/proRoute.js';
 import patientRoutes from "./routes/patientRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoute.js";
 import teleconsultationRoutes from "./routes/teleconsultationRoutes.js";
+import noteRoutes from "./routes/noteRoute.js";
 
 const app = express();
 const PORT = 3000;
@@ -20,6 +21,7 @@ app.use('/api', proRoutes);
 app.use("/api/auth", patientRoutes);
 app.use("/api/appointment", appointmentRoutes);
 app.use("/api/teleconsultations", teleconsultationRoutes);
+app.use("/api/notes", noteRoutes);
 
 
 // 404 for routes not found
