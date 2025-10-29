@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert, AppState } from "react-native";
 import HeaderPage from "../../components/HeaderPage.js";
 import FooterPro from "../../components/FooterPro";
 import Button from "../../components/Button";
@@ -29,14 +29,30 @@ export default function TeleconsultationProScreen({ navigation }) {
   const [selectedFilter, setSelectedFilter] = useState("Aujourd'hui"); // Active filter
   const [loading, setLoading] = useState(true); // Indicates whether the data is loading
   const [isLoading, setIsLoading] = useState(false);
-  
+  const appState = useRef(AppState.currentState);
+  const currentAppointmentRef = useRef(null);
+
+  useEffect(() => {
+  const subscription = AppState.addEventListener("change", (nextState) => {
+    if (appState.current !== "active" && nextState === "active") {
+      if (currentAppointmentRef.current) {
+        navigation.navigate("NoteScreen", { appointment: currentAppointmentRef.current });
+        currentAppointmentRef.current = null;
+      }
+    }
+    appState.current = nextState;
+  });
+
+  return () => subscription.remove();
+}, [navigation]);
+
   // Handles the teleconsultation start process for a given appointment
-  const handleStartConsultation = async (appointmentId) => {
+  const handleStartConsultation = async (appointment) => {
     try {
+      currentAppointmentRef.current = appointment;
       setIsLoading(true);
       //  Create a teleconsultation via the backend API
-      const teleconsultation = await createTeleconsultation(appointmentId);
-      console.log("Téléconsultation créée :", teleconsultation);
+      const teleconsultation = await createTeleconsultation(appointment.id);
 
       if (!teleconsultation?.jitsiLink) {
         Alert.alert("Erreur", "Aucun lien Jitsi disponible.");
@@ -62,10 +78,9 @@ export default function TeleconsultationProScreen({ navigation }) {
                 controlsColor: "#042456",       // iOS toolbar color
                 toolbarColor: "#fff",        // Android toolbar color
               });
-
               // When the user closes the browser → return to the professional home screen
-              if (result.type === "dismiss") {
-                navigation.navigate("HomeProScreen");
+              if (result.type === "dismiss" || result.type === 'cancel') {
+                navigation.navigate("NoteScreen");
               }
             },
           },
@@ -223,7 +238,7 @@ export default function TeleconsultationProScreen({ navigation }) {
                     <View style={styles.buttonRow}>
                        <Button
                           title={isLoading ? "Création en cours..." : "Lancer la consultation"}
-                          onPress={() => handleStartConsultation(appointment.id)}
+                          onPress={() => handleStartConsultation(appointment)}
                           variant="full"
                           disabled={isLoading}
                         />

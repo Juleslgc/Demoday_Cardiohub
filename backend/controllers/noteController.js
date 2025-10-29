@@ -7,7 +7,7 @@ export default class NoteController {
     try {
       const { description } = req.body;
       const { appointmentId } = req.params;
-      const note = await noteService.createNote(appointmentId, description);
+      const note = await noteService.createNote(appointmentId, {description});
       res.status(201).json(note);
     } catch (err) {
       res.status(400).json({ message: err.message });

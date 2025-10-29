@@ -26,29 +26,29 @@ describe('NoteService', () => {
       // Mock createNote
       noteRepository.createNote.mockResolvedValue({ id: 'note-1', appointmentId, description });
 
-      const note = await noteService.createNote(appointmentId, description);
+      const note = await noteService.createNote(appointmentId, {description});
 
       expect(Appointment.findByPk).toHaveBeenCalledWith(appointmentId);
       expect(noteRepository.getNoteByAppointment).toHaveBeenCalledWith(appointmentId);
-      expect(noteRepository.createNote).toHaveBeenCalledWith(appointmentId, description);
+      expect(noteRepository.createNote).toHaveBeenCalledWith(appointmentId, {description});
       expect(note).toEqual({ id: 'note-1', appointmentId, description });
     });
 
     it('It should fail if the appointment does not exist.', async () => {
       Appointment.findByPk = jest.fn().mockResolvedValue(null);
-      await expect(noteService.createNote('uuid-123', 'desc')).rejects.toThrow('Rendez-vous non trouvé');
+      await expect(noteService.createNote('uuid-123', { description: 'desc' })).rejects.toThrow('Rendez-vous non trouvé');
     });
 
     it('should fail if the description is missing', async () => {
       Appointment.findByPk = jest.fn().mockResolvedValue({ id: 'uuid-123' });
-      await expect(noteService.createNote('uuid-123', '')).rejects.toThrow('Description manquante');
+      await expect(noteService.createNote('uuid-123', { description: '' })).rejects.toThrow('Description manquante');
     });
 
     it('should fail if a note already exists', async () => {
       Appointment.findByPk = jest.fn().mockResolvedValue({ id: 'uuid-123' });
       noteRepository.getNoteByAppointment.mockResolvedValue({ id: 'note-1' });
 
-      await expect(noteService.createNote('uuid-123', 'desc')).rejects.toThrow('Une note existe déjà pour ce rendez-vous');
+      await expect(noteService.createNote('uuid-123', { description: 'desc' })).rejects.toThrow('Une note existe déjà pour ce rendez-vous');
     });
   });
 

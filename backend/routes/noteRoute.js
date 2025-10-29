@@ -4,10 +4,10 @@ import authenticate from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post("/appointment/:appointmentId", noteController.createNote);
+router.post("/appointment/:appointmentId", authenticate, noteController.createNote);
 
-router.get("/appointment/:appointmentId", noteController.getNoteByAppointment);
+router.get("/appointment/:appointmentId", authenticate, noteController.getNoteByAppointment);
 
-router.put("/:id", noteController.updateNote);
+router.put("/:id", authenticate, noteController.updateNote);
 
 export default router;

@@ -7,11 +7,15 @@ class NoteRepository extends BaseRepository{
   }
 
   // Create a note
-  async createNote(appointmentId, description) {
+  async createNote(appointmentId, {description}) {
+    const appointment = await Appointment.findByPk(appointmentId);
+    if (!appointment) return null;
+
     const note = await Note.create({
-      appointmentId,
-      description
+      appointmentId: appointment.id,
+      description: description
     });
+
     return note;
   }
 

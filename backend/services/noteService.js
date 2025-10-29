@@ -4,7 +4,7 @@ import { Note, Appointment } from "../models/relationModel.js";
 class NoteService {
 
   // Create a note
-  async createNote(appointmentId, description) {
+  async createNote(appointmentId, {description}) {
     const appointment = await Appointment.findByPk(appointmentId);
     if(!appointment) {
       throw new Error('Rendez-vous non trouvé');
@@ -19,7 +19,7 @@ class NoteService {
       throw new Error('Une note existe déjà pour ce rendez-vous');
     }
     
-    const note = await noteRepository.createNote(appointmentId, description);
+    const note = await noteRepository.createNote(appointmentId, {description});
 
     return note;
   }
