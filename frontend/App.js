@@ -38,6 +38,7 @@ import PatientList from "./src/screens/pro/PatientsList.js";
 import EditAppointmentScreen from "./src/screens/pro/EditAppointmentScreen.js";
 import AlertScreen from "./src/screens/pro/AlertScreen.js";
 import DocumentScreen from "./src/screens/pro/DocumentScreen.js";
+import NoteScreen from "./src/screens/pro/NoteScreen.js";
 
 // Create the navigation stack
 const Stack = createNativeStackNavigator();
@@ -69,6 +70,7 @@ export default function App() {
         <Stack.Screen name="EditAppointmentScreen" component={EditAppointmentScreen} />
         <Stack.Screen name="AlertScreen" component={AlertScreen} />
         <Stack.Screen name="DocumentScreen" component={DocumentScreen} />
+        <Stack.Screen name="NoteScreen" component={NoteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

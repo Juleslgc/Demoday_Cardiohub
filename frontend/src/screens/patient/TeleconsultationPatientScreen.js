@@ -15,10 +15,10 @@
  * - Automatically redirects the patient back to the home screen after closing the browser.
  */
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator, AppState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import HeaderPage from "../../components/HeaderPage";
 import FooterPatient from "../../components/FooterPatient";
@@ -33,6 +33,19 @@ export default function TeleconsultationPatientScreen() {
   const [teleconsultation, setTeleconsultation] = useState(null);
   const [appointment, setAppointment] = useState([]);
   const [loading, setLoading] = useState(false);
+  const appState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      // Quand l'app redevient active, on redirige
+      if (appState.current !== "active" && nextState === "active") {
+        navigation.navigate("HomePatientScreen");
+      }
+      appState.current = nextState;
+    });
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   useFocusEffect(
       useCallback(() => {
@@ -136,11 +149,6 @@ export default function TeleconsultationPatientScreen() {
                 controlsColor: "#042456",       // iOS toolbar color
                 toolbarColor: "#fff",        // Android toolbar color
               });
-
-              // When the user closes the browser → navigate back to the home screen
-              if (result.type === "dismiss") {
-                navigation.navigate("HomePatientScreen");
-              }
             } catch (error) {
               Alert.alert("Erreur", "Impossible d’ouvrir la visioconférence.");
             }
