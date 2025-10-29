@@ -1,8 +1,4 @@
 import appointmentService from "../services/appointmentService.js";
-<<<<<<< HEAD
-=======
-
->>>>>>> feature/consultation-notes
 
 export default class AppointmentController {
 
