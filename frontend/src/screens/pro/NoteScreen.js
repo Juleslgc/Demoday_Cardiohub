@@ -31,22 +31,11 @@ export default function NoteScreen({navigation, route}) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('HomeProScreen')}
-            style={styles.backButton}
-          >
-            <MaterialIcons name="arrow-back" size={26} color="#042456" />
-          </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>Téléconsultation terminée</Text>
-          </View>
-        </View>
-      <ScrollView contentContainerStyle={styles.container}>
+      <HeaderPage title="Téléconsultation terminée" />
+  
+      <ScrollView style={{ flex: 1, marginTop: 60 }} contentContainerStyle={styles.container}>
 
         {/* Patient Card */}
-
         <View style={styles.card}>
           <MaterialIcons name="account-circle" size={53} color="#042456" />
           <View style={styles.cardContent}>
@@ -85,12 +74,12 @@ export default function NoteScreen({navigation, route}) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#042456",
   },
   container: {
-    padding: 16,
+    padding: 12,
     backgroundColor: '#042456',
-    flex: 1
+    flex: 1,
   },
   header: {
     flexDirection: "row",
@@ -108,7 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   card: {
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#fff",
     borderRadius: 8,
     padding: 12,
     flexDirection: "row",
@@ -155,31 +144,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "#042456",
     fontWeight: "700",
-  },
-   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    height: 50,
-    paddingHorizontal: 10,
-    zIndex: 100,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    position: "relative",
-  },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    zIndex: 2,
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#042456",
+    fontSize: 17
   },
 });

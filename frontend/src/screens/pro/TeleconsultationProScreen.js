@@ -80,7 +80,7 @@ export default function TeleconsultationProScreen({ navigation }) {
               });
               // When the user closes the browser → return to the professional home screen
               if (result.type === "dismiss" || result.type === 'cancel') {
-                navigation.navigate("NoteScreen");
+                navigation.navigate("NoteScreen" , { appointment });
               }
             },
           },

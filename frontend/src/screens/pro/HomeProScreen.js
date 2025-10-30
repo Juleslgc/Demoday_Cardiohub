@@ -101,7 +101,7 @@ export default function HomePro({navigation}) {
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={styles.button}
-                      onPress={() => navigation.navigate("PatientDetail", { patientId: patient.id })}
+                      onPress={() => navigation.navigate("PatientFileScreen", { patientId: patient.id })}
                     >
                       <Text style={styles.buttonText}>Voir Dossier</Text>
                     </TouchableOpacity>
