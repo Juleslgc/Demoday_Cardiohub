@@ -38,7 +38,6 @@ export default function LoginScreen({ navigation }) {
 */
 	const handleSubmitLogin = async () => {
 		const data = { email, password }
-		console.log(data);
 		try {
 			const response = await login(data);
 			console.log(response.message);
@@ -47,10 +46,8 @@ export default function LoginScreen({ navigation }) {
 			await AsyncStorage.setItem("token", response.token);
       // Retrieve the token to store it
       const token = response.token;
-      console.log('TOKEN :', token);
       if (token) {
         await storeToken(token);
-        console.log('Token enregistrer');
       }
 			
       // Redirection after login

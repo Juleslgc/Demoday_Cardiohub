@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
 import HeaderPage from "../../components/HeaderPage";
@@ -17,7 +18,8 @@ export default function PatientList({ navigation }) {
     // Declaration of the "loading" state to know if the data is still loading
     const [loading, setLoading] = useState(true);
 
-   useEffect(() => {
+   useFocusEffect(
+    useCallback(() => {
       // Function to retrieve patients from the API
       const fetchPatients = async () => {
         try {
@@ -32,7 +34,7 @@ export default function PatientList({ navigation }) {
       };
   
       fetchPatients(); // We start patient recovery
-    }, []); // The empty array [] means that this action is only done once on loading
+    }, [])); // The empty array [] means that this action is only done once on loading
 
     const filteredPatients = patients.filter((patient) => {
       if (!searchPatient) return true;

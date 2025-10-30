@@ -19,7 +19,6 @@ const TOKEN_KEY = 'userToken'; // Key used to store the token in AsyncStorage
 export const storeToken = async (token) => {
   try {
     await AsyncStorage.setItem(TOKEN_KEY, token); // Stores the token under the key TOKEN_KEY
-    console.log('Token enregistrer');
   } catch (error) {
     console.log('Erreur sauvegarde token :', error.message);
   }
@@ -39,7 +38,6 @@ export const getToken = async () => {
 export const removeToken = async () => {
   try {
     await AsyncStorage.removeItem(TOKEN_KEY); // Deletes the stored token
-    console.log('Token supprimer');
   } catch (error) {
     console.log('Erreur suppression token :', error.message);
   }

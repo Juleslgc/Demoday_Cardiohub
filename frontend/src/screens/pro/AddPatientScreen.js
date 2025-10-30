@@ -5,6 +5,7 @@ import { addPatient, searchAllPatients } from "../../services/api";
 import HeaderPage from "../../components/HeaderPage";
 import FooterPro from '../../components/FooterPro';
 import Button from '../../components/Button';
+import Separator from "../../components/Separator";
 
 /**
 * Screen: Add Patient
@@ -18,6 +19,8 @@ export default function AddPatientScreen({navigation}) {
   // States managing the search
   const [searchTerm, setSearchTerm] = useState(""); // Last name or first name to search for
   const [foundPatients, setFoundPatients] = useState([]); // Search results
+  const [hasSearched, setHasSearched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   /**
   * Searches for patients via the API
@@ -26,13 +29,14 @@ export default function AddPatientScreen({navigation}) {
   * - Updates the list of results
   */
   const handleSearch = async () => {
+    setIsLoading(true);
+    setHasSearched(true);
     if (!searchTerm.trim()) {
       return Alert.alert("Erreur", "Veuillez entrer un nom ou un prénom");
     }
 
     try {
       const data = await searchAllPatients(searchTerm.trim());
-      console.log("🔍 Résultat API :", data);
 
       // Normalization and calculation of alreadyLinked for the connected pro
       const patients = Array.isArray(data)
@@ -45,15 +49,12 @@ export default function AddPatientScreen({navigation}) {
           }))
         : [];
 
-      if (patients.length === 0) {
-        Alert.alert("Aucun patient trouvé");
-      }
-      console.log("Résultat patient :", patients)
-
       setFoundPatients(patients);
     } catch (err) {
-      console.error("Erreur recherche :", err);
-      Alert.alert("Erreur", err.message || "Impossible de rechercher les patients");
+      //Alert.alert("Erreur", err.message || "Impossible de rechercher les patients");
+      setFoundPatients([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,16 +91,19 @@ export default function AddPatientScreen({navigation}) {
           />
           {/* --- Search button --- */}
           <TouchableOpacity style={styles.button} onPress={handleSearch}>
-            <Text style={{color: "#042456", fontWeight: "bold"}}>Rechercher</Text>
+            <Text style={{color: "#042456", fontWeight: "bold", fontSize: 17}}>Rechercher</Text>
           </TouchableOpacity>
         </View>
+
+        <Separator />
+
         {/* --- List of results --- */}
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: -20 }}>
           <View style={{ marginTop: 20 }}>
-            {foundPatients.length > 0 ? (
+          {foundPatients.length ? (
               foundPatients.map((patient) => (
                 <View key={patient.id} style={styles.patientCard}>
-                  <Text style={styles.text}>{patient.firstname} {patient.lastname}</Text>
+                  <Text style={styles.patientName}>{patient.firstname} {patient.lastname}</Text>
                   <Text style={styles.text}>Email : {patient.email}</Text>
                   {/* Association button */}
                   <Button
@@ -110,9 +114,9 @@ export default function AddPatientScreen({navigation}) {
                   />
                 </View>
               ))
-            ) : (
-              <Text style={{ marginTop: 10, color: "#fff", textAlign: "center" }}>Aucun patient trouvé</Text>
-            )}
+            ) : ( hasSearched && (
+              <Text style={{ marginTop: 10, color: "#fff", textAlign: "center", fontSize: 18 }}>Aucun patient trouvé</Text>
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -139,17 +143,18 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     backgroundColor: "#fff",
+    height: 40,
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,
     color: "#042456"
   },
   button: {
-    backgroundColor: "#fff",
-    height: 30,
+    backgroundColor: "#F5F7FA",
+    height: 40,
     borderRadius: 5,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   patientCard: {
     backgroundColor: "#f7f7f7",
@@ -160,11 +165,13 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   patientName: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
     marginBottom: 5,
+    color: "#042456",
   },
   text: {
     color: "#042456",
+    fontSize: 16
   }
 });

@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://mysql-championship-inquiries-privileges.trycloudflare.com/api";
+const API_URL = "https://billy-peace-across-coastal.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -39,7 +39,7 @@ export async function apiRequest(endpoint, method = "GET", body = null, showAler
 
     // Handle HTTP errors and custom backend messages
     if (!response.ok) {
-      console.log(data);
+      //console.log(data);
       throw new Error(data.message);
     }
 
@@ -50,7 +50,7 @@ export async function apiRequest(endpoint, method = "GET", body = null, showAler
     return data;
 
   } catch (error) {
-    console.error("Erreur API:", error.message);
+    //console.error("Erreur API:", error.message);
     throw error;
   }
 };

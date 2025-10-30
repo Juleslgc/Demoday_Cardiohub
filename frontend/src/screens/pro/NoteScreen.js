@@ -18,7 +18,7 @@ export default function NoteScreen({navigation, route}) {
       const data = {description};
 
       await createNote(appointmentId, data);
-      Alert.alert("La note a bien été enrgistrée.")
+      Alert.alert("La note a bien été enregistrée.")
       navigation.navigate('HomeProScreen');
     } catch (error) {
       Alert.alert("Erreur :", error.message);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from "react-native";
 import FooterPro from "../../components/FooterPro";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { searchPatientsByName, createAppointment } from "../../services/api";
@@ -40,8 +40,8 @@ export default function AppointmentScreen({ navigation }) {
         const results = await searchPatientsByName(searchQuery);
         setPatients(results);
       } catch (err) {
-        console.error(err);
-        Alert.alert("Erreur", err.message);
+        //console.error(err);
+        //Alert.alert("Erreur", err.message);
       }
     };
     fetchPatients();
@@ -66,7 +66,13 @@ export default function AppointmentScreen({ navigation }) {
       invalidFormat: false,
       invalidDayMonth: false,
       pastDate: false,
+      patient: false,
     };
+
+    if (!selectedPatient) {
+      errors.patient =  true;
+      return errors;
+    }
 
     // Empty fields
     if (!selectedDate || !selectedTime) {
@@ -144,8 +150,6 @@ export default function AppointmentScreen({ navigation }) {
   * API call: createAppointment()
   */
   const handleCreateAppointment = async () => {
-    if (!selectedPatient) return Alert.alert("Erreur", "Veuillez sélectionner un patient");
-    if (!selectedDate || !selectedTime) return Alert.alert("Erreur", "Veuillez sélectionner la date et l'heure");
 
     const dateTimeISO = getDateTimeISO();
     try {
@@ -154,9 +158,10 @@ export default function AppointmentScreen({ navigation }) {
         dateTime: dateTimeISO,
         duration: selectedDuration
       });
+      Alert.alert('Rendez-vous créé avec succès !');
       navigation.goBack(); // return to the list of appointments
     } catch (err) {
-      Alert.alert("Erreur", err.message);
+      Alert.alert(err.message);
     }
   };
 
@@ -202,6 +207,9 @@ export default function AppointmentScreen({ navigation }) {
                 />
               </View>
 
+              <View style={{ marginTop: -10}}>
+                {dateErrors.patient && <Text style={styles.errorText}>Veuillez sélectioner un patient</Text>}
+              </View>
               {/* Dropdown list of patients */}
               {filteredPatients.length > 0 && !selectedPatient && (
                 <View style={styles.dropdown}>
@@ -241,6 +249,7 @@ export default function AppointmentScreen({ navigation }) {
               {dateErrors.invalidFormat && <Text style={styles.errorText}>Format incorrect, jj/mm/aaaa</Text>}
               {dateErrors.invalidDayMonth && <Text style={styles.errorText}>Jour ou mois ou année invalide</Text>}
               {dateErrors.pastDate && <Text style={styles.errorText}>La date ou l'heure est déjà passée</Text>}
+              {dateErrors.empty && <Text style={styles.errorText}>Veuillez sélectionner la date et l'heure</Text>}
             </View>
           </View>
 
