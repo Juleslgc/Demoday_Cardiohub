@@ -63,7 +63,12 @@ export default function PatientList({ navigation }) {
             showsVerticalScrollIndicator={false}
           >
             {filteredPatients.map((patient) => 
-              <TouchableOpacity key={patient.id} style={styles.card} activeOpacity={0.7} onPress={() => navigation.navigate("PatientFileScreen")}>
+              <TouchableOpacity 
+                key={patient.id}
+                style={styles.card}
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate("PatientFileScreen", { patient })}
+              >
                 <View style={styles.cardContent}>
                   <MaterialIcons name="account-circle" size={45} color="#042456" />
                   <View style={styles.cardTextContainer}>

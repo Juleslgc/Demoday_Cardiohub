@@ -19,7 +19,7 @@ const jwtDecode = require("jwt-decode");
 
 
 // Base API endpoint
-const API_URL = "https://billy-peace-across-coastal.trycloudflare.com/api";
+const API_URL = "https://hebrew-gore-garbage-postings.trycloudflare.com/api";
 
 // Generic API request handler
 export async function apiRequest(endpoint, method = "GET", body = null, showAlert = false, token = null) {
@@ -204,4 +204,12 @@ export async function createNote(appointmentId, description) {
   if (!token) throw new Error("Aucun token trouvé");
 
   return apiRequest(`/notes/appointment/${appointmentId}`, "POST", description, false, token);
+};
+
+// Get note by appointment
+export async function getNoteByAppointment(appointmentId) {
+  const token = await getToken();
+  if (!token) throw new Error("Aucun token trouvé");
+
+  return apiRequest(`/notes/appointment/${appointmentId}`, "GET", null, false, token);
 };
