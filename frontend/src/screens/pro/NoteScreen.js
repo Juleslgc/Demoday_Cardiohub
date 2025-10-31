@@ -37,11 +37,18 @@ export default function NoteScreen({navigation, route}) {
 
         {/* Patient Card */}
         <View style={styles.card}>
-          <MaterialIcons name="account-circle" size={53} color="#042456" />
+          <MaterialIcons name="account-circle" size={60} color="#042456" />
           <View style={styles.cardContent}>
             <Text style={styles.patientName}>{appointment.patient.firstName} {appointment.patient.lastName}</Text>
-            <Text style={styles.cardSmall}>Rendez-vous du {datePart} à {formattedTime}</Text>
-            <Text style={styles.cardSmall}>Durée : {appointment.duration} min</Text>
+            <Text style={styles.cardSmall}>
+              <Text style={styles.bold}>Rendez-vous du </Text>
+              {datePart} <Text style={styles.bold}>à</Text> {formattedTime}
+            </Text>
+
+            <Text style={styles.cardSmall}>
+              <Text style={styles.bold}>Durée : </Text>
+              {appointment.duration} min
+            </Text>
           </View>
         </View>
 
@@ -81,21 +88,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#042456',
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  backArrow: {
-    color: "#fff",
-    fontSize: 20,
-    marginRight: 10,
-  },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 8,
@@ -106,16 +98,20 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     flex: 1,
+    marginLeft: 10,
   },
   patientName: {
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 17,
     marginBottom: 6,
     color: "#042456",
   },
   cardSmall: {
     color: "#042456",
-    fontSize: 12,
+    fontSize: 14,
+  },
+  bold: {
+    fontWeight: "700"
   },
   sectionTitle: {
     color: "#fff",

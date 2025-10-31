@@ -104,7 +104,10 @@ export default function AddPatientScreen({navigation}) {
               foundPatients.map((patient) => (
                 <View key={patient.id} style={styles.patientCard}>
                   <Text style={styles.patientName}>{patient.firstname} {patient.lastname}</Text>
-                  <Text style={styles.text}>Email : {patient.email}</Text>
+                  <Text style={styles.text}>
+                    <Text style={styles.bold}>Email : </Text>
+                    {patient.email}
+                  </Text>
                   {/* Association button */}
                   <Button
                     variant= 'full'
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   patientName: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: "700",
     marginBottom: 5,
     color: "#042456",
@@ -173,5 +176,8 @@ const styles = StyleSheet.create({
   text: {
     color: "#042456",
     fontSize: 16
+  },
+  bold: {
+    fontWeight: "600",
   }
 });
