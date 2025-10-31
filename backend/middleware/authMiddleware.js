@@ -1,4 +1,9 @@
 /**
+* 
+* ----------------------------------------------------------------------------
+* authMiddleware.js
+*
+* ----------------------------------------------------------------------------
 * JWT authentication middleware for Express.
 *
 * Its role:
@@ -15,11 +20,11 @@
 * 3. If valid, adds the user information to `req.user` and passes the processing to the next middleware.
 * 4. Otherwise, returns an HTTP 401 (Unauthorized) error.
 */
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 // Load the .env file (with a relative path to the parent directory)
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: "../.env" });
 
 // Retrieve the secret key used to sign JWT tokens
 const SECRET_KEY = process.env.JWT_SECRET;
@@ -29,24 +34,24 @@ export default function authenticate(req, res, next) {
   // Retrieves the "Authorization" header sent by the client
   const authHeader = req.headers.authorization;
 
-	// Checks if a token is present in the request
+  // Checks if a token is present in the request
   if (!authHeader) {
-    return res.status(401).json({ message: 'Aucun jeton n\'a été fourni' });
+    return res.status(401).json({ message: "Aucun jeton n'a été fourni" });
   }
 
-	// The header must be in the format "Bearer <token>"
-  const token = authHeader.split(' ')[1]; // "Bearer <token>"
+  // The header must be in the format "Bearer <token>"
+  const token = authHeader.split(" ")[1]; // "Bearer <token>"
 
   try {
-		// Verifies and decodes the token with the secret key
+    // Verifies and decodes the token with the secret key
     const decoded = jwt.verify(token, SECRET_KEY);
-		// Stores user information in the `req` object
-		// (then accessible in protected routes)
+    // Stores user information in the `req` object
+    // (then accessible in protected routes)
     req.user = decoded;
-		// Move to the next middleware or controller
+    // Move to the next middleware or controller
     next();
   } catch (err) {
-		// If the token is invalid, expired or malformed -> error 401
-    return res.status(401).json({ message: 'Jeton invalide' });
+    // If the token is invalid, expired or malformed -> error 401
+    return res.status(401).json({ message: "Jeton invalide" });
   }
 }

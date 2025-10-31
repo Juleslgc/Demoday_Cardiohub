@@ -1,6 +1,8 @@
 /**
-* Specific repository: ProRepository
+* -------------------------------------------------------------------------
+* proRepository.js
 *
+* -------------------------------------------------------------------------
 * This repository manages interactions with healthcare professional (Pro) data
 * and their patients.
 *
@@ -13,29 +15,29 @@
 * - findPatient(proId, patientId) → retrieves a specific patient linked to a pro.
 * - addPatient(proId, patientId) → allows the professional to add a patient
 */
-import BaseRepository from './baseRepository.js';
-import { Pro, Patient } from '../models/relationModel.js'
-import { Op } from 'sequelize';
+import BaseRepository from "./baseRepository.js";
+import { Pro, Patient } from "../models/relationModel.js";
+import { Op } from "sequelize";
 
 class ProRepository extends BaseRepository {
-	constructor() {
-		super(Pro);
-	}
+  constructor() {
+    super(Pro);
+  }
 
-	// Asynchronous method for finding a healthcare professional via their RPPS
-	// `rpps` is a unique identifier for healthcare professionals
-	async findByRpps(rpps) {
-		return await Pro.findOne({ where: { rpps } })
-	}
+  // Asynchronous method for finding a healthcare professional via their RPPS
+  // `rpps` is a unique identifier for healthcare professionals
+  async findByRpps(rpps) {
+    return await Pro.findOne({ where: { rpps } });
+  }
 
-	// Method to retrieve all patients of a pro
-	// `proId` is the pro's primary key
-	 async findPatients(proId) {
+  // Method to retrieve all patients of a pro
+  // `proId` is the pro's primary key
+  async findPatients(proId) {
     // We retrieve the Pro and include its Patients via the defined alias
     const pro = await Pro.findByPk(proId, {
       include: { 
         model: Patient,
-        as: 'Patients',
+        as: "Patients",
         through: { attributes: [] },
       }
     });
@@ -44,12 +46,12 @@ class ProRepository extends BaseRepository {
     return pro ? pro.Patients : [];
   }
 
-	// Method to retrieve a specific patient from a pro
-	// `proId` -> pro identifier
-	// `patientId` -> patient identifier (in the patient's `id` column)
-	async findPatient(proId, patientId) {
+  // Method to retrieve a specific patient from a pro
+  // `proId` -> pro identifier
+  // `patientId` -> patient identifier (in the patient's `id` column)
+  async findPatient(proId, patientId) {
     const pro = await Pro.findByPk(proId, {
-      include: { model: Patient, as: 'Patients' }
+      include: { model: Patient, as: "Patients" }
     });
 
     if (!pro) return null;
@@ -58,6 +60,7 @@ class ProRepository extends BaseRepository {
     return pro.Patients.find(p => p.id === Number(patientId)) || null;
   }
 
+  // Adds a patient to the list of patients followed by a pro
   async addPatient(proId, patientId) {
     const pro = await Pro.findByPk(proId);
     const patient = await Patient.findByPk(patientId);
@@ -70,7 +73,7 @@ class ProRepository extends BaseRepository {
     return patient;
   }
 
-   // Chercher les patients par nom pour un pro
+  // Searches for a professional's patients by their name (partial, case-insensitive)
   async searchPatientsByName(proId, name) {
     if (!proId || !name) {
       throw new Error("Pro ou nom manquant.");
@@ -83,18 +86,19 @@ class ProRepository extends BaseRepository {
           as: "Pros",
           where: { id: proId },
           required: false,
-          attributes: [], // on n’a pas besoin de données du pro ici
-          through: { attributes: [] } // ignore la table de relation
+          attributes: [], // we don't need professional data here
+          through: { attributes: [] } // ignore the relationship table
         }
       ],
       where: {
-        lastName: { [Op.iLike]: `%${name}%` }, // recherche insensible à la casse (PostgreSQL)
+        lastName: { [Op.iLike]: `%${name}%` }, // Case-insensitive search (PostgreSQL)
       },
     });
 
     return patients;
   }
 
+  // Global search for patients by name (all professionals included)
   async searchAllPatientsByName(name) {
     if (!name) throw new Error("Nom du patient manquant.");
 

@@ -1,54 +1,54 @@
+import express from "express";
+import ProController from "../controllers/proController.js";
+import authenticate from "../middleware/authMiddleware.js";
 /**
-* Routes for Healthcare Professionals (Pro)
+* -------------------------------------------------------------------------
+* proRoute.js
 *
-* This file defines the Express endpoints for managing professionals and their patients.
-* It uses the `ProController` to execute business logic
-* and the `authenticate` middleware to secure protected routes.
-* Available routes:
-* - POST /register/pro/ -> Create or retrieve a pro
-* - GET /pro/ -> Retrieve all pros
-* - GET /pro/:rpps -> Retrieve a pro by RPPS
-* - PUT /pro/:id -> Update a pro by id
-* - DELETE /pro/:id -> Delete a pro by id
-* - GET /pro/:proId/patients -> Retrieve all patients of a pro
-* - GET /pro/:proId/patients/:patientId -> Retrieve a specific patient of a pro
+* -------------------------------------------------------------------------
+* This file manages all routes related to healthcare professionals (Pros)
+* in the backend application. 
+*
+* Each route delegates the business logic to the `ProController` for actions
+* such as creation, retrieval, update, deletion, and management of associated patients. 
+*
+* Some routes use the `authenticate` middleware to secure access,
+* ensuring that only authenticated requests can access or modify the data. 
+*
+* The controller handles validation, service calls, and responses. 
 */
-import express from 'express';
-import ProController from '../controllers/proController.js';
-import authenticate from '../middleware/authMiddleware.js';
 
 // Creating an Express router
 const router = express.Router();
 
-// Create or retrieve a pro
-router.post('/auth/register/pro/', ProController.createOrLoginPro);
+// Route for creating or retrieve a pro
+router.post("/auth/register/pro/", ProController.createOrLoginPro);
 
-// Recover all Pro
-router.get('/pro/', authenticate, ProController.getAllPros);
+// Route to recover all Pro
+router.get("/pro/", authenticate, ProController.getAllPros);
 
-// Recover a pro by RPPS
-router.get('/pro/:rpps', authenticate, ProController.getProByRpps);
+// Route to recover a pro by RPPS
+router.get("/pro/:rpps", authenticate, ProController.getProByRpps);
 
-// Update a pro by id
-router.put('/pro/:id', authenticate, ProController.updatePro);
+// Route to update a pro by id
+router.put("/pro/:id", authenticate, ProController.updatePro);
 
-// Delete a pro by id
-router.delete('/pro/:id', authenticate, ProController.deletePro);
+// Route to delete a pro by id
+router.delete("/pro/:id", authenticate, ProController.deletePro);
 
-// Ajoute patient
+// Route to add a patient to a pro
 router.post("/add/pro/:proId/patients/:patientId", authenticate, ProController.addPatient);
 
-// Retrieve all patients from a pro
-router.get('/pro/:proId/patients',  ProController.getAllPatients);
+// Route to retrieve all patients from a pro
+router.get("/pro/:proId/patients",  ProController.getAllPatients);
 
-// Retrieve a specific patient from a pro
-router.get('/pro/:proId/patients/:patientId', authenticate, ProController.getPatient);
+// Route to retrieve a specific patient from a pro
+router.get("/pro/:proId/patients/:patientId", authenticate, ProController.getPatient);
 
-// Rechercher un patient par son nom
+// Route to search for a patient by name for a pro
 router.get("/:proId/patients", ProController.searchPatients);
 
-// Rechercher tout les patients
+// Route to search for all patients
 router.get("/patients/all", ProController.searchAllPatients);
-
 
 export default router;

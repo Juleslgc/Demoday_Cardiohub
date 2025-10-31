@@ -1,23 +1,28 @@
-/**
- * Handles API endpoints related to teleconsultations:
- *  - Creation of a teleconsultation by a professional
- *  - Secure retrieval of a teleconsultation (for authorized users)
- *
- * Notes:
- * - All routes are protected by authentication middleware.
- * - Routes delegate business logic to the TeleconsultationController.
- */
-
 import { Router } from "express";
 import authenticate from "../middleware/authMiddleware.js";
 import teleconsultationController from "../controllers/teleconsultationController.js";
+/**
+* -------------------------------------------------------------------------
+* teleconsultationRoute.js
+*
+* -------------------------------------------------------------------------
+* This file manages all routes related to teleconsultations in the backend application. 
+*
+* Each route delegates the business logic to the `TeleconsultationController` for actions
+* such as creating a teleconsultation or securely retrieving an existing teleconsultation. 
+*
+* All routes are protected by the `authenticate` middleware, ensuring that
+* only authenticated requests can access or modify the data. 
+*
+* The controller handles validation, service calls, and responses. 
+*/
 
 const router = Router();
 
-// Creates a new teleconsultation (accessible only to professionals)
+// Route to creating a new teleconsultation (accessible only to professionals)
 router.post("/:appointmentId", authenticate, teleconsultationController.createTeleconsultation);
 
-// Retrieves a teleconsultation (accessible to the corresponding patient or professional)
+// Route to retrieves a teleconsultation (accessible to the corresponding patient or professional)
 router.get("/:appointmentId", authenticate, teleconsultationController.getByAppointment);
 
 export default router;

@@ -1,4 +1,8 @@
 /**
+ *  -------------------------------------------------------------------------
+ * teleconsultationRepository.js
+ *
+ * -------------------------------------------------------------------------
  * This repository handles database operations related to teleconsultations.
  * It interacts directly with Sequelize models and abstracts persistence logic from services.
  *

@@ -1,4 +1,8 @@
 /**
+ * ----------------------------------------------------------------------------
+ * teleconsultationController.js
+ * 
+ * ----------------------------------------------------------------------------
  * This controller handles HTTP requests related to teleconsultations.
  * It delegates business logic to the teleconsultationService and returns appropriate HTTP responses.
  *

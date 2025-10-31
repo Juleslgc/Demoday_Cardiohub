@@ -1,4 +1,8 @@
 /**
+ * -------------------------------------------------------------------------
+ * teleconsultationModel.js
+ *
+ * -------------------------------------------------------------------------
  * This model defines the "Teleconsultation" entity in the database.
  * It extends the BaseModel class and uses Sequelize ORM for database interaction.
  *
@@ -27,9 +31,9 @@ Teleconsultation.init(
     jitsiLink: { type: DataTypes.STRING(100), allowNull: false },
   },
   {
-    sequelize,
-    modelName: "Teleconsultation",
-    tableName: "teleconsultations",
-    timestamps: true,
+    sequelize, // Connecting to the database via Sequelize
+    modelName: "Teleconsultation", // Internal model name in Sequelize
+    tableName: "teleconsultations", // Actual name of the table in the database
+    timestamps: true, // Automatically activates createdAt and updatedAt
   }
 );

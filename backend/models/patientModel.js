@@ -1,5 +1,8 @@
 /**
- * Patient model definition.
+ * -------------------------------------------------------------------------
+ * patientModel.js
+ *
+ * -------------------------------------------------------------------------
  *
  * - Extends BaseModel to inherit shared fields (e.g., UUID primary key).
  * - Defines specific attributes for patients (name, birth date, email, etc.).
@@ -27,18 +30,18 @@ class Patient extends BaseModel {
 }
 
 Patient.init(
-	{
-			...baseModel, // add id: UUID
-			lastName: { type: DataTypes.STRING(100), allowNull: false },
-			firstName: { type: DataTypes.STRING(100), allowNull: false },
-			birthDate: { type: DataTypes.DATE, allowNull: false },
-			email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: { msg: "Email non valide" } }},
-			password: { type: DataTypes.STRING, allowNull: false },
-			address: { type: DataTypes.TEXT, allowNull: true },
-			phone: { type: DataTypes.STRING(10), allowNull: true },
-	},
-	{
-		sequelize,
+  {
+    ...baseModel, // add id: UUID
+    lastName: { type: DataTypes.STRING(100), allowNull: false },
+    firstName: { type: DataTypes.STRING(100), allowNull: false },
+    birthDate: { type: DataTypes.DATE, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: { msg: "Email non valide" } }},
+    password: { type: DataTypes.STRING, allowNull: false },
+    address: { type: DataTypes.TEXT, allowNull: true },
+    phone: { type: DataTypes.STRING(10), allowNull: true },
+  },
+  {
+    sequelize,
     modelName: "Patient",
     tableName: "patients",
     timestamps: true, // Adds createdAt and updatedAt fields
@@ -54,7 +57,7 @@ Patient.init(
         attributes: { include: ["password"] },
       },
     },
-	}
+  }
 );
 
 export default Patient;

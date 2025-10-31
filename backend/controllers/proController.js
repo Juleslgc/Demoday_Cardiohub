@@ -1,4 +1,8 @@
 /**
+* ----------------------------------------------------------------------------
+* proController.js
+*
+* ----------------------------------------------------------------------------
 * This file defines the `ProController` controller, which handles all HTTP requests
 * related to healthcare professionals (Pro).
 *
@@ -15,19 +19,19 @@
 * - The methods call the service functions (`proService`) and return
 * an appropriate JSON response with an HTTP code.
 */
-import proService from '../services/proService.js';
+import proService from "../services/proService.js";
 
 export default class ProController {
 
-	// Creates a new Pro or returns the existing Pro
+  // Creates a new Pro or returns the existing Pro
   static async createOrLoginPro(req, res) {
-		try {
-			const { pro, token} = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
-			res.status(201).json({pro, token, message: "Connexion réussi !"}); // Response with the pro created or found with token created
-		} catch (err) {
-			res.status(400).json({ message: err.message }); // Validation error or other
-		}
-	}
+    try {
+      const { pro, token} = await proService.createOrLoginPro(req.body); // Call the service with the data from the request body
+      res.status(201).json({pro, token, message: "Connexion réussi !"}); // Response with the pro created or found with token created
+    } catch (err) {
+      res.status(400).json({ message: err.message }); // Validation error or other
+    }
+  }
 
   // Recover all Pro
   static async getAllPros(req, res) {
@@ -39,22 +43,22 @@ export default class ProController {
     }
   }
 
-	// Recover a Pro by RPPS
-	static async getProByRpps(req, res) {
-		const { rpps } = req.params; // Extract the RPPS parameter from the URL
-		try {
-			const pro = await proService.getProByRpps(rpps); // Search via the service
-			if (!pro) {
-                // If no professional found -> code 404
-				return res.status(404).json({ message: 'Pro introuvable' });
-			}
-			res.status(200).json(pro);
-		} catch (err) {
-			res.status(400).json({ message: err.message });
-		}
-	}
+  // Recover a Pro by RPPS
+  static async getProByRpps(req, res) {
+    const { rpps } = req.params; // Extract the RPPS parameter from the URL
+    try {
+      const pro = await proService.getProByRpps(rpps); // Search via the service
+      if (!pro) {
+        // If no professional found -> code 404
+        return res.status(404).json({ message: "Pro introuvable" });
+      }
+      res.status(200).json(pro);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
 
-  // Ajout patient
+  // Add patient by a profesionnal
   static async addPatient(req, res) {
     try {
       const { proId, patientId } = req.params;
@@ -65,8 +69,8 @@ export default class ProController {
     }
   }
 
-	// Retrieves all patients associated with a Pro
-	static async getAllPatients(req, res) {
+  // Retrieves all patients associated with a Pro
+  static async getAllPatients(req, res) {
     const { proId } = req.params; // Extract the professional ID parameter from the URL
     const { limit } = req.query;
     try {
@@ -110,7 +114,7 @@ export default class ProController {
     }
   }
 
-   static async searchPatients(req, res) {
+  static async searchPatients(req, res) {
     try {
       const { proId } = req.params;
       const { name } = req.query; // exemple: /api/pro/123/patients?name=Julie

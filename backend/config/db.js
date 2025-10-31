@@ -1,5 +1,4 @@
 /**
-<<<<<<< HEAD
 * This file configures and initializes the connection to the PostgreSQL database
 * using Sequelize, an ORM (Object-Relational Mapping) for Node.js.
 *
@@ -15,8 +14,8 @@
 * In summary: This file prepares the secure connection to the PostgreSQL database
 * and exports the `sequelize` object for use elsewhere in the project.
 */
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
 // Load the .env file: the variables become accessible via process.env
 dotenv.config();
@@ -29,5 +28,5 @@ export const sequelize = new Sequelize({
   host: process.env.DB_HOST, // Database server address
   port: process.env.DB_PORT, // Connection port
   dialect: "postgres", // Base type used: here PostgreSQL
-  timezone: '+02:00', // France time zone
+  timezone: "+02:00", // France time zone
 });

@@ -1,22 +1,28 @@
-/**
- * Teleconsultation Service
- * ----------------------------------------------------
- * This service handles the business logic related to teleconsultations.
- * It interacts with the repository and other models to manage teleconsultation creation and retrieval.
- *
- * Responsibilities:
- * - Create a teleconsultation linked to an existing appointment
- * - Retrieve a teleconsultation by appointment ID
- *
- * Notes:
- * - Ensures that a teleconsultation is created only once per appointment
- * - Automatically generates a unique Jitsi link for each teleconsultation
- * - Throws errors for missing or invalid appointment data
- */
-
 import teleconsultationRepository from "../repositories/teleconsultationRepository.js";
 import Appointment from "../models/appointmentModel.js";
 import { v4 as uuidv4 } from "uuid";
+/**
+* -------------------------------------------------------------------------
+* teleconsultationService.js
+*
+* -------------------------------------------------------------------------
+* This service manages the business logic for telemedicine consultations in the application. 
+*
+* Main functionalities:
+* - Creation of a telemedicine consultation for an existing appointment
+* - Retrieval of a telemedicine consultation via an appointment ID
+*
+* Checks and validations:
+* - Verifies that the telemedicine consultation does not already exist to avoid duplicates
+* - Verifies that the appointment exists and is linked to a professional and a patient
+*
+* Jitsi link generation:
+* - Uses a UUID to create a unique link for each telemedicine consultation
+* - Concatenates this link with a prefix for Jitsi
+*
+* Security:
+* - All operations require the existence of a valid appointment
+*/
 
 class TeleconsultationService {
   // Creates a teleconsultation for an existing appointment.
