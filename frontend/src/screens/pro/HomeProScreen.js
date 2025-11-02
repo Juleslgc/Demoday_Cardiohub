@@ -1,3 +1,23 @@
+/**
+ * HomeProScreen
+ * ------------------------------------------------------
+ * Main screen for healthcare professionals.
+ * Displays a summary of recent patients and provides
+ * quick navigation to the main professional features.
+ *
+ * Features:
+ * - Fetches and displays recent patients from the API.
+ * - Shows patient ages calculated from birth dates.
+ * - Includes loading indicators while fetching data.
+ * - Provides quick access to actions: teleconsultations, alerts, documents, and calendar.
+ * - Integrates custom header and footer components for consistent navigation.
+ *
+ * Technical notes:
+ * - Uses `useFocusEffect` to refresh data when the screen becomes active.
+ * - Responsive layout based on device width.
+ * - Organized structure separating patient list and quick actions.
+ */
+
 import React, { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
@@ -12,83 +32,69 @@ import FooterPro from "../../components/FooterPro.js";
 import { getPatients } from "../../services/api.js";
 import calculateAge from "../../utils/CalculateAge.js";
 import { Dimensions } from 'react-native';
-/**
-* HomePro.js
-*
-* Main component of the "Professional Home" screen of a medical application.
-*
-* Main features:
-* 1. Displays recent patients retrieved from the API.
-* 2. Allows you to calculate and display patient ages based on their date of birth.
-* 3. Displays a loading indicator (spinner) until data is available.
-* 4. Offers quick actions (teleconsultations, alerts, documents, calendar) in the form of buttons.
-* 5. Includes a custom Header and Footer for consistent navigation within the application.
-* 6. Manages navigation to a patient's details page or other features via `navigation.navigate`.
-*
-* Structure:
-* - Uses React hooks (`useState`, `useEffect`) to manage states and data loading.
-* - ScrollView to allow scrolling through the patient list and quick actions.
-* - SafeAreaView to account for areas not covered by the screen (notch, status bar).
-* - StyleSheet to format all components.
-*
-* Notes:
-* - Icons are imported from `@expo/vector-icons` to illustrate the various actions.
-* - The code is designed to be responsive and organized into clear sections: recent patients and quick actions.
-*/
+
 const { width } = Dimensions.get('window');
 
+/**
+ * HomePro Component
+ * ------------------------------------------------------
+ * Displays a dashboard for professionals with:
+ * - a list of recent patients
+ * - quick action buttons for core features
+ */
+
 export default function HomePro({navigation}) {
-  // Declaration of the "patients" state to store the list of patients
-  const [patients, setPatients] = useState([]);
-  // Declaration of the "loading" state to know if the data is still loading
+  // --- Local States ---
+  const [patients, setPatients] = useState([]); // All patients fetched from API
   const [loading, setLoading] = useState(true);
 
-
-  // useEffect allows you to execute an action when the component is displayed
+  /**
+   * Fetches patient data when the screen is in focus.
+   * Ensures data refresh after navigation events.
+   */
   useFocusEffect(
     useCallback(() => {
-      // Function to retrieve patients from the API
       const fetchPatients = async () => {
         try {
-          const response = await getPatients(navigation); // API call
+          const response = await getPatients(navigation);
           // If the response is an array, we use it directly, otherwise we take response.patients
           setPatients(Array.isArray(response) ? response : response.patients || []);
         } catch (error) {
           console.error("Erreur lors du chargement des patients :", error);
         } finally {
-          setLoading(false); // Once finished (success or error), we stop loading
+          setLoading(false);
         }
       };
       
-      fetchPatients(); // We start patient recovery
-    }, []) // The empty array [] means that this action is only done once on loading
+      fetchPatients();
+    }, [])
   );
 
-  // Sort from newest to oldest
+  // --- Sort and limit to most recent patients ---
   const recentPatients = patients
     .slice() // to avoid modifying the original array
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 3); // take the first 3
+    .slice(0, 3);
 
-
-  // Display part of the component
   return (
-    // SafeAreaView to properly handle non-visible screen areas
     <SafeAreaView style={{backgroundColor: '#042456', flex: 1}}>
       <HeaderPro/>
-      {/* ScrollView allows you to scroll the page if everything does not fit on the screen */}
+
+      {/* --- Scrollable Content --- */}
       <View style={styles.scrollArea}>
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+          {/* === RECENT PATIENTS SECTION === */}
           <Text style={styles.h1}>Patients récents</Text>
-          {/* If the data is loading, a spinner is displayed */}
+
+          {/* --- Loading spinner --- */}
           {loading ? (
             <ActivityIndicator size="large" color="#042456" />
           ) : (
-            // Otherwise, we display the list of patients
+            // --- List of recent patients ---
             <View style={styles.patients}>
               {recentPatients.map((patient) => (
                 <View key={patient.id} style={styles.rectangle}>
-                  {/* Line with the patient's icon and name */}
+                  {/* --- Patient name and age --- */}
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <MaterialIcons name="account-circle" size={53} color="#042456" />
                     <Text style={{ marginLeft: 10 }}>
@@ -96,7 +102,8 @@ export default function HomePro({navigation}) {
                       <Text style={{ color: "#042456", fontSize: 16 }}>{calculateAge(patient.birthDate)} ans</Text>
                     </Text>
                   </View>
-                  {/* Button to view the patient's complete file */}
+
+                  {/* --- Access patient details button --- */}
                   <View style={{ alignItems: "center", marginTop: 5 }}>
                     <TouchableOpacity
                       activeOpacity={0.8}
@@ -110,7 +117,8 @@ export default function HomePro({navigation}) {
               ))}
             </View>
           )}
-          {/* Button to see all patients */}
+
+          {/* --- View All Patients Button --- */}
           <View style={{ alignItems: "center", marginTop: 10 }}>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -120,32 +128,49 @@ export default function HomePro({navigation}) {
               <Text style={styles.buttonText1}>Voir tous les patients</Text>
             </TouchableOpacity>
           </View>
-          {/* Quick Actions Section */}
+
+          {/* === QUICK ACTIONS SECTION === */}
           <Text style={[styles.h1, { marginTop: 20 }]}>Actions rapides</Text>
+          
           <View style={styles.allActions}>
-            {/* Teleconsultation button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('TeleconsultationProScreen')}>
+            {/* --- Teleconsultations --- */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('TeleconsultationProScreen')}
+            >
               <View style={styles.square}>
                 <FontAwesome5 name="video" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Téléconsultations</Text>
               </View >
             </TouchableOpacity>
-            {/* Alert button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('AlertScreen')}>
+
+            {/* --- Alerts --- */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('AlertScreen')}
+            >
               <View style={styles.square}>
                 <Foundation name="alert" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Alertes</Text>
               </View>
             </TouchableOpacity>
-            {/* Documents Button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('DocumentScreen')}>
+
+            {/* --- Documents --- */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('DocumentScreen')}
+            >
               <View style={styles.square}>
                 <FontAwesome name="folder" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Documents</Text>
               </View>
             </TouchableOpacity>
-            {/* Calendar Button */}
-            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('CalendarScreen')}>
+
+            {/* --- Calendar --- */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('CalendarScreen')}
+            >
               <View style={styles.square}>
                 <MaterialCommunityIcons name="notebook" size={32} color="#042456" />
                 <Text style={{color: '#042456' }}>Agenda</Text>
@@ -154,46 +179,51 @@ export default function HomePro({navigation}) {
           </View>
         </ScrollView>
       </View>
+
       <FooterPro />
     </SafeAreaView>
-    );
-  }
+  );
+}
 
-// Styles for the whole screen
+// Component Styles
 const styles = StyleSheet.create({
+  // Scrollable area margins to fit header/footer
   scrollArea: {
     flex: 1,
     marginTop: 70,
-    marginBottom: 80
+    marginBottom: 80,
   },
+  // Scroll content container
   container: {
     alignContent: 'center',
-    //paddingVertical: 20,
     flexDirection: 'column',
-    //paddingBottom: 80,
   },
+  // Wrapper for recent patients
   patients: {
     flexDirection: 'row',
     flexWrap: 'wrap',  
     justifyContent: 'center',
     alignContent: 'center',
-    gap: 5
+    gap: 5,
   },
+  // Individual patient card
   rectangle: {
     width: width * 0.9,
     minHeight: 100,
     backgroundColor: '#fff',
     borderRadius: 5,
     marginBottom: 6,
-    paddingHorizontal: 7
+    paddingHorizontal: 7,
   },
+  // Container for all quick-action buttons
   allActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',  
     justifyContent: 'center',
     alignContent: 'center',
-    gap: 15
+    gap: 15,
   },
+  // Quick action button (square format)
   square: {
     width: width * 0.45,
     height: width * 0.28,
@@ -201,37 +231,37 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    
   },
+  // Section title text
   h1: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 10,
-    //marginTop: 10,
     marginLeft: 20
   },
+  // Patient name
   h2 : {
     color: '#042456',
     fontWeight: '600',
-    fontSize: 17
+    fontSize: 17,
   },
+  // "View File" button styling
   button: {
     backgroundColor: '#042456',
     width: width * 0.84,
-    //minHeight: 30,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10
-    
+    marginBottom: 10,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
-    margin: 7
+    margin: 7,
   },
+  // "View All Patients" button styling
   button1: {
     backgroundColor: '#F5F7FA',
     width: width * 0.9,
@@ -239,7 +269,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    
   },
   buttonText1: {
     color: '#042456',

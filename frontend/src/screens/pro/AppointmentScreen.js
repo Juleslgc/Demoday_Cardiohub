@@ -1,18 +1,34 @@
+/**
+ * AppointmentScreen
+ * ------------------------------------------------------
+ * This screen allows healthcare professionals to create new appointments.
+ * It enables searching for a patient, selecting a date, time, and duration,
+ * and sending the appointment information to the backend API.
+ *
+ * Features:
+ * - Dynamic patient search by name
+ * - Input validation (date format, future time, patient selection)
+ * - Quick selection of time and duration slots
+ * - Appointment creation via `createAppointment()` API
+ * - Visual feedback for errors and selected options
+ */
+
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from "react-native";
+import HeaderPage from "../../components/HeaderPage";
 import FooterPro from "../../components/FooterPro";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { searchPatientsByName, createAppointment } from "../../services/api";
-import HeaderPage from "../../components/HeaderPage";
+
 
 /**
-* Screen for creating an appointment for a professional.
-* Allows the user to:
-*  - search for a patient,
-*  - choose a date, time, and duration,
-*  - and then create an appointment in the database. 
-*/
+ * AppointmentScreen Component
+ * ------------------------------------------------------
+ * Screen dedicated to appointment creation by a healthcare professional.
+ * Handles patient search, date/time input, and API communication.
+ */
+
 export default function AppointmentScreen({ navigation }) {
   // --- Screen states ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,45 +37,40 @@ export default function AppointmentScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState(30); // default 30 min
-  // Proposed time slots
-  const timeSlots = [
-  "08:00", "09:00", "10:00",
-  "11:00", "14:00", "15:00",
-  "16:00", "17:00", "18:00"
-  ];
-  // Proposed durations
-  const durationSlots = [
-  "30", "45", "60"
-  ];
 
-  // Search for patients as soon as the search query exceeds 2 characters
+  // --- Time and duration slots ---
+  const timeSlots = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+  const durationSlots = ["30", "45", "60"];
+
+  // --- Fetch patients dynamically when typing ---
   useEffect(() => {
-    if (searchQuery.length < 2) return; // avoid too many requests
+    if (searchQuery.length < 2) return; // avoid unnecessary API calls
     const fetchPatients = async () => {
       try {
         const results = await searchPatientsByName(searchQuery);
         setPatients(results);
       } catch (err) {
-        //console.error(err);
-        //Alert.alert("Erreur", err.message);
+        console.error("Erreur recherche patient :", err);
       }
     };
     fetchPatients();
   }, [searchQuery])
 
-  // Local filtering to keep only the matching patients
+  // --- Filter patients locally by name ---
   const filteredPatients = patients.filter((patient) => {
-    if (!searchQuery) return true; // si rien n'est tapé, on garde tout
+    if (!searchQuery) return true;
     const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
     return fullName.includes(searchQuery.toLowerCase());
   });
 
   /**
-  * Checks the validity of the entered date:
-  * - correct format (dd/mm/yyyy)
-  * - valid day/month
-  * - not in the past
-  */
+   * Validates date and time fields.
+   * Checks:
+   * - correct format (dd/mm/yyyy)
+   * - valid values
+   * - not in the past
+   * - patient selected
+   */
   const isValidDate = () => {
     const errors = {
       empty: false,
@@ -74,7 +85,6 @@ export default function AppointmentScreen({ navigation }) {
       return errors;
     }
 
-    // Empty fields
     if (!selectedDate || !selectedTime) {
       errors.empty = true;
       return errors;
@@ -117,13 +127,9 @@ export default function AppointmentScreen({ navigation }) {
 
   const dateErrors = isValidDate();
 
-  /**
-  * Automatically formats the date input as dd/mm/yyyy
-  * Example: 01022025 → 01/02/2025
-  */
+  /** Automatically formats the date as dd/mm/yyyy */
   const handleDateChange = (text) => {
-    // Removes everything except the numbers
-    const cleaned = text.replace(/\D/g, '');
+    const cleaned = text.replace(/\D/g, ''); // keep digits only
 
     let formatted = cleaned;
 
@@ -136,21 +142,15 @@ export default function AppointmentScreen({ navigation }) {
     setSelectedDate(formatted);
   };
 
-  /**
-  * Transforms the selected date and time into an ISO format usable by the API.
-  */
+  /** Converts selected date & time to ISO format */
   const getDateTimeISO = () => {
     if (!selectedDate || !selectedTime) return null;
     const [day, month, year] = selectedDate.split('/');
     return new Date(`${year}-${month}-${day}T${selectedTime}:00`).toISOString();
   };
 
-  /**
-  *  Appointment creation
-  * API call: createAppointment()
-  */
+  /** Creates the appointment via API */
   const handleCreateAppointment = async () => {
-
     const dateTimeISO = getDateTimeISO();
     try {
       await createAppointment({
@@ -159,7 +159,7 @@ export default function AppointmentScreen({ navigation }) {
         duration: selectedDuration
       });
       Alert.alert('Rendez-vous créé avec succès !');
-      navigation.goBack(); // return to the list of appointments
+      navigation.goBack();
     } catch (err) {
       Alert.alert(err.message);
     }
@@ -169,82 +169,87 @@ export default function AppointmentScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <HeaderPage title="Prise de rendez-vous" />
       
-      {/* === SCROLLABLE CONTENT === */}
+      {/* --- Scrollable Content --- */}
       <ScrollView
         style={{ flex: 1, marginTop: 60 }}
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        >
-          {/* --- Patients section --- */}
-          <View style={styles.content}>
-            <View style={[styles.sectionContainer, { position: "relative" }]}>
-              <Text style={styles.text}>Patients</Text>
-              {/* Search bar */}
-              <View style={styles.searchSection}>
-                <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Rechercher un patient..."
-                  placeholderTextColor="#666"
-                  value={searchQuery}
-                  onChangeText={async (text) => {
-                    setSearchQuery(text);
-                    setSelectedPatient(null); // deselect the patient if typing
+      >
 
-                    if (text.length < 2) {
-                      setPatients([]);
-                      return;
-                    }
+        <View style={styles.content}>
+          {/* --- Patient Search Section --- */}
+          <View style={[styles.sectionContainer, { position: "relative" }]}>
+            <Text style={styles.text}>Patients</Text>
 
-                    // Call API to search patients
-                    try {
-                      const results = await searchPatientsByName(text);
-                      setPatients(results);
-                    } catch (err) {
-                      console.error(err);
-                    }
-                  }}
-                />
-              </View>
+            {/* Search bar */}
+            <View style={styles.searchSection}>
+              <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Rechercher un patient..."
+                placeholderTextColor="#666"
+                value={searchQuery}
+                onChangeText={async (text) => {
+                  setSearchQuery(text);
+                  setSelectedPatient(null); // deselect the patient if typing
 
-              <View style={{ marginTop: -10}}>
-                {dateErrors.patient && <Text style={styles.errorText}>Veuillez sélectioner un patient</Text>}
-              </View>
-              {/* Dropdown list of patients */}
-              {filteredPatients.length > 0 && !selectedPatient && (
-                <View style={styles.dropdown}>
-                  {filteredPatients.map((patient) => (
-                    <TouchableOpacity
-                      key={patient.id}
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        setSelectedPatient(patient);
-                        setSearchQuery(`${patient.lastName} ${patient.firstName}`);
-                        setPatients([]); // ferme le dropdown
-                      }}
-                    >
-                      <Text style={{color: "#042456"}}>{patient.lastName} {patient.firstName}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                  if (text.length < 2) {
+                    setPatients([]);
+                    return;
+                  }
+
+                  // Call API to search patients
+                  try {
+                    const results = await searchPatientsByName(text);
+                    setPatients(results);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
+              />
             </View>
+
+            {/* Patient error message */}
+            <View style={{ marginTop: -10}}>
+              {dateErrors.patient && <Text style={styles.errorText}>Veuillez sélectioner un patient</Text>}
+            </View>
+
+            {/* Dropdown with patient suggestions */}
+            {filteredPatients.length > 0 && !selectedPatient && (
+              <View style={styles.dropdown}>
+                {filteredPatients.map((patient) => (
+                  <TouchableOpacity
+                    key={patient.id}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedPatient(patient);
+                      setSearchQuery(`${patient.lastName} ${patient.firstName}`);
+                      setPatients([]); // ferme le dropdown
+                    }}
+                  >
+                    <Text style={{color: "#042456"}}>{patient.lastName} {patient.firstName}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
 
           {/* --- Date selection --- */}
           <View style={styles.sectionContainer}>
             <Text style={styles.text}>Date</Text>
             <View style={styles.searchSection}>
-            <FontAwesome name="calendar" size={20} color="#042456" style={styles.searchIcon} />
+              <FontAwesome name="calendar" size={20} color="#042456" style={styles.searchIcon} />
               <TextInput
-              style={styles.searchInput}
-              placeholder="jj/mm/aaaa"
-              placeholderTextColor="#666"
-              value={selectedDate}
-              onChangeText={handleDateChange}
-              keyboardType="numeric"
+                style={styles.searchInput}
+                placeholder="jj/mm/aaaa"
+                placeholderTextColor="#666"
+                value={selectedDate}
+                onChangeText={handleDateChange}
+                keyboardType="numeric"
               />
             </View>
-            {/* Dynamic error display */}
+
+            {/* Date validation messages */}
             <View style={{ marginTop: -10 }}>
               {dateErrors.invalidFormat && <Text style={styles.errorText}>Format incorrect, jj/mm/aaaa</Text>}
               {dateErrors.invalidDayMonth && <Text style={styles.errorText}>Jour ou mois ou année invalide</Text>}
@@ -258,57 +263,69 @@ export default function AppointmentScreen({ navigation }) {
             <Text style={styles.text}>Heure</Text>
             <View style={styles.allActions}>
               {timeSlots.map((time, index) => (
-                <TouchableOpacity key={index} style={[styles.square, selectedTime === time && { backgroundColor: "#A9A9A9" }]} onPress={() => setSelectedTime(time)}>
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.square, selectedTime === time && { backgroundColor: "#A9A9A9" }]}
+                  onPress={() => setSelectedTime(time)}
+                >
                   <Text style={[styles.squareText, selectedTime === time && { color: '#fff' }]}>{time}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
-          {/* --- Duration selection --- */}
+          {/* --- Duration Selection --- */}
           <View style={styles.sectionContainer}>
             <Text style={styles.text}>Durée</Text>
             <View style={styles.allActions}>
               {durationSlots.map((duration, index) => (
-                <TouchableOpacity key={index} style={[styles.square, selectedDuration === duration && { backgroundColor: "#A9A9A9" }]} onPress={() => setSelectedDuration(duration)}>
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.square, selectedDuration === duration && { backgroundColor: "#A9A9A9" }]}
+                  onPress={() => setSelectedDuration(duration)}
+                >
                   <Text style={[styles.squareText, selectedDuration === duration && { color: '#fff' }]}>{duration} min</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
-          {/* --- Save button --- */}
-            <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleCreateAppointment}>
-              <Text style={styles.saveButtonText}>Enregistrer</Text>
-            </TouchableOpacity>
-          </View>
+          {/* --- Save Button --- */}
+          <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleCreateAppointment}>
+            <Text style={styles.saveButtonText}>Enregistrer</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
-          </ScrollView>
-      {/* === FOOTER === */}
       <FooterPro />
     </SafeAreaView>
   );
 }
-// Component styles
+
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container with primary background
   container: {
     flex: 1,
     backgroundColor: "#042456",
   },
-  /** SCROLLABLE CONTENT **/
+  // Scrollable area configuration
   scrollContainer: {
     padding: 12,
-    paddingBottom: 100, // to prevent the bottom from being hidden under the footer
-    backgroundColor: "#042456"
+    paddingBottom: 100,
+    backgroundColor: "#042456",
   },
+  // Content wrapper
   content: {
     flex: 1,
     paddingHorizontal: 12,
-    paddingBottom: 80, // évite que le footer masque le bouton
+    paddingBottom: 80,
   },
+  // Shared block style for each section
   sectionContainer: {
-    marginBottom: 20, // même espacement entre chaque bloc
+    marginBottom: 20,
   },
+  // Section titles (e.g., "Date", "Heure")
   text: {
     fontSize: 18,
     color: "#fff",
@@ -316,7 +333,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 5,
   },
-  /** SEARCH BAR **/
+  // --- Search bar ---
   searchSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -330,70 +347,74 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 5,
   },
-searchIcon: {
+  searchIcon: {
     marginRight: 10,
   },
-searchInput: {
+  searchInput: {
     flex: 1,
     fontSize: 15,
     color: "#042456",
   },
-dropdown: {
-  backgroundColor: "#ccc",
-  position: "absolute",
-  top: 70, // légèrement plus précis : juste sous la barre de recherche
-  left: 10, // aligne avec le marginHorizontal de la barre
-  right: 10, // idem de l’autre côté
-  borderRadius: 6,
-  borderWidth: 1,
-  borderColor: "#aba9a9ff",
-  maxHeight: 150,
-  //zIndex: 10, // pour passer au-dessus de tout
-},
-dropdownItem: {
-  paddingVertical: 10,
-  paddingHorizontal: 15,
-  borderBottomWidth: 1,
-  borderBottomColor: "#aba9a9ff",
-},
-allActions: {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'space-between', // uniform spacing between columns
-  marginHorizontal: 10,
-  marginBottom: -70
-},
-square: {
-  width: '30%', // 3 columns → 30% + gaps
-  aspectRatio: 1.5, // proportion to make it 60x100 as before
-  backgroundColor: '#fff',
-  borderRadius: 5,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginBottom: 10, // vertical space between the lines
-},
-squareText: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: '#042456',
-},
-saveButton: {
-  backgroundColor: '#fff', // main blue tone
-  paddingVertical: 15,
-  borderRadius: 8,
-  alignItems: 'center',
-  marginHorizontal: 20,
-  marginTop: 50,
-},
-saveButtonText: {
-  color: '#042456',
-  fontSize: 18,
-  fontWeight: '600',
-},
-errorText: {
-  color: 'red',
-  marginLeft: 15,
-  marginTop: 5,
-  fontSize: 13,
-},
+  // Dropdown with patient suggestions
+  dropdown: {
+    backgroundColor: "#ccc",
+    position: "absolute",
+    top: 70,
+    left: 10,
+    right: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#aba9a9ff",
+    maxHeight: 150,
+  },
+  dropdownItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#aba9a9ff",
+  },
+  // Container for time and duration buttons
+  allActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+    marginBottom: -70,
+  },
+  // Time/duration button style
+  square: {
+    width: '30%',
+    aspectRatio: 1.5,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  squareText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#042456',
+  },
+  // Save button at the bottom
+  saveButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 50,
+  },
+  saveButtonText: {
+    color: '#042456',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  // Error message styling
+  errorText: {
+    color: 'red',
+    marginLeft: 15,
+    marginTop: 5,
+    fontSize: 13,
+  },
 });

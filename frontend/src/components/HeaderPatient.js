@@ -1,30 +1,35 @@
-/**
- * Reusable HeaderPatient Component
- * ---------------------------------------
- * A React Native component that displays the patient header
- * with a personalized greeting and the app logo.
- *
- * Features:
- * - Safe area support for devices with notches (iOS/Android)
- * - Fixed positioning at the top of the screen
- * - Horizontal layout with spaced greeting text and logo
- * - Clean, minimal design consistent with the app’s theme
- */
-
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getMe } from "../services/api";
 
-// Functional component returning the patient header layout
+/**
+ * HeaderPatient Component
+ * ---------------------------------------
+ * A reusable React Native component that displays
+ * a personalized header for patient screens.
+ *
+ * Features:
+ * - Displays a greeting message with the user's first name
+ * - Retrieves user data from the API via `getMe()`
+ * - Includes the application logo on the right
+ * - Safe area handling for devices with top insets (status bar, notch)
+ *
+ * Example usage:
+ * <HeaderPatient />
+ */
+
 export default function HeaderPatient() {
   const [firstName, setFirstName] = useState("");
 
   useEffect(() => {
+    /**
+     * Fetches user information (first name) from the API when the component mounts.
+     */
     const fetchUser = async () => {
       try {
-        const user = await getMe(); // retrieves { firstName, ... }
-        setFirstName(user.firstName || ""); // save the firstname
+        const user = await getMe(); // Retrieves { firstName, ... }
+        setFirstName(user.firstName || ""); // Stores user's first name
       } catch (error) {
         console.error("Erreur lors de la récupération du prénom:", error.message);
       }
@@ -36,9 +41,13 @@ export default function HeaderPatient() {
     // Ensures header content stays below system UI (status bar, notch)
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <View style={styles.header}>
+        
+        {/* Greeting text displaying user's first name */}
         <Text style={styles.headerText}>
           Bonjour {firstName ? firstName : "..."}
         </Text>
+
+        {/* App logo displayed on the right */}
         <Image
           source={require("../assets/LogoCardioHub.png")}
           style={styles.logo}
@@ -49,33 +58,37 @@ export default function HeaderPatient() {
   )
 };
 
-// Define styles for the HeaderPatient component
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container fixed at the top of the screen
   safeArea: {
-    position: "absolute",   // Keeps the header fixed at the top
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     backgroundColor: "#fff",
   },
+  // Header layout container
   header: {
-    height: 50,             // Header height
-    flexDirection: "row",   // Aligns elements horizontally
-    alignItems: "center",   // Vertically centers text and logo
-    justifyContent: "space-between", // Places text left and logo right
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 10,
-    zIndex: 100,            // Keeps header above other content
+    zIndex: 100,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,   // Adds subtle bottom border
+    borderBottomWidth: 1,
     borderBottomColor: "#ccc",
   },
+  // Greeting text styling
   headerText: {
     fontSize: 18,
-    fontWeight: "480",
+    fontWeight: "500",
     fontFamily: "Nunito",
     color: "#042456",
-    left: 5,                // Slight left offset for alignment
+    left: 5,
   },
+  // Logo styling
   logo: {
     width: 140,
     height: 80,

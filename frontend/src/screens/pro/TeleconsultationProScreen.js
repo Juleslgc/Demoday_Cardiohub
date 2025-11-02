@@ -1,3 +1,22 @@
+/**
+ * TeleconsultationProScreen
+ * ------------------------------------------------------
+ * Main interface for healthcare professionals to manage teleconsultations.
+ *
+ * Features:
+ * - Displays upcoming appointments retrieved from the backend API
+ * - Allows filtering by time period (today, week, or all)
+ * - Provides patient search functionality
+ * - Starts a teleconsultation session (Jitsi integration)
+ * - Redirects to a note-taking screen after session ends
+ * - Enables creation and modification of appointments
+ *
+ * Technical details:
+ * - Uses `AppState` to detect when the browser closes and return to the app
+ * - Leverages `useFocusEffect` to refresh data when screen regains focus
+ * - Integrates multiple reusable components (Button, HeaderPage, FooterPro)
+ */
+
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,39 +33,44 @@ import calculateAge from "../../utils/CalculateAge.js";
 import * as WebBrowser from "expo-web-browser";
 
 /**
-*  TeleconsultationProScreen
-* ---------------------------------------------------------
-* Main screen for healthcare professionals to manage teleconsultations. 
-* - Displays upcoming appointments
-* - Allows filtering by time period (day, week, all)
-* - Offers patient search functionality
-* - Allows creating or modifying appointments
-*/
+ * TeleconsultationProScreen Component
+ * ------------------------------------------------------
+ * Displays all upcoming teleconsultations and allows launching sessions.
+ */
+
 export default function TeleconsultationProScreen({ navigation }) {
-  // === Screen states ===
-  const [appointments, setAppointments] = useState([]); // Complete list of appointments
-  const [searchText, setSearchText] = useState(""); // Text typed for patient search
+  // --- Local States ---
+  const [appointments, setAppointments] = useState([]); // All appointments
+  const [searchText, setSearchText] = useState(""); // Patient name filter
   const [selectedFilter, setSelectedFilter] = useState("Aujourd'hui"); // Active filter
-  const [loading, setLoading] = useState(true); // Indicates whether the data is loading
-  const [isLoading, setIsLoading] = useState(false);
-  const appState = useRef(AppState.currentState);
-  const currentAppointmentRef = useRef(null);
+  const [loading, setLoading] = useState(true); // Data loading indicator
+  const [isLoading, setIsLoading] = useState(false); // API call loading state
+  const appState = useRef(AppState.currentState); // App state reference
+  const currentAppointmentRef = useRef(null); // Currently active teleconsultation
 
+  // --- Manage App State (when browser closes) ---
   useEffect(() => {
-  const subscription = AppState.addEventListener("change", (nextState) => {
-    if (appState.current !== "active" && nextState === "active") {
-      if (currentAppointmentRef.current) {
-        navigation.navigate("NoteScreen", { appointment: currentAppointmentRef.current });
-        currentAppointmentRef.current = null;
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (appState.current !== "active" && nextState === "active") {
+        if (currentAppointmentRef.current) {
+          navigation.navigate("NoteScreen", { appointment: currentAppointmentRef.current });
+          currentAppointmentRef.current = null;
+        }
       }
-    }
-    appState.current = nextState;
-  });
+      appState.current = nextState;
+    });
 
-  return () => subscription.remove();
-}, [navigation]);
+    return () => subscription.remove();
+  }, [navigation]);
 
-  // Handles the teleconsultation start process for a given appointment
+
+  /**
+   * Handles starting a teleconsultation session.
+   * ------------------------------------------------------
+   * - Calls the backend API to create a new teleconsultation
+   * - Opens the Jitsi video room via the in-app browser
+   * - Redirects to the note-taking screen when closed
+   */
   const handleStartConsultation = async (appointment) => {
     try {
       currentAppointmentRef.current = appointment;
@@ -78,7 +102,7 @@ export default function TeleconsultationProScreen({ navigation }) {
                 controlsColor: "#042456",       // iOS toolbar color
                 toolbarColor: "#fff",        // Android toolbar color
               });
-              // When the user closes the browser → return to the professional home screen
+              // When the user closes the browser, return to the professional home screen
               if (result.type === "dismiss" || result.type === 'cancel') {
                 navigation.navigate("NoteScreen" , { appointment });
               }
@@ -94,10 +118,10 @@ export default function TeleconsultationProScreen({ navigation }) {
       setIsLoading(false);
     }
   };
+  
   /**
-  * Loading appointments each time the screen is in focus.
-  * useFocusEffect = automatic reloading as soon as you return to the page.
-  */
+   * Loads all appointments each time the screen gains focus.
+   */
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -129,7 +153,6 @@ export default function TeleconsultationProScreen({ navigation }) {
   * into a usable JavaScript Date object (ISO format). 
   */
   const parseFrenchDate = (dateStr) => {
-    // Example : "18/10/2025 14:00:00"
     const [datePart, timePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
     const [hours, minutes, seconds] = timePart.split(':').map(Number);
@@ -138,12 +161,12 @@ export default function TeleconsultationProScreen({ navigation }) {
 
 
   /**
-  * Dynamic filtering:
-  * - Removes past appointments
-  * - Filters according to the selected type (Today / Week / All)
-  * - Searches by patient name
-  * - Sorts by chronological date
-  */
+   * Filters appointments:
+   * - Removes past appointments
+   * - Applies active filter (Today / Week / All)
+   * - Applies patient name search
+   * - Sorts results chronologically
+   */
   const filteredAppointments = appointments.filter((appointment) => {
     const appointmentDate = parseFrenchDate(appointment.dateTime);
 
@@ -159,36 +182,36 @@ export default function TeleconsultationProScreen({ navigation }) {
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    // On exclut les rendez-vous passés
+    // Excludes past appointments
     if (appointmentDate < todayStart) return false;
 
-    // Filtrage selon le filtre actif
+    // Filtering according to the active filter
     if (selectedFilter === "Aujourd'hui") {
       return appointmentDate >= todayStart && appointmentDate <= todayEnd;
     }
     if (selectedFilter === "Semaine") {
       return appointmentDate >= startOfWeek && appointmentDate <= endOfWeek;
     }
-
-    // “Tous” = no specific filter
     return true;
   })
   // Next, filter by searching for first or last name.
-  .filter((appointment) => {
-    if (!searchText) return true;
-    const fullName = `${appointment.patient.firstName} ${appointment.patient.lastName}`.toLowerCase();
-    return fullName.includes(searchText.toLowerCase());
-  })
-  // And finally, sort in chronological order
-  .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+    .filter((appointment) => {
+      if (!searchText) return true;
+      const fullName = `${appointment.patient.firstName} ${appointment.patient.lastName}`.toLowerCase();
+      return fullName.includes(searchText.toLowerCase());
+    })
+  // Sort in chronological order
+    .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderPage title="Téléconsultations" />
-        <KeyboardAvoidingView style={{flex: 1, backgroundColor: "#042456", paddingTop: 50, zIndex: -1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+
+      {/* === MAIN CONTENT === */}
+      <KeyboardAvoidingView style={{flex: 1, backgroundColor: "#042456", paddingTop: 50, zIndex: -1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         
 
-        {/* === SECTION: Appointment creation === */}
+        {/* --- Fixed Section: New Appointment --- */}
         <View style={styles.fixedAction}>
           <Button
             title="Nouveau rendez-vous"
@@ -197,93 +220,98 @@ export default function TeleconsultationProScreen({ navigation }) {
             icon="calendar-plus"
           />
         </View>
-          {/* === SCROLLABLE CONTENT === */}
-          <ScrollView
-            contentContainerStyle={styles.scrollContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Dynamic filters */}
-            <View style={styles.filterContainer}>
-              {["Aujourd'hui", "Semaine", "Tous"].map((filter) => (
-                <TouchableOpacity
-                  key={filter}
-                  style={[styles.filterItem, selectedFilter === filter && styles.filterItemActive]}
-                  onPress={() => setSelectedFilter(filter)}
-                >
-                  <Text style={[styles.filterText, selectedFilter === filter && styles.filterTextActive]}>
-                    {filter}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-          </View>
-            {/* Loading or displaying appointments */}
-            {loading ? (
-              <ActivityIndicator size="large" color="#042456" />
-            ) : filteredAppointments.length === 0 ? (
-              <Text style={{ color: "#fff", textAlign: "center", marginTop: 20 }}>Aucun rendez-vous à afficher</Text>
-            ) : (
-              filteredAppointments.map((appointment) => {
-                const [datePart, timePart] = appointment.dateTime.split(' ');
-                const [hour, minute] = timePart ? timePart.split(':') : ['', ''];
-                const formattedTime = `${hour}:${minute}`;
-                
-                return (
-                  <View key={appointment.id} style={styles.card}>
-                    <View style={styles.rowCenter}>
-                      <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
-                      <Text style={styles.title}>{datePart} à {formattedTime}</Text>
-                    </View>
-                    <View style={styles.rowCenter}>
-                      <MaterialIcons name="account-circle" size={45} color="#042456" style={styles.iconInline} />
-                      <View>
-                        <Text style={styles.patientName}>{appointment.patient.firstName} {appointment.patient.lastName}</Text>
-                        <Text style={styles.patientAge}>{calculateAge(appointment.patient.birthDate)} ans</Text>
-                      </View>
-                    </View>
-                    <View style={styles.buttonRow}>
-                       <Button
-                          title={isLoading ? "Création en cours..." : "Lancer la consultation"}
-                          onPress={() => handleStartConsultation(appointment)}
-                          variant="full"
-                          disabled={isLoading}
-                        />
 
-                      <TouchableOpacity
-                        style={styles.editButton}
-                        onPress={() => navigation.navigate('EditAppointmentScreen', {appointment})}
-                      >
-                        <Text style={styles.editButtonText}>Modifier</Text>
-                      </TouchableOpacity>
+        {/* --- Scrollable Content --- */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Filter Buttons */}
+          <View style={styles.filterContainer}>
+            {["Aujourd'hui", "Semaine", "Tous"].map((filter) => (
+              <TouchableOpacity
+                key={filter}
+                style={[styles.filterItem, selectedFilter === filter && styles.filterItemActive]}
+                onPress={() => setSelectedFilter(filter)}
+              >
+                <Text style={[styles.filterText, selectedFilter === filter && styles.filterTextActive]}>
+                  {filter}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Appointments Display */}
+          {loading ? (
+            <ActivityIndicator size="large" color="#042456" />
+          ) : filteredAppointments.length === 0 ? (
+            <Text style={{ color: "#fff", textAlign: "center", marginTop: 20 }}>Aucun rendez-vous à afficher</Text>
+          ) : (
+            filteredAppointments.map((appointment) => {
+              const [datePart, timePart] = appointment.dateTime.split(' ');
+              const [hour, minute] = timePart ? timePart.split(':') : ['', ''];
+              const formattedTime = `${hour}:${minute}`;
+                
+              return (
+                <View key={appointment.id} style={styles.card}>
+                  <View style={styles.rowCenter}>
+                    <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
+                    <Text style={styles.title}>{datePart} à {formattedTime}</Text>
+                  </View>
+                  <View style={styles.rowCenter}>
+                    <MaterialIcons name="account-circle" size={45} color="#042456" style={styles.iconInline} />
+                    <View>
+                      <Text style={styles.patientName}>{appointment.patient.firstName} {appointment.patient.lastName}</Text>
+                      <Text style={styles.patientAge}>{calculateAge(appointment.patient.birthDate)} ans</Text>
                     </View>
+                  </View>
+                  <View style={styles.buttonRow}>
+                    <Button
+                      title={isLoading ? "Création en cours..." : "Lancer la consultation"}
+                      onPress={() => handleStartConsultation(appointment)}
+                      variant="full"
+                      disabled={isLoading}
+                    />
+
+                    <TouchableOpacity
+                      style={styles.editButton}
+                      onPress={() => navigation.navigate('EditAppointmentScreen', {appointment})}
+                    >
+                      <Text style={styles.editButtonText}>Modifier</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               );
             })
           )}
-          </ScrollView>
-          {/* === SEARCH BAR === */}
-          <View style={styles.searchSection}>
-            <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Rechercher un patient..."
-              placeholderTextColor="#666"
-              value={searchText}
-              onChangeText={setSearchText}
-            />
-          </View>
+        </ScrollView>
+
+        {/* --- Search Bar --- */}
+        <View style={styles.searchSection}>
+          <FontAwesome name="search" size={20} color="#042456" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher un patient..."
+            placeholderTextColor="#666"
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
       </KeyboardAvoidingView>
-      {/* === FOOTER === */}
+
+
       <FooterPro />
     </SafeAreaView>
   );
 }
 
+// Component Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
-  /** SECTION: "New appointment" button **/
+  /** FIXED SECTION: New Appointment Button **/
   fixedAction: {
     backgroundColor: "#F5F7FA",
     width: "100%",
@@ -296,7 +324,7 @@ const styles = StyleSheet.create({
   /** FILTER BAR **/
   filterContainer: {
     flexDirection: "row",
-    backgroundColor: "#E6E6E6", // light gray background
+    backgroundColor: "#E6E6E6",
     borderRadius: 10,
     overflow: "hidden",
     marginTop: 6,
@@ -322,10 +350,10 @@ const styles = StyleSheet.create({
     color: "#042456",
     fontWeight: "600",
   },
-  /** SCROLLABLE CONTENT **/
+  /** SCROLL CONTENT **/
   scrollContainer: {
     padding: 12,
-    paddingBottom: 100, // to prevent the bottom from being hidden under the footer
+    paddingBottom: 100,
   },
   rowCenter: {
     flexDirection: "row",
@@ -334,18 +362,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 5,
   },
-  filterItem: {
-    flex: 1,
-    paddingVertical: 9,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#E6E6E6",
-    borderRadius: 10,
+  iconInline: {
+    marginRight: 8,
   },
-  filterItemActive: { backgroundColor: "#fff" },
-  filterText: { fontSize: 18, color: "#042456", fontWeight: "500" },
-  filterTextActive: { color: "#042456", fontWeight: "600" },
-  scrollContainer: { padding: 12, paddingBottom: 100 },
+  /** APPOINTMENT CARD **/
   card: {
     backgroundColor: "#fff",
     marginBottom: 20,
@@ -356,9 +376,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
   },
-  iconInline: {
-    marginRight: 8,
-  },
   title: {
     fontSize: 18,
     fontWeight: "600",
@@ -368,7 +385,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     color: "#042456",
-    marginBottom: 2, // small space between name and age
+    marginBottom: 2,
   },
   patientAge: {
     fontSize: 16,
@@ -395,27 +412,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#042456",
   },
+  /** BUTTONS **/
   buttonRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginTop: 2,
-  gap: 10, // to space out the buttons
-},
-
-editButton: {
-  backgroundColor: '#fff',
-  borderWidth: 1,
-  borderColor: '#042456',
-  paddingVertical: 11,
-  paddingHorizontal: 18,
-  borderRadius: 5,
-  marginBottom: -10
-},
-
-editButtonText: {
-  color: '#042456',
-  fontSize: 15,
-  fontWeight: '600',
-},
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 2,
+    gap: 10,
+  },
+  editButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#042456',
+    paddingVertical: 11,
+    paddingHorizontal: 18,
+    borderRadius: 5,
+    marginBottom: -10
+  },
+  editButtonText: {
+    color: '#042456',
+    fontSize: 15,
+    fontWeight: '600',
+  },
 });

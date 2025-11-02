@@ -3,36 +3,57 @@ import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
 /**
-* Reusable "StyledPicker" component
-*
-* Props:
-* - label: Text displayed above the picker
-* - selectedValue: Currently selected value
-* - onValueChange: Function called each time the value changes
-* - options: Array of options (label, value) to display in the Picker
-* - error: Error message displayed if the selection is invalid
-* - required: Indicates whether the field is required (displays an *)
-*
-* How it works:
-* - Displays a label with an * if the field is required
-* - Changes the border color if an error occurs
-* - Displays an error message below the Picker
-* - Displays the options passed in the `options` prop
-*/
+ * StyledPicker Component
+ * ---------------------------------------
+ * A reusable React Native component that renders a stylized Picker (dropdown)
+ * with label, validation, and required field handling.
+ *
+ * Features:
+ * - Displays a label with an optional red asterisk for required fields
+ * - Highlights the border in red when an error is present
+ * - Displays an error message below the field
+ * - Renders dynamic options passed via the `options` prop
+ *
+ * Example usage:
+ * <StyledPicker
+ *   label="Select gender"
+ *   selectedValue={gender}
+ *   onValueChange={setGender}
+ *   options={[
+ *     { label: "Male", value: "male" },
+ *     { label: "Female", value: "female" },
+ *   ]}
+ *   required
+ *   error={formError}
+ * />
+ *
+ * @param {Object} props
+ * @param {string} [props.label] - Text displayed above the picker.
+ * @param {string|number} props.selectedValue - Currently selected value.
+ * @param {function} props.onValueChange - Callback triggered when the selection changes.
+ * @param {{label: string, value: string|number}[]} props.options - Array of options displayed in the picker.
+ * @param {string} [props.error] - Error message displayed below the picker.
+ * @param {boolean} [props.required] - Displays a red asterisk next to the label if true.
+ */
+
 export default function StyledPicker({ label, selectedValue, onValueChange, options, error, required}) {
   return (
+    // Wrapper containing label, picker, and error message
     <View style={styles.container}>
+
+      {/* Label with optional red asterisk */}
       {label && (
         <Text style={styles.label}>
           {label} {required && <Text style={styles.star}>*</Text>}
         </Text>
       )}
 
+      {/* Picker field container */}
       <View style={[styles.pickerContainer, error && styles.errorInput]}>
         <Picker
-          selectedValue={selectedValue} // currently selected value
-          onValueChange={onValueChange} // function called on change
-          style={styles.picker} // Picker text style
+          selectedValue={selectedValue}
+          onValueChange={onValueChange}
+          style={styles.picker}
         >
           {options.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
@@ -40,32 +61,52 @@ export default function StyledPicker({ label, selectedValue, onValueChange, opti
         </Picker>
       </View>
 
+      {/* Error message */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
 
-// Styles of the StyledPicker component
+// Component Styles
 const styles = StyleSheet.create({
-  container: { marginBottom: 15 },
-  label: { marginBottom: 5, fontWeight: "bold", color: "#042456", fontFamily: "Nunito" },
-
-  // "Input" style
+  // Wrapper for label, picker, and error text
+  container: {
+    marginBottom: 15,
+  },
+  // Label displayed above the picker
+  label: {
+    marginBottom: 5,
+    fontWeight: "bold",
+    color: "#042456",
+    fontFamily: "Nunito",
+  },
+  // Picker container styled like a text input
   pickerContainer: {
     borderWidth: 1,
     borderColor: "#042456",
     borderRadius: 5,
-    overflow: "hidden", // so that the Picker does not overflow
+    overflow: "hidden", // prevents the picker from overflowing
     height: 50,
-    justifyContent: "center"
+    justifyContent: "center",
   },
+  // Picker text styling
   picker: {
     fontFamily: "Nunito",
     color: "#042456", // Picker text
     fontSize: 12,
   },
-
-  errorInput: { borderColor: "red" },
-  errorText: { color: "red", marginTop: 5, fontFamily: "Nunito" },
-  star: { color: 'red' }
+  // Red border when there's an error
+  errorInput: {
+    borderColor: "red",
+  },
+  // Error message text
+  errorText: {
+    color: "red",
+    marginTop: 5,
+    fontFamily: "Nunito",
+  },
+  // Red asterisk for required fields
+  star: {
+    color: 'red',
+  },
 });

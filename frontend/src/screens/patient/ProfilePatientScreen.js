@@ -1,4 +1,6 @@
 /**
+ * ProfilePatientScreen
+ * ---------------------------------------
  * A React Native screen that displays the patient's personal profile information.
  *
  * Features:
@@ -19,17 +21,25 @@ import Button from "../../components/Button";
 import Separator from "../../components/Separator";
 import LogOut from "../../utils/LogOut";
 
-// Functional component representing the patient profile page
-export default function ProfileScreen({ navigation }) {
-  // Holds the current user data retrieved from the API
-  const [user, setUser] = useState(null);
+/**
+ * ProfilePatientScreen Component
+ * ---------------------------------------
+ * Displays and manages the patient's profile data.
+ * Allows editing profile information and logging out.
+ *
+ * @param {object} navigation - React Navigation prop used for screen navigation.
+ * @returns {JSX.Element} The rendered profile screen for the logged-in patient.
+ */
 
-  // Fetch user data 
+export default function ProfileScreen({ navigation }) {
+  const [user, setUser] = useState(null); // Stores the fetched user data
+
+  // --- Fetch user data on mount ---
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await getMe(); // API call to fetch logged-in user's profile
-        setUser(data); // Store the retrieved user in state
+        const data = await getMe(); // Retrieve the logged-in user's profile
+        setUser(data);
       } catch (error) {
         console.error("Erreur lors du chargement du profil :", error);
       }
@@ -37,12 +47,11 @@ export default function ProfileScreen({ navigation }) {
     fetchUser();
   }, []);
 
-  // Redirects to the login screen (logout simulation)
+  // --- Navigation handlers ---
   const handleLogout = () => {
     LogOut(navigation);
   };
 
-  // Redirects to the Edit Profile screen
   const handleEditProfile = () => {
     navigation.navigate("EditProfileScreen");
   };
@@ -51,10 +60,12 @@ export default function ProfileScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <HeaderPatient />
 
+      {/* --- Main content area --- */}
       <View style={styles.scrollArea}>
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.title}>Mon profil</Text>
-          {/* Conditional rendering: display user info once loaded */}
+
+          {/* Display user information once fetched */}
           {user ? (
             <View style={styles.infoBox}>
               <Text style={styles.label}>Nom</Text>
@@ -66,17 +77,21 @@ export default function ProfileScreen({ navigation }) {
               <Text style={styles.value}>
                 {new Date(user.birthDate).toLocaleDateString("fr-FR")}
               </Text>
+
               <Text style={styles.label}>Email</Text>
               <Text style={styles.value}>{user.email}</Text>
+
               <Text style={styles.label}>Téléphone</Text>
               <Text style={styles.value}>{user.phone || "Non renseigné"}</Text>
+
               <Text style={styles.label}>Adresse</Text>
               <Text style={styles.value}>{user.address || "Non renseignée"}</Text>
             </View>
           ) : (
             <Text style={styles.loading}>Chargement du profil...</Text>
           )}
-          {/* Button to navigate to profile editing screen */}
+          
+          {/* --- Edit profile button --- */}
           <Button
             title="Modifier mes informations"
             onPress={handleEditProfile}
@@ -84,7 +99,8 @@ export default function ProfileScreen({ navigation }) {
             icon="account-edit"
           />
           <Separator />
-          {/* Bouton to log out (redirecting to login screen) */}
+
+          {/* --- Logout button --- */}
           <Button
             title="Se déconnecter"
             onPress={handleLogout}
@@ -99,21 +115,25 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
-// Component styles
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container with light background
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA", // Light background for readability
+    backgroundColor: "#F5F7FA",
   },
+  // Scrollable area adjusted for header and footer height
   scrollArea: {
     flex: 1,
-    marginTop: 70,      // header height (50) + margin of 20
-    marginBottom: 80,   // footer height (60) + margin of 20
+    marginTop: 70,
+    marginBottom: 80,
   },
+  // ScrollView inner padding
   content: {
-    paddingBottom: 80,      // Offset for footer height
-    paddingHorizontal: 20,  // Horizontal inner spacing
+    paddingBottom: 80,
+    paddingHorizontal: 20,
   },
+  // Page title styling
   title: {
     fontSize: 24,
     fontWeight: "500",
@@ -121,22 +141,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
+  // User info container
   infoBox: {
     backgroundColor: "#fff",
     borderRadius: 8,
     padding: 15,
     marginBottom: 25,
   },
+  // Info field label
   label: {
     color: "#888",
     fontSize: 14,
     marginTop: 10,
   },
+  // Info field value
   value: {
     fontSize: 16,
     color: "#042456",
     fontWeight: "500",
   },
+  // Loading message
   loading: {
     color: "#fff",
     textAlign: "center",

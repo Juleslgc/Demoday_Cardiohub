@@ -2,62 +2,92 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const jwtDecode = require("jwt-decode");
 
 /**
-* tokenStorage.js
-* ---------------------------------------
-* This module centralizes the management of the user's authentication token
-* in a React Native application using AsyncStorage.
-*
-* Features:
-* 1. `storeToken(token)`: Stores a user token in secure local storage.
-* 2. `getToken()`: Retrieves the stored token if the user is logged in.
-* 3. `removeToken()`: Removes the token to log the user out.
-*/
+ * TokenStorage Utility Module
+ * ---------------------------------------
+ * Centralizes the management of the user's authentication token
+ * in a React Native application using AsyncStorage.
+ *
+ * Features:
+ * - `storeToken(token)`: Saves a user token in local storage
+ * - `getToken()`: Retrieves the stored authentication token
+ * - `removeToken()`: Deletes the token to log the user out
+ * - `isTokenExpired(token)`: Checks whether a JWT token has expired
+ *
+ * Example usage:
+ * import { storeToken, getToken, removeToken, isTokenExpired } from "../utils/TokenStorage";
+ *
+ * await storeToken(authToken);
+ * const token = await getToken();
+ * const expired = await isTokenExpired(token);
+ * if (expired) await removeToken();
+ */
 
 const TOKEN_KEY = 'userToken'; // Key used to store the token in AsyncStorage
 
-// Save the token in AsyncStorage
+/**
+ * Stores a JWT authentication token in AsyncStorage.
+ *
+ * @param {string} token - The JWT token to store.
+ * @returns {Promise<void>} Resolves when the token is successfully saved.
+ */
 export const storeToken = async (token) => {
   try {
-    await AsyncStorage.setItem(TOKEN_KEY, token); // Stores the token under the key TOKEN_KEY
+    await AsyncStorage.setItem(TOKEN_KEY, token);
   } catch (error) {
-    console.log('Erreur sauvegarde token :', error.message);
+    console.log('Error saving token:', error.message);
   }
 };
 
-// Retrieve the token from AsyncStorage
+/**
+ * Retrieves the stored authentication token from AsyncStorage.
+ *
+ * @returns {Promise<string | null>} The stored JWT token, or null if none exists.
+ */
 export const getToken = async () => {
   try {
-    const token = await AsyncStorage.getItem(TOKEN_KEY); // Retrieves the stored token
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
     return token;
   } catch (error) {
-    console.log('Erreur de recupération token :', error.message);
+    console.log('Error retrieving token:', error.message);
   }
 };
 
-// Delete the token from AsyncStorage
+/**
+ * Removes the authentication token from AsyncStorage.
+ *
+ * @returns {Promise<void>} Resolves when the token is successfully removed.
+ */
 export const removeToken = async () => {
   try {
-    await AsyncStorage.removeItem(TOKEN_KEY); // Deletes the stored token
+    await AsyncStorage.removeItem(TOKEN_KEY);
   } catch (error) {
-    console.log('Erreur suppression token :', error.message);
+    console.log('Error removing token:', error.message);
   }
 };
 
-// Checks if the token is expired
+/**
+ * Checks whether a JWT token has expired.
+ *
+ * @param {string} token - The JWT token to verify.
+ * @returns {Promise<boolean>} Returns `true` if the token is missing, invalid, or expired.
+ */
 export const isTokenExpired = async (token) => {
   if (!token) {
-    return true; // If there is no token, it is considered "expired"
+    return true; // No token = expired by default
   }
+
   try {
     const decoded = jwtDecode(token);
+
+    // If no expiration field is found, consider the token expired
     if (!decoded.exp) {
-      return true; // If there is no exp field, it is considered "expired"
+      return true;
     }
 
-    const now = Date.now() / 1000; // We pass the date from millisecond to second
-    return decoded.exp < now; // Compare if expiration has passed
+    const now = Date.now() / 1000; // Convert milliseconds to seconds
+    return decoded.exp < now; // Compare expiration time with current time
   } catch (error) {
-    console.log("Token invalid :", error.message);
-    return true; // If the token is invalid, it is considered "expired"
+    console.log("Invalid token:", error.message);
+    return true; // Invalid tokens are treated as expired
   }
 };

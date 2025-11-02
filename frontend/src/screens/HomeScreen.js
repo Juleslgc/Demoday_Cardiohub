@@ -1,17 +1,20 @@
 /**
- * HomeScreen Component
- * ---------------------------------------
- * Main entry point of the CardioHub application.
- * This screen allows users to choose between creating
- * a Patient or Professional account, or logging in.
- *
- * Navigation:
- * - React Navigation prop used to navigate between screens.
+ * HomeScreen
+ * ------------------------------------------------------
+ * Main entry point of the CardioHub mobile application.
  *
  * Features:
- * - Displays the app logo and welcome message.
- * - Provides navigation to registration and login screens.
- * - Includes reusable UI components for consistency.
+ * - Displays the CardioHub logo and welcome message
+ * - Allows users to:
+ *   → Create a Patient account
+ *   → Create a Professional account (via PSC simulation)
+ *   → Log in if already registered
+ * - Integrates reusable UI components for visual consistency
+ *
+ * Technical details:
+ * - Uses `SafeAreaView` for compatibility with notched devices
+ * - Employs navigation to handle screen transitions
+ * - Clean, centered layout for accessibility and clarity
  */
 
 import React from "react";
@@ -22,11 +25,18 @@ import Button from "../components/Button";
 import Separator from "../components/Separator";
 import SeparatorWithText from "../components/SeparatorWithText";
 
-// Functional component rendering the Home screen
+/**
+ * HomeScreen Component
+ * ------------------------------------------------------
+ * Displays the welcome page and guides the user toward
+ * registration or authentication.
+ */
+
 export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
-       <View style={styles.logoContainer}>
+      {/* === LOGO SECTION === */}
+      <View style={styles.logoContainer}>
         <Image
           source={require("../assets/LogoCardioHub.png")}
           style={styles.logo}
@@ -34,10 +44,12 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-
+      {/* === MAIN CONTENT === */}
       <View style={styles.content}>
+        {/* --- Welcome Message --- */}
         <Text style={styles.title}>Bienvenue sur CardioHub</Text>
-        
+
+        {/* --- Patient Account Creation --- */}
         <Button
           title="Créer un compte Patient"
           onPress={() => navigation.navigate("PatientRegisterScreen")}
@@ -46,12 +58,14 @@ export default function HomeScreen({ navigation }) {
 
         <SeparatorWithText/>
 
+        {/* --- Professional Account Creation --- */}
         <Button
           title="Créer un compte Professionnel"
           onPress={() => navigation.navigate("SimulationPsc")}
           variant="full"
         />
 
+        {/* --- PSC Info Line --- */}
         <View style={styles.proConnectContainer}>
           <MaterialCommunityIcons name="shield-check" size={20} color="#042456" />
           <Text style={styles.text}>via Pro Santé Connect</Text>
@@ -59,6 +73,7 @@ export default function HomeScreen({ navigation }) {
         
         <Separator />
 
+        {/* --- Login Option --- */}
         <Text style={styles.text}> Déjà inscrit ?</Text>
 
         <Button
@@ -71,13 +86,15 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-// Component styles
+// Component Styles
 const styles = StyleSheet.create({
+  // --- Global layout ---
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
+  // --- Logo section ---
   logoContainer: {
     alignItems: "center",
     marginTop: 50,
@@ -86,24 +103,27 @@ const styles = StyleSheet.create({
     width: 290,
     height: 130,
   },
+  // --- Main content area ---
   content: {
     flex: 1,
     justifyContent: "center",
     width: "80%",
     marginTop: -100,
   },
+  // --- Text styles ---
   title: {
     color: '#042456',
     fontSize: 20,
     marginBottom: 40,
     fontWeight: "normal",
-    textAlign: "center"
+    textAlign: "center",
   },
   text: {
     color: '#042456',
     fontSize: 16,
-    textAlign: "center"
+    textAlign: "center",
   },
+  // --- Pro Santé Connect visual cue ---
   proConnectContainer: {
     flexDirection: "row",
     justifyContent: "center",

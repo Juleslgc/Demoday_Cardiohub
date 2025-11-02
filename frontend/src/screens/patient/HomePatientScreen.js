@@ -1,11 +1,18 @@
-/** 
+/**
+ * HomePatientScreen
+ * ---------------------------------------
  * A React Native screen displaying the patient's home dashboard.
  *
  * Features:
- * - Displays three main sections: Teleconsultation, ECG Sensor, and Messaging
- * - Each section provides quick access to relevant features
- * - Uses custom reusable components (HeaderPatient, FooterPatient, Button)
- * - Scrollable layout with consistent styling and responsive design
+ * - Displays three main sections: Teleconsultation, ECG Sensor, and Messaging.
+ * - Each section provides quick access to relevant patient features.
+ * - Uses custom reusable components (HeaderPatient, FooterPatient, Button).
+ * - Scrollable layout with consistent styling and responsive design.
+ *
+ * Future Enhancements:
+ * - Add a health summary widget with recent data.
+ * - Include notifications for upcoming consultations.
+ * - Integrate live ECG connection status.
  */
 
 import React, { useState, useCallback } from "react";
@@ -20,18 +27,39 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { getAppointmentPatient } from "../../services/api.js";
 
-// Functional component representing the patient's main home screen
+/**
+ * HomePatientScreen Component
+ * ---------------------------------------
+ * Displays the main dashboard for a logged-in patient.
+ * Fetches and shows upcoming teleconsultations, ECG connection status,
+ * and a messaging preview section.
+ *
+ * @param {object} navigation - React Navigation object for screen transitions.
+ * @returns {JSX.Element} The rendered patient home screen.
+ */
+
 export default function HomePatientScreen({ navigation }) {
   const [appointment, setAppointment] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Fetches the list of patient appointments when the screen gains focus.
+   * Uses `useFocusEffect` to refresh data each time the user returns to the screen.
+   */
   useFocusEffect(
     useCallback(() => {
       const fetchAppointment = async () => {
         try {
           setLoading(true);
           const response = await getAppointmentPatient();
-          const data = Array.isArray(response) ? response : (response && response.appointment) ? response.appointment : [];
+
+          // Ensures consistent data structure from backend response
+          const data = Array.isArray(response)
+            ? response
+            : (response && response.appointment)
+            ? response.appointment
+            : [];
+
           setAppointment(data);
         } catch (err) {
           console.error('Erreur lors du chargement du rendez-vous :', err);
@@ -44,17 +72,23 @@ export default function HomePatientScreen({ navigation }) {
   );
 
   /**
-  * Converts a date in the French format "dd/mm/yyyy hh:mm:ss"
-  * into a usable JavaScript Date object (ISO format). 
-  */
+   * Converts a date in the French format "dd/mm/yyyy hh:mm:ss"
+   * into a usable JavaScript Date object (ISO format).
+   * @param {string} dateStr - The date string in French format.
+   * @returns {Date} A valid JavaScript Date object.
+   */
   const parseFrenchDate = (dateStr) => {
-    // Example : "18/10/2025 14:00:00"
     const [datePart, timePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
     const [hours, minutes, seconds] = timePart.split(':').map(Number);
     return new Date(year, month - 1, day, hours, minutes, seconds || 0);
   };
 
+  /**
+   * Formats a French-style date string for user-friendly display.
+   * @param {string} dateStr - The original date string.
+   * @returns {string} The formatted date (e.g., "31/10/2025 à 14:30").
+   */
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "";
     const date = parseFrenchDate(dateStr);
@@ -63,17 +97,20 @@ export default function HomePatientScreen({ navigation }) {
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-  
+
     return `${day}/${month}/${year} à ${hours}:${minutes}`;
   };
   
-
+  /**
+   * Filters the upcoming appointments and sorts them chronologically.
+   * Displays only the next scheduled teleconsultation.
+   */
   const recentAppointment = appointment
     .filter(a => new Date(parseFrenchDate(a.dateTime)) >= new Date()) 
     .sort((a, b) => new Date(parseFrenchDate(a.dateTime)) - new Date(parseFrenchDate(b.dateTime)));
 
   // --- Navigation Handlers ---
-  // Each function redirects the user to a specific patient feature screen
+  // Each function redirects the user to the corresponding patient screen.
   const handleTeleconsultation = () => {
     navigation.navigate("TeleconsultationPatientScreen");
   };
@@ -86,24 +123,25 @@ export default function HomePatientScreen({ navigation }) {
     navigation.navigate("EcgScreen");
   };
 
-  // Mock data for demonstration
-  // Sample messages displayed in the messaging preview card
+  // Mock messages displayed in the messaging preview section
   const messages = [
     { sender: "Dr. DUPONT", subject: "Résultat de votre ECG", time: "09:45" },
     { sender: "Dr. LEROY", subject: "Compte-rendu de consultation", time: "Hier" },
   ];
 
   return (
-    // SafeAreaView ensures proper layout on devices with notches or curved screens
+  // Ensures proper layout on devices with notches or curved screens
     <SafeAreaView style={styles.container}>
+      {/* Top navigation header */}
       <HeaderPatient />
 
-      {/* Scrollable main content area */}
+      {/* Scrollable main content */}
       <View style={styles.scrollArea}>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
+
           {/* --- Teleconsultation section --- */}
           {loading ? (
             <ActivityIndicator size="large" color="#042456" />
@@ -126,6 +164,7 @@ export default function HomePatientScreen({ navigation }) {
                   />
                 </View>
               ) : (
+                // If no upcoming consultation exists
                 <View style={styles.card}>
                   <FontAwesome5 name="video" size={22} color="#042456" style={styles.icon} />
                   <Text style={styles.title}>Téléconsultation</Text>
@@ -184,65 +223,77 @@ export default function HomePatientScreen({ navigation }) {
         </ScrollView>
       </View>
 
+      {/* Fixed bottom navigation footer */}
       <FooterPatient />
     </SafeAreaView>
   );
 }
 
-// Component styles
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container with dark-blue background and full height
   container: {
     flex: 1,
     backgroundColor: "#042456",
   },
+  // Scrollable content area between header and footer
   scrollArea: {
     flex: 1,
-    marginTop: 70,      // header height (50) + margin of 20
-    marginBottom: 80,   // footer height (60) + margin of 20
+    marginTop: 70,
+    marginBottom: 80,
   },
+  // Inner padding for consistent content alignment
   scrollContainer: {
-    paddingHorizontal: 12, // Inner horizontal padding for content alignment
+    paddingHorizontal: 12,
   },
+  // Base card style for each dashboard section
   card: {
     backgroundColor: "#fff",
-    marginBottom: 20,   // Vertical space between cards
+    marginBottom: 20,
     borderRadius: 7,
     padding: 10,
-    position: "relative", // Allows icon positioning
+    position: "relative",
   },
+  // Icon displayed at the top-right of each card
   icon: {
     position: "absolute",
     top: 10,
-    right: 10,          // Positions the icon at top-right of the card
+    right: 10,
   },
+  // Section title text
   title: {
     fontSize: 20,
     fontWeight: "500",
     color: "#042456",
     marginBottom: 20,
   },
+  // Informational text paragraphs
   text: {
     fontSize: 16,
     color: "#042456",
     marginBottom: 7,
   },
+  // Appointment date text styling
   dateText: {
     fontSize: 16,
     color: "#042456",
-    fontWeight: "500", // légèrement bold
+    fontWeight: "500",
     marginBottom: 7,
   },
 
-  /* Messaging section styles */
+  /* --- Messaging section styles --- */
+  // Row layout for each message preview
   messageRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 12,
   },
+  // Doctor avatar icon
   avatar: {
     marginRight: 10,
     marginTop: 2,
   },
+  // Container wrapping message content
   messageTextContainer: {
     flex: 1,
     flexDirection: "column",
@@ -250,20 +301,24 @@ const styles = StyleSheet.create({
     borderBottomColor: "#eee",
     paddingBottom: 8,
   },
+  // Header section displaying sender and timestamp
   messageHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 2,
   },
+  // Sender’s name text
   sender: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#042456",
   },
+  // Message timestamp text
   time: {
     fontSize: 13,
     color: "#888",
   },
+  // Message subject preview
   subject: {
     fontSize: 14,
     color: "#042456",

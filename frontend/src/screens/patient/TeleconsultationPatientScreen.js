@@ -1,18 +1,16 @@
 /**
- * Teleconsultation Patient Screen
+ * TeleconsultationPatientScreen
  * ----------------------------------------------------
  * React Native screen allowing a patient to access their teleconsultation session.
- * Designed to work with `expo-web-browser`, similar to the professional side.
+ * Designed to work with `expo-web-browser`, similar to the professional interface.
  *
  * Responsibilities:
- * - Periodically fetch the teleconsultation details linked to a given appointment
- * - Open the Jitsi video consultation in the mobile browser
- * - Display relevant appointment and doctor information
+ * - Periodically fetch teleconsultation details for the upcoming appointment.
+ * - Open the Jitsi video consultation link in the mobile browser.
+ * - Display relevant appointment and doctor information.
  *
  * Notes:
- * - The teleconsultation link is refreshed every 10 seconds until available.
- * - Uses a temporary appointment ID for testing purposes.
- * - Automatically redirects the patient back to the home screen after closing the browser.
+ * - Automatically redirects the patient back to the home screen when the app resumes.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -28,6 +26,15 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { getTeleconsultationByAppointment, getAppointmentPatient } from "../../services/api";
 import * as WebBrowser from "expo-web-browser";
 
+/**
+ * TeleconsultationPatientScreen Component
+ * ---------------------------------------
+ * Displays the patient's scheduled teleconsultations and allows them to join
+ * the video session via an external browser using the Jitsi platform.
+ *
+ * @returns {JSX.Element} A screen showing available teleconsultations with a join button.
+ */
+
 export default function TeleconsultationPatientScreen() {
   const navigation = useNavigation();
   const [teleconsultation, setTeleconsultation] = useState(null);
@@ -35,9 +42,9 @@ export default function TeleconsultationPatientScreen() {
   const [loading, setLoading] = useState(false);
   const appState = useRef(AppState.currentState);
 
+  /* --- Handle app resume: return to home screen --- */
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextState) => {
-      // Quand l'app redevient active, on redirige
       if (appState.current !== "active" && nextState === "active") {
         navigation.navigate("HomePatientScreen");
       }
@@ -47,27 +54,27 @@ export default function TeleconsultationPatientScreen() {
     return () => subscription.remove();
   }, [navigation]);
 
+  /* --- Fetch appointment list on focus --- */
   useFocusEffect(
-      useCallback(() => {
-        const fetchAppointment = async () => {
-          try {
-            setLoading(true);
-            const response = await getAppointmentPatient();
-            const data = Array.isArray(response) ? response : (response && response.appointment) ? response.appointment : [];
-            setAppointment(data);
-          } catch (err) {
-            console.error('Erreur lors du chargement du rendez-vous :', err);
-          } finally {
-            setLoading(false);
-          }
-        };
-        fetchAppointment();
-      }, [])
-    );
+    useCallback(() => {
+      const fetchAppointment = async () => {
+        try {
+          setLoading(true);
+          const response = await getAppointmentPatient();
+          const data = Array.isArray(response) ? response : (response && response.appointment) ? response.appointment : [];
+          setAppointment(data);
+        } catch (err) {
+          console.error('Erreur lors du chargement du rendez-vous :', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchAppointment();
+    }, [])
+  );
 
-    // Convert the date to ISO format
+  /* --- Parse and format date/time --- */
   const parseFrenchDate = (dateStr) => {
-    // Example : "18/10/2025 14:00:00"
     const [datePart, timePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
     const [hours, minutes, seconds] = timePart.split(':').map(Number);
@@ -85,31 +92,28 @@ export default function TeleconsultationPatientScreen() {
     return `${day}/${month}/${year} à ${hours}:${minutes}`;
   };
 
-  // Filtrage dynamique
+  /* --- Filter upcoming appointments --- */
   const filteredAppointments = appointment.filter((appointment) => {
     const appointmentDate = parseFrenchDate(appointment.dateTime);
-
-    // bornes du jour
     const today = new Date();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-    // bornes de la semaine
     const startOfWeek = new Date(todayStart);
-    startOfWeek.setDate(todayStart.getDate() - todayStart.getDay()); // dimanche
+    startOfWeek.setDate(todayStart.getDate() - todayStart.getDay());
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // samedi
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    // Supprime les rendez-vous passés
+    // Delete past appointments
     if (appointmentDate < todayStart) return false;
 
     return true;
   })
-  .slice()
-  .sort((a, b) => new Date(parseFrenchDate(a.dateTime)) - new Date(parseFrenchDate(b.dateTime)));
+    .slice()
+    .sort((a, b) => new Date(parseFrenchDate(a.dateTime)) - new Date(parseFrenchDate(b.dateTime)));
 
-  // Opens the Jitsi consultation in the browser using expo-web-browser
+  /* --- Join the consultation via WebBrowser --- */
   const handleJoinConsultation = async (appointmentId) => {
     try {
       let data;
@@ -135,32 +139,32 @@ export default function TeleconsultationPatientScreen() {
     
       const jitsiLink = data.jitsiLink;
 
-    Alert.alert(
-      "Rejoindre la consultation",
-      "Vous allez être redirigé vers la visioconférence.",
-      [
-        {
-          text: "Ouvrir",
-          onPress: async () => {
-            try {
+      Alert.alert(
+        "Rejoindre la consultation",
+        "Vous allez être redirigé vers la visioconférence.",
+        [
+          {
+            text: "Ouvrir",
+            onPress: async () => {
+              try {
               // Opens the browser with the teleconsultation link
-              const result = await WebBrowser.openBrowserAsync(jitsiLink, {
-                presentationStyle: "pageSheet", // iOS appearance style
-                controlsColor: "#042456",       // iOS toolbar color
-                toolbarColor: "#fff",        // Android toolbar color
-              });
-            } catch (error) {
-              Alert.alert("Erreur", "Impossible d’ouvrir la visioconférence.");
-            }
+                const result = await WebBrowser.openBrowserAsync(jitsiLink, {
+                  presentationStyle: "pageSheet", // iOS appearance style
+                  controlsColor: "#042456",       // iOS toolbar color
+                  toolbarColor: "#fff",        // Android toolbar color
+                });
+              } catch (error) {
+                Alert.alert("Erreur", "Impossible d’ouvrir la visioconférence.");
+              }
+            },
           },
-        },
-        { text: "Annuler", style: "cancel" },
-      ]
-    );
-  } catch (error) {
-    Alert.alert("Erreur", "Une erreur est survenue lors de la tentative de connexion.");
-  }
-};
+          { text: "Annuler", style: "cancel" },
+        ]
+      );
+    } catch (error) {
+      Alert.alert("Erreur", "Une erreur est survenue lors de la tentative de connexion.");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -176,19 +180,19 @@ export default function TeleconsultationPatientScreen() {
           ) : filteredAppointments.length > 0 ? (
             filteredAppointments.map((patient) => (
               <View key={patient.id} style={styles.card}>
-                {/* Date section */}
+                {/* --- Appointment date --- */}
                 <View style={styles.rowCenter}>
                   <Entypo name="calendar" size={22} color="#042456" style={styles.iconInline} />
                   <Text style={styles.dateText}>{formatDateTime(patient.dateTime)}</Text>
                 </View>
 
-                {/* Doctor section */}
+                {/* --- Doctor info --- */}
                 <View style={styles.rowCenter}>
                   <FontAwesome6 name="user-doctor" size={22} color="#042456" style={styles.iconInline} />
                   <Text style={styles.text}>Dr. {patient.pro.lastName}</Text>
                 </View>
 
-                {/* Button */}
+                {/* --- Join button --- */}
                 <Button
                   title="Rejoindre la consultation"
                   onPress={() => handleJoinConsultation(patient.id)}
@@ -197,6 +201,7 @@ export default function TeleconsultationPatientScreen() {
               </View>
             ))
           ) : (
+            // Displayed when the patient has no upcoming or past teleconsultations
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyTitle}>Aucune téléconsultation disponible</Text>
               <Text style={styles.emptyText}>
@@ -216,25 +221,30 @@ export default function TeleconsultationPatientScreen() {
   );
 }
 
-// Component styles
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container with dark blue background filling the entire screen
   container: {
     flex: 1,
     backgroundColor: "#042456",
   },
+  // Scrollable area between header and footer
   scrollArea: {
     flex: 1,
     marginTop: 70,
     marginBottom: 80,
   },
+  // Inner container for scrollable content
   scrollContainer: {
     paddingHorizontal: 12,
   },
+  // Row layout to align icons and text horizontally
   rowCenter: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
   },
+  // Card containing teleconsultation details (date, doctor, button)
   card: {
     backgroundColor: "#fff",
     marginBottom: 20,
@@ -242,24 +252,29 @@ const styles = StyleSheet.create({
     padding: 10,
     position: "relative",
   },
+  // Appointment date text displayed prominently
   dateText: {
     fontSize: 17,
     fontWeight: "600",
     color: "#042456",
-  },  
+  },
+  // Small margin between icon and text
   iconInline: {
     marginRight: 8,
   },
+  // Section or card title (used when needed)
   title: {
     fontSize: 19,
     fontWeight: "600",
     color: "#042456",
   },
+  // General text style for doctor name or secondary info
   text: {
     fontSize: 16,
     color: "#042456",
     fontWeight: "500",
   },
+  // Container displayed when there are no teleconsultations available
   emptyContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -269,6 +284,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 10,
   },
+  // Title in the empty state message
   emptyTitle: {
     fontSize: 18,
     fontWeight: "600",
@@ -276,6 +292,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
+  // Subtext providing additional details in the empty state
   emptyText: {
     fontSize: 15,
     color: "#042456",

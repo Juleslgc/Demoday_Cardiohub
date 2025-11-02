@@ -1,16 +1,3 @@
-/**
- * Reusable FooterPatient Component
- * ---------------------------------------
- * A React Native component that displays a bottom navigation
- * bar specifically designed for the patient interface.
- *
- * Features:
- * - Safe area support for devices with bottom insets (iOS/Android)
- * - Five navigation buttons: Home, Video Consultation, ECG, Messages, and Profile
- * - Each button includes an icon and a label
- * - Fixed positioning for persistent navigation across patient screens
- */
-
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,17 +6,33 @@ import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-// Functional component returning the footer navigation bar for patients
+/**
+ * FooterPatient Component
+ * ---------------------------------------
+ * A reusable React Native component that provides a bottom navigation
+ * bar designed for the patient interface of the application.
+ *
+ * Features:
+ * - Safe area handling for devices with home indicators (iOS/Android)
+ * - Five navigation buttons: Home, Video Consultation, ECG, Messages, and Profile
+ * - Each button includes an icon and label for clear navigation
+ * - Persistent fixed position at the bottom of the screen
+ *
+ * Example usage:
+ * <FooterPatient />
+ */
+
 export default function FooterPatient() {
   const navigation = useNavigation(); // Hook for navigating between patient screens
 
   return (
-    // Ensures footer stays above the system navigation bar or home indicator
+    // SafeAreaView ensures the footer doesn't overlap system UI areas
     <SafeAreaView edges={["bottom"]} style={styles.safeArea}> 
       <View style={styles.footer}>
+
         {/* Home navigation button */}
         <TouchableOpacity 
-          style={styles.homeButton}
+          style={styles.navButton}
           onPress={() => navigation.navigate("HomePatientScreen")}
         >
           <Entypo name="home" size={22} color="#042456" />
@@ -38,7 +41,7 @@ export default function FooterPatient() {
 
         {/* Video consultation navigation button */}
         <TouchableOpacity 
-          style={styles.homeButton}
+          style={styles.navButton}
           onPress={() => navigation.navigate("TeleconsultationPatientScreen")}
         >
           <FontAwesome5 name="video" size={22} color="#042456" />
@@ -47,7 +50,7 @@ export default function FooterPatient() {
 
         {/* ECG feature navigation button */}
         <TouchableOpacity 
-          style={styles.homeButton}
+          style={styles.navButton}
           onPress={() => navigation.navigate("EcgScreen")}
         >
           <FontAwesome name="heartbeat" size={24} color="#F35330" />
@@ -56,7 +59,7 @@ export default function FooterPatient() {
 
         {/* Messaging navigation button */}
         <TouchableOpacity 
-          style={styles.homeButton}
+          style={styles.navButton}
           onPress={() => navigation.navigate("MessagingScreen")}
         >
           <FontAwesome name="envelope" size={22} color="#042456" />
@@ -65,7 +68,7 @@ export default function FooterPatient() {
 
         {/* Profile navigation button */}
         <TouchableOpacity 
-          style={styles.homeButton}
+          style={styles.navButton}
           onPress={() => navigation.navigate("ProfilePatientScreen")}
         >
           <FontAwesome name="user" size={22} color="#042456" />
@@ -77,35 +80,39 @@ export default function FooterPatient() {
   );
 }
 
-// Define styles for the FooterPatient component
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container that sticks to the bottom of the screen
   safeArea: {
-    position: "absolute",       // Keeps the footer foxed at the bottom
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: "#fff",
   },
+  // Main footer container layout
   footer: {
-    height: 60,                 // Footer height
-    flexDirection: "row",       // Aligns icons and text horizontally
-    alignItems: "center",       // Vertically centers elements
-    justifyContent: "space-between", // Evenly spaces navigation buttons
+    height: 60,       
+    flexDirection: "row",       
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     backgroundColor: "#fff",
-    borderTopWidth: 1,          // Adds subtle top border
+    borderTopWidth: 1,
     borderTopColor: "#ccc",
-    zIndex: 1,                  // Ensures footer appears above main content
+    zIndex: 1,
   },
-  homeButton: {
-    flexDirection: "column",    // Places icon above text
-    alignItems: "center",       // Centers both horizontally
+  // Reusable style for each navigation button
+  navButton: {
+    flexDirection: "column",
+    alignItems: "center",
   },
+  // Label text for navigation items
   link: {
     color: "#042456",
     fontSize: 15,
-    marginTop: 2,               // Space between icon and label
+    marginTop: 2, 
     fontFamily: "Nunito",
-    fontWeight: "480",
+    fontWeight: "500",
   },
 });

@@ -1,42 +1,53 @@
-/**
- * Reusable Header Component
- * ---------------------------------------
- * A React Native component that displays a top header
- * with a personalized greeting and the app logo.
- *
- * Features:
- * - Safe area support for devices with notches (iOS/Android)
- * - Fixed positioning at the top of the screen
- * - Horizontal layout with spaced text and image
- * - Simple, clean design for reusability across screens
- */
-
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getMePro } from "../services/api";
 
-// Functional component returning the header layout with text and logo
+/**
+ * HeaderPro Component
+ * ---------------------------------------
+ * A reusable React Native component that displays
+ * a personalized header for healthcare professionals.
+ *
+ * Features:
+ * - Displays a greeting message with the user's last name
+ * - Retrieves professional user data from the API via `getMePro()`
+ * - Includes the application logo on the right
+ * - Safe area handling for devices with top insets (status bar, notch)
+ *
+ * Example usage:
+ * <HeaderPro />
+ */
+
 export default function HeaderPro() {
-   const [lastName, setLastName] = useState("");
+  const [lastName, setLastName] = useState("");
   
-    useEffect(() => {
-      const fetchUser = async () => {
-        try {
-          const user = await getMePro(); // retrieves { firstName, ... }
-          setLastName(user.lastName || ""); // save the firstname
-        } catch (error) {
-          console.error("Erreur lors de la récupération du nom:", error.message);
-        }
-      };
-      fetchUser();
-    }, []);
+  useEffect(() => {
+    /**
+       * Fetches user information (last name) from the API when the component mounts.
+       */
+    const fetchUser = async () => {
+      try {
+        const user = await getMePro(); // Retrieves { lastName, ... }
+        setLastName(user.lastName || ""); // Stores the user's last name
+      } catch (error) {
+        console.error("Erreur lors de la récupération du nom:", error.message);
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
-    // Ensures header content stays below system elements (status bar, notch)
+    // Ensures header content stays below system UI (status bar, notch)
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Bonjour {lastName ? lastName : "..."}</Text>
+
+        {/* Greeting text displaying the professional's last name */}
+        <Text style={styles.headerText}>
+          Bonjour {lastName ? lastName : "..."}
+        </Text>
+
+        {/* App logo displayed on the right */}
         <Image
           source={require("../assets/LogoCardioHub.png")}
           style={styles.logo}
@@ -47,36 +58,40 @@ export default function HeaderPro() {
   )
 };
 
-// Define styles for the header component
+// Component Styles
 const styles = StyleSheet.create({
+  // Root container fixed at the top of the screen
   safeArea: {
-    position: "absolute",   // Keeps the header fixed at the top
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     backgroundColor: "#fff",
   },
+  // Header layout container
   header: {
-    height: 50,                 // Header height
-    flexDirection: "row",       // Aligns text and logo horizontally
-    alignItems: "center",       // Centers elements vertically
-    justifyContent: "space-between", // Pushes text to left, logo to right
-    paddingHorizontal: 10,      // Adds space on left and right sides
-    zIndex: 100,                // Keeps header above other components
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    zIndex: 100,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,       // Adds subtle bottom border
+    borderBottomWidth: 1,
     borderBottomColor: "#ccc",
   },
+  // Greeting text styling
   headerText: {
     fontSize: 18,
-    fontWeight: "480",          // Medium weight for balanced emphasis
+    fontWeight: "500",
     fontFamily: "Nunito",
     color: "#042456",
-    left: 5,                    // Slight left offset for alignment
+    left: 5,
   },
+  // Logo styling
   logo: {
     width: 140,
     height: 80,
-    resizeMode: "contain",      // Ensures correct scaling
+    resizeMode: "contain",
   },
 });
