@@ -201,11 +201,11 @@ export default function TeleconsultationPatientScreen() {
               </View>
             ))
           ) : (
-            // Displayed when the patient has no upcoming or past teleconsultations
+            // Displayed when the patient has no upcoming teleconsultations
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyTitle}>Aucune téléconsultation disponible</Text>
               <Text style={styles.emptyText}>
-                Vous n’avez actuellement aucune téléconsultation prévue ni passée.
+                Vous n’avez actuellement aucune téléconsultation prévue.
               </Text>
               <Text style={styles.emptyText}>
                 Votre professionnel de santé vous en programmera une lorsque ce sera nécessaire.

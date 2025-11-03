@@ -31,7 +31,7 @@ const jwtDecode = require("jwt-decode");
 // ------------------------------------------------------
 // Base API Endpoint
 // ------------------------------------------------------
-const API_URL = "https://hebrew-gore-garbage-postings.trycloudflare.com/api";
+const API_URL = "https://thereby-aqua-adam-glasgow.trycloudflare.com/api";
 
 // ------------------------------------------------------
 // Generic API Request Handler

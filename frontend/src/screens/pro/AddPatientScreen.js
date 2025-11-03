@@ -71,7 +71,7 @@ export default function AddPatientScreen({navigation}) {
 
       setFoundPatients(patients);
     } catch (err) {
-      console.error("Erreur lors de la recherche :", err);
+      console.log("Erreur lors de la recherche :", err);
       setFoundPatients([]);
     } finally {
       setIsLoading(false);
@@ -141,7 +141,7 @@ export default function AddPatientScreen({navigation}) {
                   />
                 </View>
               ))
-            ) : ( hasSearched && (
+            ) : ( !isLoading && hasSearched && (
               <Text style={{ marginTop: 10, color: "#fff", textAlign: "center", fontSize: 18 }}>Aucun patient trouvé</Text>
             ))}
           </View>
